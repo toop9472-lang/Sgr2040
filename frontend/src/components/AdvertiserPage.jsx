@@ -31,7 +31,7 @@ const AdvertiserPage = ({ onNavigate }) => {
   const [tapAvailable, setTapAvailable] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState('ad_1_month');
 
-  // Load pricing packages on mount
+  // Load pricing packages and check Tap availability on mount
   useEffect(() => {
     const loadPackages = async () => {
       try {
@@ -42,17 +42,34 @@ const AdvertiserPage = ({ onNavigate }) => {
         console.error('Failed to load packages:', error);
       }
     };
+    
+    const checkTapStatus = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/tap/status`);
+        const data = await response.json();
+        setTapAvailable(data.configured);
+      } catch (error) {
+        console.error('Failed to check Tap status:', error);
+      }
+    };
+    
     loadPackages();
+    checkTapStatus();
   }, []);
 
   // Check for payment return
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id');
+    const chargeId = urlParams.get('charge_id');
+    const provider = urlParams.get('provider');
     
     if (sessionId) {
-      // Poll payment status
+      // Stripe payment
       pollPaymentStatus(sessionId);
+    } else if (chargeId && provider === 'tap') {
+      // Tap payment
+      pollTapPaymentStatus(chargeId);
     }
   }, []);
 
