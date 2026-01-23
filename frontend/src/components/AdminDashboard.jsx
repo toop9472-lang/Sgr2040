@@ -145,25 +145,25 @@ const AdminDashboard = ({ admin, onLogout }) => {
 
   if (isLoading) {
     return (
-      <div className=\"min-h-screen flex items-center justify-center bg-gray-50\">
-        <p className=\"text-gray-600\">جاري التحميل...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-gray-600">جاري التحميل...</p>
       </div>
     );
   }
 
   return (
-    <div className=\"min-h-screen bg-gray-50 pb-20\">
+    <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <div className=\"bg-gradient-to-r from-gray-900 to-gray-800 px-4 pt-8 pb-16 shadow-lg\">
-        <div className=\"flex justify-between items-center mb-6\">
+      <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-4 pt-8 pb-16 shadow-lg">
+        <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className=\"text-white text-2xl font-bold\">لوحة التحكم</h1>
-            <p className=\"text-gray-400 text-sm mt-1\">مرحباً {admin.name}</p>
+            <h1 className="text-white text-2xl font-bold">لوحة التحكم</h1>
+            <p className="text-gray-400 text-sm mt-1">مرحباً {admin.name}</p>
           </div>
           <Button
             onClick={onLogout}
-            variant=\"ghost\"
-            className=\"text-white hover:bg-white/20\"
+            variant="ghost"
+            className="text-white hover:bg-white/20"
           >
             تسجيل الخروج
           </Button>
@@ -171,40 +171,40 @@ const AdminDashboard = ({ admin, onLogout }) => {
       </div>
 
       {/* Stats Cards */}
-      <div className=\"px-4 -mt-8 mb-6\">
-        <div className=\"grid grid-cols-1 md:grid-cols-4 gap-4\">
-          <Card className=\"shadow-lg border-0\">
-            <CardContent className=\"pt-6\">
-              <div className=\"text-center\">
-                <p className=\"text-sm text-gray-600\">إجمالي الإيرادات</p>
-                <p className=\"text-3xl font-bold text-green-600\">{stats?.total_revenue || 0} ر.س</p>
+      <div className="px-4 -mt-8 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card className="shadow-lg border-0">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <p className="text-sm text-gray-600">إجمالي الإيرادات</p>
+                <p className="text-3xl font-bold text-green-600">{stats?.total_revenue || 0} ر.س</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className=\"shadow-lg border-0\">
-            <CardContent className=\"pt-6\">
-              <div className=\"text-center\">
-                <p className=\"text-sm text-gray-600\">المدفوعات للمستخدمين</p>
-                <p className=\"text-3xl font-bold text-red-600\">{stats?.total_payouts || 0} $</p>
+          <Card className="shadow-lg border-0">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <p className="text-sm text-gray-600">المدفوعات للمستخدمين</p>
+                <p className="text-3xl font-bold text-red-600">{stats?.total_payouts || 0} $</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className=\"shadow-lg border-0\">
-            <CardContent className=\"pt-6\">
-              <div className=\"text-center\">
-                <p className=\"text-sm text-gray-600\">صافي الربح</p>
-                <p className=\"text-3xl font-bold text-indigo-600\">{stats?.net_profit || 0} ر.س</p>
+          <Card className="shadow-lg border-0">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <p className="text-sm text-gray-600">صافي الربح</p>
+                <p className="text-3xl font-bold text-indigo-600">{stats?.net_profit || 0} ر.س</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className=\"shadow-lg border-0\">
-            <CardContent className=\"pt-6\">
-              <div className=\"text-center\">
-                <p className=\"text-sm text-gray-600\">إجمالي المستخدمين</p>
-                <p className=\"text-3xl font-bold text-blue-600\">{stats?.total_users || 0}</p>
+          <Card className="shadow-lg border-0">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <p className="text-sm text-gray-600">إجمالي المستخدمين</p>
+                <p className="text-3xl font-bold text-blue-600">{stats?.total_users || 0}</p>
               </div>
             </CardContent>
           </Card>
@@ -212,60 +212,60 @@ const AdminDashboard = ({ admin, onLogout }) => {
       </div>
 
       {/* Tabs */}
-      <div className=\"px-4\">
-        <Tabs defaultValue=\"withdrawals\" className=\"w-full\">
-          <TabsList className=\"grid w-full grid-cols-2\">
-            <TabsTrigger value=\"withdrawals\">
+      <div className="px-4">
+        <Tabs defaultValue="withdrawals" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="withdrawals">
               طلبات السحب ({pendingWithdrawals.length})
             </TabsTrigger>
-            <TabsTrigger value=\"ads\">
+            <TabsTrigger value="ads">
               طلبات الإعلانات ({pendingAds.length})
             </TabsTrigger>
           </TabsList>
 
           {/* Pending Withdrawals */}
-          <TabsContent value=\"withdrawals\" className=\"space-y-4 mt-4\">
+          <TabsContent value="withdrawals" className="space-y-4 mt-4">
             {pendingWithdrawals.length === 0 ? (
               <Card>
-                <CardContent className=\"pt-6 text-center text-gray-500\">
+                <CardContent className="pt-6 text-center text-gray-500">
                   لا توجد طلبات سحب معلقة
                 </CardContent>
               </Card>
             ) : (
               pendingWithdrawals.map((withdrawal) => (
-                <Card key={withdrawal.id} className=\"shadow-md\">
+                <Card key={withdrawal.id} className="shadow-md">
                   <CardHeader>
-                    <div className=\"flex justify-between items-start\">
+                    <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className=\"text-lg\">{withdrawal.user_name || 'مستخدم'}</CardTitle>
+                        <CardTitle className="text-lg">{withdrawal.user_name || 'مستخدم'}</CardTitle>
                         <CardDescription>{withdrawal.user_email}</CardDescription>
                       </div>
-                      <Badge variant=\"outline\">{withdrawal.status}</Badge>
+                      <Badge variant="outline">{withdrawal.status}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className=\"space-y-2 mb-4\">
-                      <p className=\"text-sm\"><strong>المبلغ:</strong> ${withdrawal.amount}</p>
-                      <p className=\"text-sm\"><strong>النقاط:</strong> {withdrawal.points}</p>
-                      <p className=\"text-sm\"><strong>الطريقة:</strong> {withdrawal.method_name}</p>
-                      <div className=\"bg-gray-50 p-3 rounded-lg mt-2\">
-                        <p className=\"text-sm font-semibold mb-1\">تفاصيل الحساب:</p>
-                        {Object.entries(withdrawal.details).map(([key, value]) => (
-                          <p key={key} className=\"text-sm\"><strong>{key}:</strong> {value}</p>
+                    <div className="space-y-2 mb-4">
+                      <p className="text-sm"><strong>المبلغ:</strong> ${withdrawal.amount}</p>
+                      <p className="text-sm"><strong>النقاط:</strong> {withdrawal.points}</p>
+                      <p className="text-sm"><strong>الطريقة:</strong> {withdrawal.method_name}</p>
+                      <div className="bg-gray-50 p-3 rounded-lg mt-2">
+                        <p className="text-sm font-semibold mb-1">تفاصيل الحساب:</p>
+                        {Object.entries(withdrawal.details || {}).map(([key, value]) => (
+                          <p key={key} className="text-sm"><strong>{key}:</strong> {value}</p>
                         ))}
                       </div>
                     </div>
-                    <div className=\"flex gap-2\">
+                    <div className="flex gap-2">
                       <Button
                         onClick={() => handleApproveWithdrawal(withdrawal.id)}
-                        className=\"flex-1 bg-green-600 hover:bg-green-700\"
+                        className="flex-1 bg-green-600 hover:bg-green-700"
                       >
                         ✓ موافقة
                       </Button>
                       <Button
                         onClick={() => handleRejectWithdrawal(withdrawal.id)}
-                        variant=\"destructive\"
-                        className=\"flex-1\"
+                        variant="destructive"
+                        className="flex-1"
                       >
                         ✗ رفض
                       </Button>
@@ -277,52 +277,52 @@ const AdminDashboard = ({ admin, onLogout }) => {
           </TabsContent>
 
           {/* Pending Ads */}
-          <TabsContent value=\"ads\" className=\"space-y-4 mt-4\">
+          <TabsContent value="ads" className="space-y-4 mt-4">
             {pendingAds.length === 0 ? (
               <Card>
-                <CardContent className=\"pt-6 text-center text-gray-500\">
+                <CardContent className="pt-6 text-center text-gray-500">
                   لا توجد طلبات إعلانات معلقة
                 </CardContent>
               </Card>
             ) : (
               pendingAds.map((ad) => (
-                <Card key={ad.id} className=\"shadow-md\">
+                <Card key={ad.id} className="shadow-md">
                   <CardHeader>
-                    <div className=\"flex justify-between items-start\">
+                    <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className=\"text-lg\">{ad.title}</CardTitle>
+                        <CardTitle className="text-lg">{ad.title}</CardTitle>
                         <CardDescription>{ad.advertiser_name}</CardDescription>
                       </div>
-                      <Badge variant=\"outline\">{ad.payment_status}</Badge>
+                      <Badge variant="outline">{ad.payment_status}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className=\"space-y-2 mb-4\">
-                      <p className=\"text-sm\">{ad.description}</p>
-                      <p className=\"text-sm\"><strong>المبلغ:</strong> {ad.price} ر.س</p>
-                      <p className=\"text-sm\"><strong>المدة:</strong> {ad.duration_months} شهر</p>
-                      <p className=\"text-sm\"><strong>البريد:</strong> {ad.advertiser_email}</p>
-                      <p className=\"text-sm\"><strong>الجوال:</strong> {ad.advertiser_phone || '-'}</p>
+                    <div className="space-y-2 mb-4">
+                      <p className="text-sm">{ad.description}</p>
+                      <p className="text-sm"><strong>المبلغ:</strong> {ad.price} ر.س</p>
+                      <p className="text-sm"><strong>المدة:</strong> {ad.duration_months} شهر</p>
+                      <p className="text-sm"><strong>البريد:</strong> {ad.advertiser_email}</p>
+                      <p className="text-sm"><strong>الجوال:</strong> {ad.advertiser_phone || '-'}</p>
                       <a 
                         href={ad.video_url} 
-                        target=\"_blank\" 
-                        rel=\"noopener noreferrer\"
-                        className=\"text-sm text-indigo-600 hover:underline block\"
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-indigo-600 hover:underline block"
                       >
                         مشاهدة الفيديو →
                       </a>
                     </div>
-                    <div className=\"flex gap-2\">
+                    <div className="flex gap-2">
                       <Button
                         onClick={() => handleApproveAd(ad.id)}
-                        className=\"flex-1 bg-green-600 hover:bg-green-700\"
+                        className="flex-1 bg-green-600 hover:bg-green-700"
                       >
                         ✓ موافقة وتفعيل
                       </Button>
                       <Button
                         onClick={() => handleRejectAd(ad.id)}
-                        variant=\"destructive\"
-                        className=\"flex-1\"
+                        variant="destructive"
+                        className="flex-1"
                       >
                         ✗ رفض
                       </Button>
