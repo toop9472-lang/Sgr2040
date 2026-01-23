@@ -359,7 +359,7 @@ const AdminDashboard = ({ admin, onLogout }) => {
         <Tabs defaultValue="users" className="w-full">
           <TabsList className="flex flex-wrap gap-2 h-auto p-2 bg-gray-100 rounded-lg">
             <TabsTrigger value="users" className="flex-1 min-w-[100px] text-xs py-2">
-              المستخدمون
+              المستخدمون ({totalUsers})
             </TabsTrigger>
             <TabsTrigger value="withdrawals" className="flex-1 min-w-[100px] text-xs py-2">
               السحوبات ({pendingWithdrawals.length})
@@ -378,26 +378,121 @@ const AdminDashboard = ({ admin, onLogout }) => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Active Users Tab - NEW */}
+          {/* Users Management Tab */}
           <TabsContent value="users" className="mt-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                  المستخدمون النشطون
+                <CardTitle className="text-lg flex items-center justify-between">
+                  <span>إدارة المستخدمين</span>
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <Input
+                        placeholder="بحث بالاسم أو البريد..."
+                        value={userSearch}
+                        onChange={(e) => {
+                          setUserSearch(e.target.value);
+                          loadUsers(1, e.target.value);
+                        }}
+                        className="pr-10 w-64"
+                      />
+                    </div>
+                    <Button onClick={() => loadUsers(usersPage, userSearch)} variant="ghost" size="sm">
+                      <RefreshCw className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </CardTitle>
                 <CardDescription>
-                  نشط آخر ساعة: {userStats?.users?.active_1h || 0} | 
-                  آخر 24 ساعة: {userStats?.users?.active_24h || 0} | 
-                  آخر أسبوع: {userStats?.users?.active_7d || 0}
+                  إجمالي: {totalUsers} | 
+                  نشط الآن: {userStats?.users?.online || 0} | 
+                  نشط آخر 24 ساعة: {userStats?.users?.active_24h || 0}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {userStats?.recent_active_users?.length === 0 ? (
-                  <p className="text-gray-500 text-center py-4">لا يوجد مستخدمون نشطون حالياً</p>
+                {allUsers.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">لا يوجد مستخدمون</p>
                 ) : (
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {userStats?.recent_active_users?.map((user) => (
+                  <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                    {allUsers.map((user) => (
+                      <div key={user.id || user.user_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${user.is_banned ? 'bg-red-100' : 'bg-indigo-100'}`}>
+                            <span className="text-lg">{user.is_banned ? '🚫' : '👤'}</span>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-800 flex items-center gap-2">
+                              {user.name || 'بدون اسم'}
+                              {user.is_banned && <Badge variant="destructive" className="text-xs">محظور</Badge>}
+                            </p>
+                            <p className="text-xs text-gray-500">{user.email}</p>
+                            <p className="text-xs text-gray-400">
+                              النقاط: {user.points || 0} | المكتسبة: {user.total_earned || 0}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {user.is_banned ? (
+                            <Button
+                              onClick={() => handleUnbanUser(user.id || user.user_id)}
+                              variant="outline"
+                              size="sm"
+                              className="text-green-600 border-green-300"
+                            >
+                              <UserCheck className="w-4 h-4 ml-1" />
+                              رفع الحظر
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={() => handleBanUser(user.id || user.user_id, user.name)}
+                              variant="outline"
+                              size="sm"
+                              className="text-orange-600 border-orange-300"
+                            >
+                              <Ban className="w-4 h-4 ml-1" />
+                              حظر
+                            </Button>
+                          )}
+                          <Button
+                            onClick={() => handleDeleteUser(user.id || user.user_id, user.name)}
+                            variant="outline"
+                            size="sm"
+                            className="text-red-600 border-red-300"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Pagination */}
+                {totalUsers > 20 && (
+                  <div className="flex justify-center gap-2 mt-4">
+                    <Button
+                      onClick={() => loadUsers(usersPage - 1, userSearch)}
+                      disabled={usersPage <= 1}
+                      variant="outline"
+                      size="sm"
+                    >
+                      السابق
+                    </Button>
+                    <span className="px-4 py-2 text-sm">
+                      صفحة {usersPage} من {Math.ceil(totalUsers / 20)}
+                    </span>
+                    <Button
+                      onClick={() => loadUsers(usersPage + 1, userSearch)}
+                      disabled={usersPage >= Math.ceil(totalUsers / 20)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      التالي
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
                       <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-3">
                           <div className="relative">
