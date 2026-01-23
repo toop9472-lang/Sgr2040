@@ -16,9 +16,9 @@ def get_db():
     return client[os.environ['DB_NAME']]
 
 @router.get('', response_model=List[AdResponse])
-async def get_ads(user_id: str = Depends(get_current_user_id)):
+async def get_ads():
     """
-    Get all active ads
+    Get all active ads (public - no auth required)
     """
     db = get_db()
     ads = await db.ads.find({'is_active': True}).to_list(100)
