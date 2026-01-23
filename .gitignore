@@ -109,3 +109,7 @@ android-sdk/ -e
 # Sensitive files
 CREDENTIALS.md
 *.credentials
+-e 
+# Environment files
+*.env
+*.env.*
