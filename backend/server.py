@@ -28,6 +28,7 @@ from routes.withdrawal_methods_routes import router as withdrawal_methods_router
 from routes.activity_routes import router as activity_router
 from routes.payment_gateways_routes import router as payment_gateways_router
 from routes.settings_routes import router as settings_router
+from routes.wallet_routes import router as wallet_router
 
 
 ROOT_DIR = Path(__file__).parent
