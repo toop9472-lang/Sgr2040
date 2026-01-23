@@ -11,6 +11,7 @@ const API = `${BACKEND_URL}/api`;
 
 const AdminDashboard = ({ admin, onLogout }) => {
   const [stats, setStats] = useState(null);
+  const [userStats, setUserStats] = useState(null);
   const [pendingWithdrawals, setPendingWithdrawals] = useState([]);
   const [pendingAds, setPendingAds] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +23,20 @@ const AdminDashboard = ({ admin, onLogout }) => {
 
   useEffect(() => {
     loadDashboardData();
+    // Refresh user stats every 30 seconds
+    const interval = setInterval(loadUserStats, 30000);
+    return () => clearInterval(interval);
   }, []);
+
+  const loadUserStats = async () => {
+    try {
+      const headers = getAuthHeaders();
+      const response = await axios.get(`${API}/activity/user-stats`, { headers });
+      setUserStats(response.data);
+    } catch (error) {
+      console.error('Failed to load user stats:', error);
+    }
+  };
 
   const loadDashboardData = async () => {
     try {
@@ -32,6 +46,9 @@ const AdminDashboard = ({ admin, onLogout }) => {
       // Load stats
       const statsResponse = await axios.get(`${API}/admin/dashboard/stats`, { headers });
       setStats(statsResponse.data);
+
+      // Load user activity stats
+      await loadUserStats();
 
       // Load pending withdrawals
       const withdrawalsResponse = await axios.get(`${API}/admin/dashboard/withdrawals/pending`, { headers });
