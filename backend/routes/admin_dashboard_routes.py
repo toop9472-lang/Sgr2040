@@ -184,6 +184,18 @@ async def reject_withdrawal(
         }}
     )
     
+    # Send notification to user
+    from routes.notification_routes import send_notification_to_user
+    reason = data.get('reason', 'لم يتم تحديد سبب')
+    await send_notification_to_user(
+        db=db,
+        user_id=withdrawal['user_id'],
+        title='❌ تم رفض طلب السحب',
+        body=f'تم رفض طلب السحب الخاص بك. السبب: {reason}. تم إرجاع النقاط لحسابك.',
+        notification_type='withdrawal_rejected',
+        data={'withdrawal_id': withdrawal_id, 'reason': reason}
+    )
+    
     return {'success': True, 'message': 'تم رفض طلب السحب وإرجاع النقاط'}
 
 @router.get('/ads/pending')
