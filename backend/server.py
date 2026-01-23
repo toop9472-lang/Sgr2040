@@ -21,6 +21,7 @@ from routes.admin_auth_routes import router as admin_auth_router
 from routes.admin_dashboard_routes import router as admin_dashboard_router
 from routes.payment_routes import router as payment_router
 from routes.tap_routes import router as tap_router
+from routes.notification_routes import router as notification_router
 
 
 ROOT_DIR = Path(__file__).parent
