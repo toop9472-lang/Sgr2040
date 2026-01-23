@@ -4,8 +4,14 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Switch } from './ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { toast } from '../hooks/use-toast';
-import { Key, CreditCard, Shield, Eye, EyeOff, Save, RefreshCw } from 'lucide-react';
+import { 
+  Key, CreditCard, Shield, Eye, EyeOff, Save, RefreshCw, 
+  AlertTriangle, Settings, Wrench, Globe, Phone, Mail,
+  Users, DollarSign, TrendingUp, Activity, Power, Ban,
+  MessageSquare, Link, Clock
+} from 'lucide-react';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -15,6 +21,10 @@ const AdminSettings = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showKeys, setShowKeys] = useState({});
+  const [activeTab, setActiveTab] = useState('dashboard');
+  
+  // Dashboard Stats
+  const [dashboardStats, setDashboardStats] = useState(null);
   
   // Payment Gateway Settings
   const [paymentSettings, setPaymentSettings] = useState({
@@ -38,6 +48,35 @@ const AdminSettings = () => {
     google_enabled: true,
     apple_enabled: false
   });
+  
+  // App Settings
+  const [appSettings, setAppSettings] = useState({
+    maintenance_mode: false,
+    maintenance_message: 'التطبيق تحت الصيانة، سنعود قريباً',
+    maintenance_message_en: 'App is under maintenance, we\'ll be back soon',
+    allow_new_registrations: true,
+    allow_withdrawals: true,
+    allow_ad_submissions: true,
+    min_withdrawal_points: 500,
+    points_per_minute: 1,
+    ad_price_per_month: 500,
+    max_ads_per_10min: 5,
+    min_watch_seconds: 30,
+    contact_email: '',
+    contact_phone: '',
+    support_whatsapp: '',
+    terms_url: '',
+    privacy_url: ''
+  });
+  
+  // Emergency Settings
+  const [emergencySettings, setEmergencySettings] = useState({
+    pause_all_payments: false,
+    pause_all_withdrawals: false,
+    block_all_logins: false,
+    emergency_message: '',
+    show_emergency_banner: false
+  });
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('admin_token');
@@ -45,162 +84,63 @@ const AdminSettings = () => {
   };
 
   useEffect(() => {
-    loadSettings();
+    loadAllSettings();
   }, []);
 
-  const loadSettings = async () => {
+  const loadAllSettings = async () => {
     try {
       setIsLoading(true);
       const headers = getAuthHeaders();
 
-      const [paymentRes, oauthRes] = await Promise.all([
+      const [paymentRes, oauthRes, appRes, emergencyRes, statsRes] = await Promise.all([
         axios.get(`${API}/settings/payment-gateways`, { headers }),
-        axios.get(`${API}/settings/oauth`, { headers })
+        axios.get(`${API}/settings/oauth`, { headers }),
+        axios.get(`${API}/settings/app`, { headers }).catch(() => ({ data: appSettings })),
+        axios.get(`${API}/settings/emergency`, { headers }).catch(() => ({ data: emergencySettings })),
+        axios.get(`${API}/settings/dashboard/stats`, { headers }).catch(() => ({ data: null }))
       ]);
 
       setPaymentSettings(paymentRes.data);
       setOauthSettings(oauthRes.data);
+      setAppSettings({ ...appSettings, ...appRes.data });
+      setEmergencySettings({ ...emergencySettings, ...emergencyRes.data });
+      setDashboardStats(statsRes.data);
     } catch (error) {
       console.error('Failed to load settings:', error);
-      toast({
-        title: '❌ خطأ',
-        description: 'فشل تحميل الإعدادات',
-        variant: 'destructive'
-      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const savePaymentSettings = async () => {
+  const saveSettings = async (type, data, endpoint) => {
     try {
       setIsSaving(true);
       const headers = getAuthHeaders();
-
-      await axios.put(`${API}/settings/payment-gateways`, paymentSettings, { headers });
-
-      toast({
-        title: '✅ تم الحفظ',
-        description: 'تم حفظ إعدادات بوابات الدفع بنجاح'
-      });
-      
-      // Reload to get masked keys
-      loadSettings();
+      await axios.put(`${API}/settings/${endpoint}`, data, { headers });
+      toast({ title: '✅ تم الحفظ', description: 'تم حفظ الإعدادات بنجاح' });
+      loadAllSettings();
     } catch (error) {
-      console.error('Failed to save payment settings:', error);
-      toast({
-        title: '❌ خطأ',
-        description: 'فشل حفظ الإعدادات',
-        variant: 'destructive'
-      });
+      toast({ title: '❌ خطأ', description: 'فشل حفظ الإعدادات', variant: 'destructive' });
     } finally {
       setIsSaving(false);
     }
   };
 
-  const saveOAuthSettings = async () => {
+  const toggleMaintenance = async () => {
     try {
-      setIsSaving(true);
       const headers = getAuthHeaders();
-
-      await axios.put(`${API}/settings/oauth`, oauthSettings, { headers });
-
+      const res = await axios.post(`${API}/settings/maintenance/toggle`, {}, { headers });
+      setAppSettings(prev => ({ ...prev, maintenance_mode: res.data.maintenance_mode }));
       toast({
-        title: '✅ تم الحفظ',
-        description: 'تم حفظ إعدادات تسجيل الدخول بنجاح'
+        title: res.data.maintenance_mode ? '🔧 تم تفعيل وضع الصيانة' : '✅ تم إلغاء وضع الصيانة',
+        description: res.data.message
       });
     } catch (error) {
-      console.error('Failed to save OAuth settings:', error);
-      toast({
-        title: '❌ خطأ',
-        description: 'فشل حفظ الإعدادات',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsSaving(false);
+      toast({ title: '❌ خطأ', variant: 'destructive' });
     }
   };
 
-  const toggleShowKey = (key) => {
-    setShowKeys(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const handlePaymentChange = (field, value) => {
-    setPaymentSettings(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleOAuthChange = (field, value) => {
-    setOauthSettings(prev => ({ ...prev, [field]: value }));
-  };
-
-  const PaymentGatewayCard = ({ id, name, icon, enabled, apiKeyField, apiKeyValue, secondaryField, secondaryValue }) => (
-    <div className={`p-4 rounded-lg border-2 transition-all ${enabled ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${enabled ? 'bg-green-600' : 'bg-gray-400'}`}>
-            {icon}
-          </div>
-          <span className="font-semibold text-gray-800">{name}</span>
-        </div>
-        <Switch
-          checked={enabled}
-          onCheckedChange={(checked) => handlePaymentChange(`${id}_enabled`, checked)}
-        />
-      </div>
-      
-      {enabled && (
-        <div className="space-y-3 mt-4">
-          <div>
-            <Label htmlFor={apiKeyField} className="text-xs text-gray-600">
-              مفتاح API
-            </Label>
-            <div className="relative">
-              <Input
-                id={apiKeyField}
-                type={showKeys[apiKeyField] ? 'text' : 'password'}
-                value={apiKeyValue}
-                onChange={(e) => handlePaymentChange(apiKeyField, e.target.value)}
-                placeholder="أدخل مفتاح API"
-                className="pl-10"
-              />
-              <button
-                type="button"
-                onClick={() => toggleShowKey(apiKeyField)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                {showKeys[apiKeyField] ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
-          
-          {secondaryField && (
-            <div>
-              <Label htmlFor={secondaryField} className="text-xs text-gray-600">
-                {secondaryField.includes('secret') ? 'المفتاح السري' : 'معرف العميل'}
-              </Label>
-              <div className="relative">
-                <Input
-                  id={secondaryField}
-                  type={showKeys[secondaryField] ? 'text' : 'password'}
-                  value={secondaryValue}
-                  onChange={(e) => handlePaymentChange(secondaryField, e.target.value)}
-                  placeholder="أدخل المفتاح"
-                  className="pl-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => toggleShowKey(secondaryField)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showKeys[secondaryField] ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
+  const toggleShowKey = (key) => setShowKeys(prev => ({ ...prev, [key]: !prev[key] }));
 
   if (isLoading) {
     return (
@@ -211,243 +151,502 @@ const AdminSettings = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Payment Gateways Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-indigo-600" />
-            بوابات الدفع
-          </CardTitle>
-          <CardDescription>
-            إدارة مفاتيح API لبوابات الدفع المختلفة
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Stripe */}
-            <PaymentGatewayCard
-              id="stripe"
-              name="Stripe (عالمي)"
-              icon={<CreditCard className="text-white" size={20} />}
-              enabled={paymentSettings.stripe_enabled}
-              apiKeyField="stripe_api_key"
-              apiKeyValue={paymentSettings.stripe_api_key}
-            />
+    <div className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="flex flex-wrap gap-2 h-auto p-2 bg-gray-100 rounded-lg mb-4">
+          <TabsTrigger value="dashboard" className="flex items-center gap-1 text-xs">
+            <TrendingUp className="w-3 h-3" /> لوحة البيانات
+          </TabsTrigger>
+          <TabsTrigger value="maintenance" className="flex items-center gap-1 text-xs">
+            <Wrench className="w-3 h-3" /> الصيانة
+          </TabsTrigger>
+          <TabsTrigger value="payments" className="flex items-center gap-1 text-xs">
+            <CreditCard className="w-3 h-3" /> بوابات الدفع
+          </TabsTrigger>
+          <TabsTrigger value="auth" className="flex items-center gap-1 text-xs">
+            <Shield className="w-3 h-3" /> تسجيل الدخول
+          </TabsTrigger>
+          <TabsTrigger value="app" className="flex items-center gap-1 text-xs">
+            <Settings className="w-3 h-3" /> إعدادات التطبيق
+          </TabsTrigger>
+          <TabsTrigger value="emergency" className="flex items-center gap-1 text-xs">
+            <AlertTriangle className="w-3 h-3" /> الطوارئ
+          </TabsTrigger>
+        </TabsList>
 
-            {/* Tap */}
-            <PaymentGatewayCard
-              id="tap"
-              name="Tap (محلي)"
-              icon={<span className="text-white font-bold text-xs">TAP</span>}
-              enabled={paymentSettings.tap_enabled}
-              apiKeyField="tap_api_key"
-              apiKeyValue={paymentSettings.tap_api_key}
-            />
-
-            {/* Tabby */}
-            <PaymentGatewayCard
-              id="tabby"
-              name="Tabby"
-              icon={<span className="text-white font-bold text-xs">TB</span>}
-              enabled={paymentSettings.tabby_enabled}
-              apiKeyField="tabby_api_key"
-              apiKeyValue={paymentSettings.tabby_api_key}
-            />
-
-            {/* Tamara */}
-            <PaymentGatewayCard
-              id="tamara"
-              name="Tamara"
-              icon={<span className="text-white font-bold text-xs">TM</span>}
-              enabled={paymentSettings.tamara_enabled}
-              apiKeyField="tamara_api_key"
-              apiKeyValue={paymentSettings.tamara_api_key}
-            />
-
-            {/* STC Pay */}
-            <PaymentGatewayCard
-              id="stcpay"
-              name="STC Pay"
-              icon={<span className="text-white font-bold text-xs">STC</span>}
-              enabled={paymentSettings.stcpay_enabled}
-              apiKeyField="stcpay_api_key"
-              apiKeyValue={paymentSettings.stcpay_api_key}
-            />
-
-            {/* PayPal */}
-            <div className={`p-4 rounded-lg border-2 transition-all ${paymentSettings.paypal_enabled ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'}`}>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentSettings.paypal_enabled ? 'bg-blue-600' : 'bg-gray-400'}`}>
-                    <span className="text-white font-bold text-xs">PP</span>
-                  </div>
-                  <span className="font-semibold text-gray-800">PayPal</span>
+        {/* Dashboard Tab */}
+        <TabsContent value="dashboard">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+              <CardContent className="pt-4">
+                <Users className="w-6 h-6 mb-2 opacity-80" />
+                <p className="text-2xl font-bold">{dashboardStats?.users?.total || 0}</p>
+                <p className="text-xs opacity-80">إجمالي المستخدمين</p>
+                <p className="text-xs mt-1">+{dashboardStats?.users?.new_today || 0} اليوم</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
+              <CardContent className="pt-4">
+                <DollarSign className="w-6 h-6 mb-2 opacity-80" />
+                <p className="text-2xl font-bold">{dashboardStats?.financials?.total_revenue || 0}</p>
+                <p className="text-xs opacity-80">الإيرادات (ر.س)</p>
+                <p className="text-xs mt-1">صافي: {dashboardStats?.financials?.net_profit || 0}</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+              <CardContent className="pt-4">
+                <Activity className="w-6 h-6 mb-2 opacity-80" />
+                <p className="text-2xl font-bold">{dashboardStats?.ads?.active || 0}</p>
+                <p className="text-xs opacity-80">إعلانات نشطة</p>
+                <p className="text-xs mt-1">{dashboardStats?.ads?.pending || 0} معلقة</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+              <CardContent className="pt-4">
+                <Clock className="w-6 h-6 mb-2 opacity-80" />
+                <p className="text-2xl font-bold">{dashboardStats?.withdrawals?.pending || 0}</p>
+                <p className="text-xs opacity-80">طلبات سحب معلقة</p>
+                <p className="text-xs mt-1">{dashboardStats?.withdrawals?.approved || 0} مكتملة</p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>ملخص سريع</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-gray-500">إجمالي النقاط الموزعة</p>
+                  <p className="text-xl font-bold text-indigo-600">{dashboardStats?.financials?.total_points_distributed || 0}</p>
                 </div>
-                <Switch
-                  checked={paymentSettings.paypal_enabled}
-                  onCheckedChange={(checked) => handlePaymentChange('paypal_enabled', checked)}
-                />
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-gray-500">المدفوعات للمستخدمين</p>
+                  <p className="text-xl font-bold text-red-600">${dashboardStats?.financials?.total_payouts || 0}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Maintenance Tab */}
+        <TabsContent value="maintenance">
+          <Card className={appSettings.maintenance_mode ? 'border-2 border-orange-500' : ''}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="w-5 h-5" />
+                وضع الصيانة
+              </CardTitle>
+              <CardDescription>
+                عند تفعيل وضع الصيانة، سيرى المستخدمون رسالة الصيانة ولن يتمكنوا من استخدام التطبيق
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className={`p-6 rounded-lg text-center ${appSettings.maintenance_mode ? 'bg-orange-100' : 'bg-gray-100'}`}>
+                <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 ${appSettings.maintenance_mode ? 'bg-orange-500' : 'bg-gray-400'}`}>
+                  <Power className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">
+                  {appSettings.maintenance_mode ? '🔧 وضع الصيانة مفعّل' : '✅ التطبيق يعمل بشكل طبيعي'}
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  {appSettings.maintenance_mode ? 'المستخدمون لا يمكنهم الوصول للتطبيق حالياً' : 'جميع الخدمات تعمل بشكل طبيعي'}
+                </p>
+                <Button
+                  onClick={toggleMaintenance}
+                  className={appSettings.maintenance_mode ? 'bg-green-600 hover:bg-green-700' : 'bg-orange-600 hover:bg-orange-700'}
+                  size="lg"
+                >
+                  {appSettings.maintenance_mode ? '✅ إلغاء وضع الصيانة' : '🔧 تفعيل وضع الصيانة'}
+                </Button>
               </div>
               
-              {paymentSettings.paypal_enabled && (
-                <div className="space-y-3 mt-4">
-                  <div>
-                    <Label htmlFor="paypal_client_id" className="text-xs text-gray-600">
-                      معرف العميل (Client ID)
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="paypal_client_id"
-                        type={showKeys['paypal_client_id'] ? 'text' : 'password'}
-                        value={paymentSettings.paypal_client_id}
-                        onChange={(e) => handlePaymentChange('paypal_client_id', e.target.value)}
-                        placeholder="أدخل معرف العميل"
-                        className="pl-10"
+              <div className="space-y-3">
+                <div>
+                  <Label>رسالة الصيانة (عربي)</Label>
+                  <Input
+                    value={appSettings.maintenance_message}
+                    onChange={(e) => setAppSettings(prev => ({ ...prev, maintenance_message: e.target.value }))}
+                    placeholder="التطبيق تحت الصيانة..."
+                  />
+                </div>
+                <div>
+                  <Label>Maintenance Message (English)</Label>
+                  <Input
+                    value={appSettings.maintenance_message_en}
+                    onChange={(e) => setAppSettings(prev => ({ ...prev, maintenance_message_en: e.target.value }))}
+                    placeholder="App is under maintenance..."
+                    dir="ltr"
+                  />
+                </div>
+                <Button onClick={() => saveSettings('app', appSettings, 'app')} disabled={isSaving}>
+                  <Save className="w-4 h-4 ml-2" /> حفظ رسالة الصيانة
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Payment Gateways Tab */}
+        <TabsContent value="payments">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="w-5 h-5" /> بوابات الدفع
+              </CardTitle>
+              <CardDescription>إدارة مفاتيح API لبوابات الدفع المختلفة</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { id: 'stripe', name: 'Stripe (عالمي)', color: 'indigo' },
+                  { id: 'tap', name: 'Tap (محلي)', color: 'green' },
+                  { id: 'tabby', name: 'Tabby', color: 'blue' },
+                  { id: 'tamara', name: 'Tamara', color: 'purple' },
+                  { id: 'stcpay', name: 'STC Pay', color: 'violet' }
+                ].map(gateway => (
+                  <div key={gateway.id} className={`p-4 rounded-lg border-2 ${paymentSettings[`${gateway.id}_enabled`] ? `border-${gateway.color}-200 bg-${gateway.color}-50` : 'border-gray-200 bg-gray-50'}`}>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-semibold">{gateway.name}</span>
+                      <Switch
+                        checked={paymentSettings[`${gateway.id}_enabled`]}
+                        onCheckedChange={(checked) => setPaymentSettings(prev => ({ ...prev, [`${gateway.id}_enabled`]: checked }))}
                       />
-                      <button
-                        type="button"
-                        onClick={() => toggleShowKey('paypal_client_id')}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showKeys['paypal_client_id'] ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
                     </div>
+                    {paymentSettings[`${gateway.id}_enabled`] && (
+                      <div className="relative">
+                        <Input
+                          type={showKeys[gateway.id] ? 'text' : 'password'}
+                          value={paymentSettings[`${gateway.id}_api_key`]}
+                          onChange={(e) => setPaymentSettings(prev => ({ ...prev, [`${gateway.id}_api_key`]: e.target.value }))}
+                          placeholder="مفتاح API"
+                          className="pl-10"
+                        />
+                        <button onClick={() => toggleShowKey(gateway.id)} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                          {showKeys[gateway.id] ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <Label htmlFor="paypal_secret" className="text-xs text-gray-600">
-                      المفتاح السري (Secret)
-                    </Label>
-                    <div className="relative">
+                ))}
+                
+                {/* PayPal Special */}
+                <div className={`p-4 rounded-lg border-2 ${paymentSettings.paypal_enabled ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-semibold">PayPal</span>
+                    <Switch
+                      checked={paymentSettings.paypal_enabled}
+                      onCheckedChange={(checked) => setPaymentSettings(prev => ({ ...prev, paypal_enabled: checked }))}
+                    />
+                  </div>
+                  {paymentSettings.paypal_enabled && (
+                    <div className="space-y-2">
                       <Input
-                        id="paypal_secret"
+                        type={showKeys['paypal_id'] ? 'text' : 'password'}
+                        value={paymentSettings.paypal_client_id}
+                        onChange={(e) => setPaymentSettings(prev => ({ ...prev, paypal_client_id: e.target.value }))}
+                        placeholder="Client ID"
+                      />
+                      <Input
                         type={showKeys['paypal_secret'] ? 'text' : 'password'}
                         value={paymentSettings.paypal_secret}
-                        onChange={(e) => handlePaymentChange('paypal_secret', e.target.value)}
-                        placeholder="أدخل المفتاح السري"
-                        className="pl-10"
+                        onChange={(e) => setPaymentSettings(prev => ({ ...prev, paypal_secret: e.target.value }))}
+                        placeholder="Secret"
                       />
-                      <button
-                        type="button"
-                        onClick={() => toggleShowKey('paypal_secret')}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showKeys['paypal_secret'] ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
                     </div>
+                  )}
+                </div>
+              </div>
+              
+              <Button onClick={() => saveSettings('payments', paymentSettings, 'payment-gateways')} disabled={isSaving} className="w-full">
+                <Save className="w-4 h-4 ml-2" /> حفظ إعدادات الدفع
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Auth Tab */}
+        <TabsContent value="auth">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5" /> تسجيل الدخول الاجتماعي
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className={`p-4 rounded-lg border-2 ${oauthSettings.google_enabled ? 'border-red-200 bg-red-50' : 'border-gray-200'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${oauthSettings.google_enabled ? 'bg-red-500' : 'bg-gray-400'}`}>
+                        <Globe className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold">Google</p>
+                        <p className="text-xs text-gray-500">تسجيل الدخول بواسطة Google</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={oauthSettings.google_enabled}
+                      onCheckedChange={(checked) => setOauthSettings(prev => ({ ...prev, google_enabled: checked }))}
+                    />
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
+                
+                <div className={`p-4 rounded-lg border-2 ${oauthSettings.apple_enabled ? 'border-gray-800 bg-gray-100' : 'border-gray-200'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${oauthSettings.apple_enabled ? 'bg-black' : 'bg-gray-400'}`}>
+                        <span className="text-white text-lg"></span>
+                      </div>
+                      <div>
+                        <p className="font-semibold">Apple</p>
+                        <p className="text-xs text-gray-500">تسجيل الدخول بواسطة Apple</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={oauthSettings.apple_enabled}
+                      onCheckedChange={(checked) => setOauthSettings(prev => ({ ...prev, apple_enabled: checked }))}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <Button onClick={() => saveSettings('oauth', oauthSettings, 'oauth')} disabled={isSaving} className="w-full">
+                <Save className="w-4 h-4 ml-2" /> حفظ إعدادات تسجيل الدخول
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          <div className="pt-4 border-t">
-            <Button
-              onClick={savePaymentSettings}
-              disabled={isSaving}
-              className="w-full bg-indigo-600 hover:bg-indigo-700"
-            >
-              {isSaving ? (
-                <RefreshCw className="w-4 h-4 animate-spin ml-2" />
-              ) : (
-                <Save className="w-4 h-4 ml-2" />
-              )}
-              حفظ إعدادات الدفع
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* OAuth Settings Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-indigo-600" />
-            تسجيل الدخول الاجتماعي
-          </CardTitle>
-          <CardDescription>
-            تفعيل أو تعطيل طرق تسجيل الدخول المختلفة
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Google */}
-            <div className={`p-4 rounded-lg border-2 transition-all ${oauthSettings.google_enabled ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${oauthSettings.google_enabled ? 'bg-red-500' : 'bg-gray-400'}`}>
-                    <svg className="w-5 h-5 text-white" viewBox="0 0 24 24">
-                      <path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
-                    </svg>
+        {/* App Settings Tab */}
+        <TabsContent value="app">
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>التحكم في الميزات</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span>السماح بالتسجيل الجديد</span>
+                    <Switch
+                      checked={appSettings.allow_new_registrations}
+                      onCheckedChange={(checked) => setAppSettings(prev => ({ ...prev, allow_new_registrations: checked }))}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span>السماح بالسحوبات</span>
+                    <Switch
+                      checked={appSettings.allow_withdrawals}
+                      onCheckedChange={(checked) => setAppSettings(prev => ({ ...prev, allow_withdrawals: checked }))}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span>السماح بإضافة إعلانات</span>
+                    <Switch
+                      checked={appSettings.allow_ad_submissions}
+                      onCheckedChange={(checked) => setAppSettings(prev => ({ ...prev, allow_ad_submissions: checked }))}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>إعدادات النقاط والأسعار</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <Label>الحد الأدنى للسحب (نقطة)</Label>
+                    <Input
+                      type="number"
+                      value={appSettings.min_withdrawal_points}
+                      onChange={(e) => setAppSettings(prev => ({ ...prev, min_withdrawal_points: parseInt(e.target.value) }))}
+                    />
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-800">Google</span>
-                    <p className="text-xs text-gray-500">تسجيل الدخول بواسطة Google</p>
-                  </div>
-                </div>
-                <Switch
-                  checked={oauthSettings.google_enabled}
-                  onCheckedChange={(checked) => handleOAuthChange('google_enabled', checked)}
-                />
-              </div>
-            </div>
-
-            {/* Apple */}
-            <div className={`p-4 rounded-lg border-2 transition-all ${oauthSettings.apple_enabled ? 'border-gray-800 bg-gray-100' : 'border-gray-200 bg-gray-50'}`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${oauthSettings.apple_enabled ? 'bg-black' : 'bg-gray-400'}`}>
-                    <svg className="w-5 h-5 text-white" viewBox="0 0 24 24">
-                      <path fill="currentColor" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                    </svg>
+                    <Label>نقاط لكل دقيقة</Label>
+                    <Input
+                      type="number"
+                      value={appSettings.points_per_minute}
+                      onChange={(e) => setAppSettings(prev => ({ ...prev, points_per_minute: parseInt(e.target.value) }))}
+                    />
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-800">Apple</span>
-                    <p className="text-xs text-gray-500">تسجيل الدخول بواسطة Apple</p>
+                    <Label>سعر الإعلان الشهري (ر.س)</Label>
+                    <Input
+                      type="number"
+                      value={appSettings.ad_price_per_month}
+                      onChange={(e) => setAppSettings(prev => ({ ...prev, ad_price_per_month: parseInt(e.target.value) }))}
+                    />
+                  </div>
+                  <div>
+                    <Label>أقصى إعلانات/10 دقائق</Label>
+                    <Input
+                      type="number"
+                      value={appSettings.max_ads_per_10min}
+                      onChange={(e) => setAppSettings(prev => ({ ...prev, max_ads_per_10min: parseInt(e.target.value) }))}
+                    />
                   </div>
                 </div>
-                <Switch
-                  checked={oauthSettings.apple_enabled}
-                  onCheckedChange={(checked) => handleOAuthChange('apple_enabled', checked)}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t">
-            <Button
-              onClick={saveOAuthSettings}
-              disabled={isSaving}
-              className="w-full bg-indigo-600 hover:bg-indigo-700"
-            >
-              {isSaving ? (
-                <RefreshCw className="w-4 h-4 animate-spin ml-2" />
-              ) : (
-                <Save className="w-4 h-4 ml-2" />
-              )}
-              حفظ إعدادات تسجيل الدخول
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>معلومات التواصل</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="flex items-center gap-1"><Mail className="w-3 h-3" /> البريد الإلكتروني</Label>
+                    <Input
+                      value={appSettings.contact_email}
+                      onChange={(e) => setAppSettings(prev => ({ ...prev, contact_email: e.target.value }))}
+                      placeholder="support@saqr.app"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <Label className="flex items-center gap-1"><Phone className="w-3 h-3" /> رقم الهاتف</Label>
+                    <Input
+                      value={appSettings.contact_phone}
+                      onChange={(e) => setAppSettings(prev => ({ ...prev, contact_phone: e.target.value }))}
+                      placeholder="+966..."
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <Label className="flex items-center gap-1"><MessageSquare className="w-3 h-3" /> WhatsApp</Label>
+                    <Input
+                      value={appSettings.support_whatsapp}
+                      onChange={(e) => setAppSettings(prev => ({ ...prev, support_whatsapp: e.target.value }))}
+                      placeholder="+966..."
+                      dir="ltr"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <Label className="flex items-center gap-1"><Link className="w-3 h-3" /> رابط الشروط والأحكام</Label>
+                    <Input
+                      value={appSettings.terms_url}
+                      onChange={(e) => setAppSettings(prev => ({ ...prev, terms_url: e.target.value }))}
+                      placeholder="https://..."
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <Label className="flex items-center gap-1"><Link className="w-3 h-3" /> رابط سياسة الخصوصية</Label>
+                    <Input
+                      value={appSettings.privacy_url}
+                      onChange={(e) => setAppSettings(prev => ({ ...prev, privacy_url: e.target.value }))}
+                      placeholder="https://..."
+                      dir="ltr"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Button onClick={() => saveSettings('app', appSettings, 'app')} disabled={isSaving} className="w-full">
+              <Save className="w-4 h-4 ml-2" /> حفظ إعدادات التطبيق
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </TabsContent>
 
-      {/* Info Card */}
-      <Card className="bg-amber-50 border-amber-200">
-        <CardContent className="pt-4">
-          <div className="flex items-start gap-3">
-            <Key className="w-5 h-5 text-amber-600 mt-0.5" />
-            <div className="text-sm text-amber-800">
-              <p className="font-semibold mb-1">ملاحظة مهمة:</p>
-              <ul className="list-disc list-inside space-y-1 text-xs">
-                <li>المفاتيح المحفوظة تظهر مخفية (****) لأسباب أمنية</li>
-                <li>لتحديث مفتاح، أدخل المفتاح الجديد كاملاً ثم اضغط حفظ</li>
-                <li>تأكد من صحة المفاتيح قبل تفعيل بوابة الدفع</li>
-                <li>بوابات الدفع المعطلة لن تظهر للمعلنين</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Emergency Tab */}
+        <TabsContent value="emergency">
+          <Card className="border-2 border-red-200">
+            <CardHeader className="bg-red-50">
+              <CardTitle className="flex items-center gap-2 text-red-700">
+                <AlertTriangle className="w-5 h-5" /> خيارات الطوارئ
+              </CardTitle>
+              <CardDescription className="text-red-600">
+                استخدم هذه الخيارات فقط في حالات الطوارئ - ستؤثر على جميع المستخدمين فوراً
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className={`p-4 rounded-lg border-2 ${emergencySettings.pause_all_payments ? 'border-red-500 bg-red-100' : 'border-gray-200'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Ban className="w-5 h-5 text-red-600" />
+                      <span className="font-medium">إيقاف جميع المدفوعات</span>
+                    </div>
+                    <Switch
+                      checked={emergencySettings.pause_all_payments}
+                      onCheckedChange={(checked) => setEmergencySettings(prev => ({ ...prev, pause_all_payments: checked }))}
+                    />
+                  </div>
+                </div>
+                
+                <div className={`p-4 rounded-lg border-2 ${emergencySettings.pause_all_withdrawals ? 'border-red-500 bg-red-100' : 'border-gray-200'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Ban className="w-5 h-5 text-red-600" />
+                      <span className="font-medium">إيقاف جميع السحوبات</span>
+                    </div>
+                    <Switch
+                      checked={emergencySettings.pause_all_withdrawals}
+                      onCheckedChange={(checked) => setEmergencySettings(prev => ({ ...prev, pause_all_withdrawals: checked }))}
+                    />
+                  </div>
+                </div>
+                
+                <div className={`p-4 rounded-lg border-2 ${emergencySettings.block_all_logins ? 'border-red-500 bg-red-100' : 'border-gray-200'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Ban className="w-5 h-5 text-red-600" />
+                      <span className="font-medium">منع تسجيل الدخول</span>
+                    </div>
+                    <Switch
+                      checked={emergencySettings.block_all_logins}
+                      onCheckedChange={(checked) => setEmergencySettings(prev => ({ ...prev, block_all_logins: checked }))}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className={`p-4 rounded-lg border-2 ${emergencySettings.show_emergency_banner ? 'border-orange-500 bg-orange-100' : 'border-gray-200'}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5 text-orange-600" />
+                    <span className="font-medium">عرض رسالة طوارئ للمستخدمين</span>
+                  </div>
+                  <Switch
+                    checked={emergencySettings.show_emergency_banner}
+                    onCheckedChange={(checked) => setEmergencySettings(prev => ({ ...prev, show_emergency_banner: checked }))}
+                  />
+                </div>
+                {emergencySettings.show_emergency_banner && (
+                  <Input
+                    value={emergencySettings.emergency_message}
+                    onChange={(e) => setEmergencySettings(prev => ({ ...prev, emergency_message: e.target.value }))}
+                    placeholder="اكتب رسالة الطوارئ هنا..."
+                    className="mt-2"
+                  />
+                )}
+              </div>
+              
+              <Button 
+                onClick={() => saveSettings('emergency', emergencySettings, 'emergency')} 
+                disabled={isSaving} 
+                className="w-full bg-red-600 hover:bg-red-700"
+              >
+                <Save className="w-4 h-4 ml-2" /> حفظ إعدادات الطوارئ
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
