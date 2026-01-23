@@ -317,27 +317,6 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
         )}
       </div>
 
-      {/* Progress Dots - Right Side */}
-      <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex flex-col gap-1 z-10">
-        {ads.slice(Math.max(0, currentIndex - 3), currentIndex + 4).map((ad, idx) => {
-          const actualIndex = Math.max(0, currentIndex - 3) + idx;
-          const adWatched = user?.watched_ads?.some(w => w.ad_id === ad.id);
-          return (
-            <div
-              key={ad.id}
-              onClick={(e) => { e.stopPropagation(); setCurrentIndex(actualIndex); }}
-              className={`w-1 rounded-full cursor-pointer transition-all ${
-                actualIndex === currentIndex
-                  ? 'h-6 bg-white'
-                  : adWatched
-                  ? 'h-3 bg-green-500/80'
-                  : 'h-3 bg-white/30'
-              }`}
-            />
-          );
-        })}
-      </div>
-
       {/* Ad Counter - Bottom Center */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20">
         <div className="bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full">
