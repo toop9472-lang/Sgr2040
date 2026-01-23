@@ -3,8 +3,11 @@ import { ChevronUp, ChevronDown, Volume2, VolumeX, Play, Pause } from 'lucide-re
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { toast } from '../hooks/use-toast';
+import { useLanguage } from '../i18n/LanguageContext';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const AdViewer = ({ ads, onAdWatched, user }) => {
+  const { t, isRTL } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -28,14 +31,15 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
           const progress = (newTime / currentAd.duration) * 100;
           setWatchProgress(progress);
 
-          // Award points every 60 seconds (1 minute) and at the end
+          // Award points every 60 seconds (1 minute)
           if (newTime > 0 && newTime % 60 === 0 && newTime <= currentAd.duration) {
-            // Call backend to award points
             onAdWatched(currentAd.id, newTime)
               .then((response) => {
                 toast({
-                  title: '✨ حصلت على نقاط!',
-                  description: `${response.points_earned} نقطة جديدة! الرصيد: ${response.total_points}`,
+                  title: '✨ ' + t('earnedPoint'),
+                  description: isRTL 
+                    ? `${response.points_earned} نقطة جديدة! الرصيد: ${response.total_points}`
+                    : `${response.points_earned} new points! Balance: ${response.total_points}`,
                 });
               })
               .catch((error) => {
@@ -63,7 +67,7 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
         clearInterval(watchTimerRef.current);
       }
     };
-  }, [isPlaying, currentAd, isWatched, onAdWatched]);
+  }, [isPlaying, currentAd, isWatched, onAdWatched, t, isRTL]);
 
   useEffect(() => {
     // Reset watch time when ad changes
@@ -127,6 +131,14 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
     }
   };
 
+  if (!currentAd) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-black text-white">
+        <p>{t('noAds')}</p>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
@@ -135,10 +147,15 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
       onTouchEnd={handleTouchEnd}
       onWheel={handleWheel}
     >
+      {/* Language Switcher - Top Left */}
+      <div className="absolute top-4 left-4 z-50">
+        <LanguageSwitcher />
+      </div>
+
       {/* Video */}
       <video
         ref={videoRef}
-        src={currentAd.videoUrl}
+        src={currentAd.video_url || currentAd.videoUrl}
         className="w-full h-full object-cover"
         loop
         playsInline
@@ -149,20 +166,22 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />
 
       {/* Top Info */}
-      <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/50 to-transparent">
+      <div className="absolute top-0 left-0 right-0 p-4 pt-16 bg-gradient-to-b from-black/50 to-transparent">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold">
-              {currentAd.advertiser[0]}
+              {currentAd.advertiser?.[0] || 'A'}
             </div>
             <div>
               <p className="text-white font-semibold">{currentAd.advertiser}</p>
-              <p className="text-white/80 text-sm">إعلان مدعوم</p>
+              <p className="text-white/80 text-sm">
+                {isRTL ? 'إعلان مدعوم' : 'Sponsored Ad'}
+              </p>
             </div>
           </div>
           {isWatched && (
             <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-              ✓ تمت المشاهدة
+              ✓ {isRTL ? 'تمت المشاهدة' : 'Watched'}
             </div>
           )}
         </div>
@@ -170,10 +189,12 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
 
       {/* Watch Progress Bar */}
       {!isWatched && (
-        <div className="absolute top-20 left-0 right-0 px-4">
+        <div className="absolute top-28 left-0 right-0 px-4">
           <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-white text-sm font-medium">وقت المشاهدة</span>
+              <span className="text-white text-sm font-medium">
+                {isRTL ? 'وقت المشاهدة' : 'Watch Time'}
+              </span>
               <span className="text-white text-sm font-bold">
                 {Math.floor(watchTime / 60)}:{(watchTime % 60).toString().padStart(2, '0')} / {Math.floor(currentAd.duration / 60)}:00
               </span>
@@ -184,18 +205,18 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
       )}
 
       {/* Bottom Info */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 pb-8">
+      <div className="absolute bottom-0 left-0 right-0 p-6 pb-24">
         <h2 className="text-white text-2xl font-bold mb-2">{currentAd.title}</h2>
         <p className="text-white/90 text-base mb-4">{currentAd.description}</p>
         <div className="flex items-center gap-2 text-white/80 text-sm">
-          <span>🎯 {currentAd.points} نقطة/دقيقة</span>
+          <span>🎯 {currentAd.points || 1} {isRTL ? 'نقطة/دقيقة' : 'point/min'}</span>
           <span>•</span>
-          <span>⏱️ {currentAd.duration / 60} دقيقة</span>
+          <span>⏱️ {currentAd.duration / 60} {isRTL ? 'دقيقة' : 'min'}</span>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="absolute right-4 bottom-32 flex flex-col gap-4">
+      <div className={`absolute ${isRTL ? 'left-4' : 'right-4'} bottom-32 flex flex-col gap-4`}>
         <Button
           onClick={handlePlayPause}
           size="icon"
@@ -231,7 +252,7 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
       )}
 
       {/* Ad Counter */}
-      <div className="absolute top-1/2 right-4 -translate-y-1/2 flex flex-col gap-2">
+      <div className={`absolute top-1/2 ${isRTL ? 'left-4' : 'right-4'} -translate-y-1/2 flex flex-col gap-2`}>
         {ads.map((ad, index) => {
           const adWatched = user?.watched_ads?.some(w => w.ad_id === ad.id) || false;
           return (
