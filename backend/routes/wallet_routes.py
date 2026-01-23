@@ -457,3 +457,63 @@ async def get_wallet_stats(user_id: str = Depends(get_current_user_id)):
         'withdrawals_today': withdrawals_today[0]['total'] if withdrawals_today else 0,
         'pending_withdrawals_count': pending_count
     }
+
+
+@router.delete('/reset')
+async def reset_wallet(user_id: str = Depends(get_current_user_id)):
+    """Reset wallet - delete all transactions and reset balance"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    # Delete all transactions
+    await db.wallet_transactions.delete_many({})
+    
+    # Reset wallet balance
+    await db.app_wallet.update_one(
+        {'type': 'main'},
+        {'$set': {
+            'balance': 0,
+            'total_deposited': 0,
+            'total_withdrawn': 0,
+            'updated_at': datetime.utcnow()
+        }},
+        upsert=True
+    )
+    
+    return {'message': 'تم إعادة تعيين المحفظة بنجاح'}
+
+
+@router.delete('/transactions/{transaction_id}')
+async def delete_transaction(
+    transaction_id: str,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Delete a specific transaction"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    # Get transaction first
+    tx = await db.wallet_transactions.find_one({'id': transaction_id})
+    if not tx:
+        raise HTTPException(status_code=404, detail='المعاملة غير موجودة')
+    
+    # Reverse the balance change if transaction was completed
+    if tx.get('status') == 'completed':
+        amount = tx.get('amount', 0)
+        if tx.get('type') == 'deposit':
+            # Reverse deposit
+            await db.app_wallet.update_one(
+                {'type': 'main'},
+                {'$inc': {'balance': -amount, 'total_deposited': -amount}}
+            )
+        else:
+            # Reverse withdrawal
+            await db.app_wallet.update_one(
+                {'type': 'main'},
+                {'$inc': {'balance': abs(amount), 'total_withdrawn': -abs(amount)}}
+            )
+    
+    # Delete transaction
+    await db.wallet_transactions.delete_one({'id': transaction_id})
+    
+    return {'message': 'تم حذف المعاملة بنجاح'}
