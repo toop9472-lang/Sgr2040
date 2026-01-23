@@ -33,6 +33,8 @@ class PaymentGatewaySettings(BaseModel):
     paypal_enabled: bool = False
     paypal_client_id: Optional[str] = None
     paypal_secret: Optional[str] = None
+    applepay_enabled: bool = False
+    applepay_merchant_id: Optional[str] = None
 
 
 class OAuthSettings(BaseModel):
