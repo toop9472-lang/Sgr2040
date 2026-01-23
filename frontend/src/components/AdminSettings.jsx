@@ -390,9 +390,6 @@ const AdminSettings = () => {
                     )}
                   </div>
                 ))}
-
-        {/* Email Settings Tab */}
-        <TabsContent value="email">
           <div className="space-y-4">
             <Card className={emailSettings.email_enabled ? 'border-2 border-green-200' : ''}>
               <CardHeader>
