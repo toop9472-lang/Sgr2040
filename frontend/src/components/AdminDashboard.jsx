@@ -296,7 +296,7 @@ const AdminDashboard = ({ admin, onLogout }) => {
       {/* Tabs */}
       <div className="px-4">
         <Tabs defaultValue="users" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 text-xs">
+          <TabsList className="grid w-full grid-cols-6 text-xs">
             <TabsTrigger value="users">
               المستخدمون
             </TabsTrigger>
@@ -311,6 +311,9 @@ const AdminDashboard = ({ admin, onLogout }) => {
             </TabsTrigger>
             <TabsTrigger value="invoices">
               الفواتير
+            </TabsTrigger>
+            <TabsTrigger value="settings">
+              الإعدادات
             </TabsTrigger>
           </TabsList>
 
