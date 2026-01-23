@@ -443,7 +443,7 @@ const AdminDashboard = ({ admin, onLogout }) => {
                             </Button>
                           ) : (
                             <Button
-                              onClick={() => handleBanUser(user.id || user.user_id, user.name)}
+                              onClick={() => handleBanUser(user.user_id || user.id, user.name)}
                               variant="outline"
                               size="sm"
                               className="text-orange-600 border-orange-300"
@@ -453,7 +453,7 @@ const AdminDashboard = ({ admin, onLogout }) => {
                             </Button>
                           )}
                           <Button
-                            onClick={() => handleDeleteUser(user.id || user.user_id, user.name)}
+                            onClick={() => handleDeleteUser(user.user_id || user.id, user.name)}
                             variant="outline"
                             size="sm"
                             className="text-red-600 border-red-300"
