@@ -23,7 +23,8 @@ const BottomNav = ({ currentPage, onNavigate }) => {
                   ? 'text-indigo-600'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
-            >\n              <Icon size={item.id === 'advertiser' ? 26 : 24} className={isActive ? 'stroke-[2.5]' : 'stroke-2'} />
+            >
+              <Icon size={item.id === 'advertiser' ? 26 : 24} className={isActive ? 'stroke-[2.5]' : 'stroke-2'} />
               <span className={`text-xs ${ isActive ? 'font-semibold' : 'font-medium'}`}>
                 {item.label}
               </span>
