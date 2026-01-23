@@ -94,7 +94,14 @@ async def login_email(credentials: EmailLogin):
     
     if admin:
         # Verify admin password
-        if bcrypt.verify(credentials.password, admin['password_hash']):
+        try:
+            password_valid = bcrypt.verify(credentials.password, admin['password_hash'])
+        except Exception as e:
+            import logging
+            logging.error(f"Password verification error: {e}")
+            password_valid = False
+        
+        if password_valid:
             admin_id = admin.get('id', admin['email'])
             
             # Update last login
