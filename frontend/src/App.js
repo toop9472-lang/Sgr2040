@@ -171,6 +171,11 @@ function App() {
           onNavigate={handleNavigate}
         />
       )}
+      {currentPage === 'advertiser' && (
+        <AdvertiserPage 
+          onNavigate={handleNavigate}
+        />
+      )}
       {currentPage === 'withdraw' && (
         <WithdrawPage 
           user={user}
