@@ -6,7 +6,7 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://pointads.preview.emergentagent.com';
+const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://adrewards-37.preview.emergentagent.com';
 const API_BASE = `${API_URL}/api`;
 
 // Create axios instance
