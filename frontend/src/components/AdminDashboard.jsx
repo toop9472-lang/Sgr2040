@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 import { toast } from '../hooks/use-toast';
 import axios from 'axios';
 import AdminSettings from './AdminSettings';
+import { Search, Ban, Trash2, UserCheck, RefreshCw, Eye, Edit2 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -15,6 +17,10 @@ const AdminDashboard = ({ admin, onLogout }) => {
   const [userStats, setUserStats] = useState(null);
   const [pendingWithdrawals, setPendingWithdrawals] = useState([]);
   const [pendingAds, setPendingAds] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  const [userSearch, setUserSearch] = useState('');
+  const [usersPage, setUsersPage] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   const getAuthHeaders = () => {
