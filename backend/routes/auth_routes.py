@@ -8,17 +8,20 @@ import os
 
 router = APIRouter(prefix='/auth', tags=['Authentication'])
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+def get_db():
+    """Get database connection"""
+    mongo_url = os.environ['MONGO_URL']
+    client = AsyncIOMotorClient(mongo_url)
+    return client[os.environ['DB_NAME']]
 
 @router.post('/login', response_model=dict)
 async def login(user_data: UserCreate):
-    """
+    \"""
     Login or register user (Google/Apple OAuth)
-    """
+    \"""
     try:
+        db = get_db()
+        
         # Check if user exists
         existing_user = await db.users.find_one({
             'provider': user_data.provider,
@@ -69,9 +72,10 @@ async def login(user_data: UserCreate):
 
 @router.get('/me', response_model=dict)
 async def get_current_user(user_id: str = Depends(get_current_user_id)):
-    """
+    \"""
     Get current user profile
-    """
+    \"""
+    db = get_db()
     user = await db.users.find_one({'id': user_id})
     
     if not user:
