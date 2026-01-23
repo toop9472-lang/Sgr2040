@@ -219,12 +219,23 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
       <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
 
       {/* Live Viewers Badge - Top Right */}
-      <div className="absolute top-4 right-4 z-20">
-        <div className="flex items-center gap-2 bg-red-500/90 backdrop-blur-sm px-3 py-1.5 rounded-full">
-          <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-          <Eye className="w-4 h-4 text-white" />
-          <span className="text-white text-sm font-semibold">{viewersCount}</span>
-        </div>
+      <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
+        {/* Currently Watching */}
+        {viewersCount > 0 && (
+          <div className="flex items-center gap-2 bg-red-500/90 backdrop-blur-sm px-3 py-1.5 rounded-full">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+            <Eye className="w-4 h-4 text-white" />
+            <span className="text-white text-sm font-semibold">{viewersCount}</span>
+          </div>
+        )}
+        
+        {/* Total Views */}
+        {totalViews > 0 && (
+          <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full">
+            <Eye className="w-4 h-4 text-white/80" />
+            <span className="text-white/80 text-sm">{totalViews} {isRTL ? 'مشاهدة' : 'views'}</span>
+          </div>
+        )}
       </div>
 
       {/* Points Badge - Top Left */}
