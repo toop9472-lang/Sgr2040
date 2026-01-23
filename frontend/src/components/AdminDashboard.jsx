@@ -338,8 +338,194 @@ const AdminDashboard = ({ admin, onLogout }) => {
               ))
             )}
           </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="mt-4">
+            <AnalyticsContent />
+          </TabsContent>
+
+          {/* Invoices Tab */}
+          <TabsContent value="invoices" className="mt-4">
+            <InvoicesContent />
+          </TabsContent>
         </Tabs>
       </div>
+    </div>
+  );
+};
+
+// Analytics Content Component
+const AnalyticsContent = () => {
+  const [analytics, setAnalytics] = useState(null);
+  const [topAds, setTopAds] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadAnalytics();
+  }, []);
+
+  const loadAnalytics = async () => {
+    try {
+      const token = localStorage.getItem('admin_token');
+      
+      const [analyticsRes, topAdsRes] = await Promise.all([
+        axios.get(`${API}/analytics/platform/overview`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API}/analytics/top-ads?limit=5`, { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+      
+      setAnalytics(analyticsRes.data);
+      setTopAds(topAdsRes.data.top_ads || []);
+    } catch (error) {
+      console.error('Failed to load analytics:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return <div className="text-center py-8">جاري التحميل...</div>;
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Card>
+          <CardContent className="pt-4">
+            <p className="text-2xl font-bold text-indigo-600">{analytics?.engagement?.total_views || 0}</p>
+            <p className="text-xs text-gray-500">إجمالي المشاهدات</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <p className="text-2xl font-bold text-green-600">{analytics?.users?.active_last_7_days || 0}</p>
+            <p className="text-xs text-gray-500">نشط آخر 7 أيام</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <p className="text-2xl font-bold text-purple-600">{analytics?.financials?.total_points_distributed || 0}</p>
+            <p className="text-xs text-gray-500">نقاط موزعة</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <p className="text-2xl font-bold text-orange-600">{analytics?.users?.activity_rate || 0}%</p>
+            <p className="text-xs text-gray-500">معدل النشاط</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Top Ads */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">أفضل الإعلانات</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {topAds.length === 0 ? (
+            <p className="text-gray-500 text-center">لا توجد بيانات</p>
+          ) : (
+            <div className="space-y-2">
+              {topAds.map((ad, i) => (
+                <div key={ad.ad_id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                  <div className="flex items-center gap-3">
+                    <span className={`font-bold ${i === 0 ? 'text-yellow-500' : 'text-gray-400'}`}>#{i+1}</span>
+                    <span className="font-medium">{ad.title}</span>
+                  </div>
+                  <span className="font-bold text-indigo-600">{ad.views} مشاهدة</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// Invoices Content Component
+const InvoicesContent = () => {
+  const [invoices, setInvoices] = useState([]);
+  const [stats, setStats] = useState({ total_revenue: 0, pending_amount: 0 });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadInvoices();
+  }, []);
+
+  const loadInvoices = async () => {
+    try {
+      const token = localStorage.getItem('admin_token');
+      const response = await axios.get(`${API}/invoices/admin/all`, { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
+      
+      setInvoices(response.data.invoices || []);
+      setStats({
+        total_revenue: response.data.total_revenue || 0,
+        pending_amount: response.data.pending_amount || 0
+      });
+    } catch (error) {
+      console.error('Failed to load invoices:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    const variants = { paid: 'default', pending: 'secondary', cancelled: 'destructive' };
+    const labels = { paid: 'مدفوعة', pending: 'معلقة', cancelled: 'ملغية' };
+    return <Badge variant={variants[status] || 'secondary'}>{labels[status] || status}</Badge>;
+  };
+
+  if (isLoading) {
+    return <div className="text-center py-8">جاري التحميل...</div>;
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-3">
+        <Card>
+          <CardContent className="pt-4">
+            <p className="text-2xl font-bold text-green-600">{stats.total_revenue.toFixed(2)} ر.س</p>
+            <p className="text-xs text-gray-500">إجمالي الإيرادات</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <p className="text-2xl font-bold text-yellow-600">{stats.pending_amount.toFixed(2)} ر.س</p>
+            <p className="text-xs text-gray-500">مبالغ معلقة</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Invoices List */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">الفواتير الأخيرة</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {invoices.length === 0 ? (
+            <p className="text-gray-500 text-center">لا توجد فواتير</p>
+          ) : (
+            <div className="space-y-2">
+              {invoices.slice(0, 10).map((inv) => (
+                <div key={inv.id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                  <div>
+                    <p className="font-mono text-sm">{inv.invoice_number}</p>
+                    <p className="text-xs text-gray-500">{inv.advertiser_name}</p>
+                  </div>
+                  <div className="text-left">
+                    <p className="font-bold">{inv.total?.toFixed(2)} ر.س</p>
+                    {getStatusBadge(inv.status)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
