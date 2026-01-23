@@ -139,10 +139,11 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
             </CardContent>
           </Card>
         </div>
+        )}
 
         {/* Info Card */}
         {!isGuest && (
-        <Card className="shadow-md border-0">
+          <Card className="shadow-md border-0">
           <CardHeader>
             <CardTitle className="text-lg">كيف يعمل النظام؟</CardTitle>
           </CardHeader>
