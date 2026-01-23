@@ -357,7 +357,7 @@ function MainApp() {
                   data-testid="add-your-ad-btn"
                 >
                   <span>💼</span>
-                  <span>أضف إعلانك</span>
+                  <span>{t('addYourAd')}</span>
                 </button>
               </div>
               <Toaster />
