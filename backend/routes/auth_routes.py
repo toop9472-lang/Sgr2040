@@ -79,7 +79,9 @@ async def signin(credentials: EmailLogin):
             password_valid = False
         
         if password_valid:
-            token = create_access_token(user['id'])
+            # Handle both 'id' and 'user_id' fields for backward compatibility
+            user_id = user.get('id') or user.get('user_id')
+            token = create_access_token(user_id)
             
             created_at = user.get('created_at')
             if isinstance(created_at, datetime):
@@ -91,7 +93,7 @@ async def signin(credentials: EmailLogin):
                 'token': token,
                 'role': 'user',
                 'user': {
-                    'id': user['id'],
+                    'id': user_id,
                     'email': user['email'],
                     'name': user['name'],
                     'avatar': user.get('avatar'),
