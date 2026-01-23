@@ -143,10 +143,6 @@ function MainApp() {
         setIsLoading(false);
         return;
       }
-        
-        setIsLoading(false);
-        return;
-      }
       
       // For email/social login, user data comes from auth response
       setUser(userData);
