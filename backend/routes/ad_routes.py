@@ -147,6 +147,9 @@ async def watch_ad(data: dict, user_id: str = Depends(get_current_user_id)):
             detail='وقت المشاهدة قصير جداً لكسب النقاط. شاهد لمدة دقيقة على الأقل.'
         )
     
+    # Get current points before update
+    old_points = user.get('points', 0)
+    
     # Create watched ad record
     watched_ad_record = {
         'ad_id': ad_id,
@@ -173,9 +176,40 @@ async def watch_ad(data: dict, user_id: str = Depends(get_current_user_id)):
         '$or': [{'id': actual_user_id}, {'user_id': actual_user_id}]
     })
     
+    new_points = updated_user.get('points', 0)
+    
+    # Check for milestones and send notification
+    milestones = [100, 250, 500, 1000, 2500, 5000, 10000]
+    for milestone in milestones:
+        if old_points < milestone <= new_points:
+            # User crossed a milestone!
+            try:
+                from routes.notification_routes import send_notification_to_user
+                if milestone == 500:
+                    await send_notification_to_user(
+                        db=db,
+                        user_id=actual_user_id,
+                        title='🎉 مبروك! يمكنك السحب الآن!',
+                        body=f'وصلت إلى {milestone} نقطة! يمكنك الآن سحب $1',
+                        notification_type='points_milestone',
+                        data={'milestone': milestone, 'can_withdraw': True}
+                    )
+                else:
+                    await send_notification_to_user(
+                        db=db,
+                        user_id=actual_user_id,
+                        title=f'🎯 إنجاز جديد: {milestone} نقطة!',
+                        body=f'أحسنت! وصلت إلى {milestone} نقطة. استمر في المشاهدة!',
+                        notification_type='points_milestone',
+                        data={'milestone': milestone}
+                    )
+            except Exception as e:
+                print(f"Notification error: {e}")
+            break
+    
     return {
         'success': True,
         'points_earned': points_earned,
-        'total_points': updated_user.get('points', 0),
+        'total_points': new_points,
         'message': f'حصلت على {points_earned} نقطة!'
     }
