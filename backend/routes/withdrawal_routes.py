@@ -8,16 +8,18 @@ import os
 
 router = APIRouter(prefix='/withdrawals', tags=['Withdrawals'])
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+def get_db():
+    """Get database connection"""
+    mongo_url = os.environ['MONGO_URL']
+    client = AsyncIOMotorClient(mongo_url)
+    return client[os.environ['DB_NAME']]
 
 @router.get('', response_model=List[WithdrawalResponse])
 async def get_user_withdrawals(user_id: str = Depends(get_current_user_id)):
     """
     Get all withdrawal requests for current user
     """
+    db = get_db()
     withdrawals = await db.withdrawals.find({'user_id': user_id}).sort('created_at', -1).to_list(100)
     
     return [
@@ -43,6 +45,8 @@ async def create_withdrawal(
     """
     Create withdrawal request
     """
+    db = get_db()
+    
     # Get user
     user = await db.users.find_one({'id': user_id})
     if not user:
@@ -116,6 +120,7 @@ async def get_withdrawal(
     """
     Get specific withdrawal by ID
     """
+    db = get_db()
     withdrawal = await db.withdrawals.find_one({
         'id': withdrawal_id,
         'user_id': user_id

@@ -6,16 +6,18 @@ import os
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+def get_db():
+    """Get database connection"""
+    mongo_url = os.environ['MONGO_URL']
+    client = AsyncIOMotorClient(mongo_url)
+    return client[os.environ['DB_NAME']]
 
 @router.get('/profile', response_model=dict)
 async def get_profile(user_id: str = Depends(get_current_user_id)):
     """
     Get user profile with full details
     """
+    db = get_db()
     user = await db.users.find_one({'id': user_id})
     
     if not user:
@@ -45,6 +47,7 @@ async def update_profile(
     """
     Update user profile
     """
+    db = get_db()
     update_data = {}
     
     if 'name' in data:

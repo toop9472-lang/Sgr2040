@@ -9,16 +9,18 @@ import os
 
 router = APIRouter(prefix='/ads', tags=['Advertisements'])
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+def get_db():
+    """Get database connection"""
+    mongo_url = os.environ['MONGO_URL']
+    client = AsyncIOMotorClient(mongo_url)
+    return client[os.environ['DB_NAME']]
 
 @router.get('', response_model=List[AdResponse])
 async def get_ads(user_id: str = Depends(get_current_user_id)):
     """
     Get all active ads
     """
+    db = get_db()
     ads = await db.ads.find({'is_active': True}).to_list(100)
     
     return [
@@ -40,6 +42,7 @@ async def get_ad(ad_id: str, user_id: str = Depends(get_current_user_id)):
     """
     Get specific ad by ID
     """
+    db = get_db()
     ad = await db.ads.find_one({'id': ad_id})
     
     if not ad:
@@ -65,6 +68,7 @@ async def watch_ad(data: dict, user_id: str = Depends(get_current_user_id)):
     Record ad watch and award points
     Anti-cheat: Validates watch time and ensures each ad is watched only once
     """
+    db = get_db()
     ad_id = data.get('ad_id')
     watch_time = data.get('watch_time', 0)
     
