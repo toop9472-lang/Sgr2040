@@ -146,6 +146,29 @@ async def approve_withdrawal(
         data={'withdrawal_id': withdrawal_id, 'amount': withdrawal.get('amount', 0)}
     )
     
+    # Send email notification
+    import asyncio
+    async def send_withdrawal_email():
+        try:
+            from services.email_service import send_withdrawal_notification, get_email_settings
+            settings = await get_email_settings()
+            if settings and settings.get('email_enabled') and settings.get('send_withdrawal_notifications'):
+                user = await db.users.find_one({'$or': [{'id': withdrawal['user_id']}, {'user_id': withdrawal['user_id']}]}, {'_id': 0})
+                if user:
+                    await send_withdrawal_notification(
+                        user['email'],
+                        user.get('name', 'مستخدم'),
+                        withdrawal.get('amount', 0),
+                        withdrawal.get('method', 'PayPal'),
+                        'approved',
+                        '',
+                        'ar'
+                    )
+        except Exception as e:
+            print(f"Failed to send withdrawal email: {e}")
+    
+    asyncio.create_task(send_withdrawal_email())
+    
     return {'success': True, 'message': 'تمت الموافقة على طلب السحب'}
 
 @router.put('/withdrawals/{withdrawal_id}/reject')
