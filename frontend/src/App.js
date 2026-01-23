@@ -381,6 +381,11 @@ function MainApp() {
                   onNavigate={handleNavigate}
                 />
               )}
+              {currentPage === 'notifications' && (
+                <NotificationsPage 
+                  user={user}
+                />
+              )}
               {currentPage === 'withdraw' && (
                 <WithdrawPage 
                   user={user}
