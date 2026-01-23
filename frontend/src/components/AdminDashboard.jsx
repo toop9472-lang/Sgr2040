@@ -64,6 +64,9 @@ const AdminDashboard = ({ admin, onLogout }) => {
       // Load pending ads
       const adsResponse = await axios.get(`${API}/admin/dashboard/ads/pending`, { headers });
       setPendingAds(adsResponse.data.ads);
+      
+      // Load all users
+      await loadUsers();
 
     } catch (error) {
       console.error('Failed to load dashboard:', error);
@@ -74,6 +77,58 @@ const AdminDashboard = ({ admin, onLogout }) => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadUsers = async (page = 1, search = '') => {
+    try {
+      const headers = getAuthHeaders();
+      const response = await axios.get(`${API}/admin/users/list`, {
+        headers,
+        params: { page, limit: 20, search }
+      });
+      setAllUsers(response.data.users);
+      setTotalUsers(response.data.total);
+      setUsersPage(page);
+    } catch (error) {
+      console.error('Failed to load users:', error);
+    }
+  };
+
+  const handleBanUser = async (userId, userName) => {
+    if (!window.confirm(`هل أنت متأكد من حظر المستخدم "${userName}"؟`)) return;
+    
+    try {
+      const headers = getAuthHeaders();
+      await axios.put(`${API}/admin/users/${userId}/ban`, null, { headers });
+      toast({ title: '✅ تم', description: 'تم حظر المستخدم' });
+      loadUsers(usersPage, userSearch);
+    } catch (error) {
+      toast({ title: '❌ خطأ', description: 'فشل حظر المستخدم', variant: 'destructive' });
+    }
+  };
+
+  const handleUnbanUser = async (userId) => {
+    try {
+      const headers = getAuthHeaders();
+      await axios.put(`${API}/admin/users/${userId}/unban`, null, { headers });
+      toast({ title: '✅ تم', description: 'تم رفع الحظر' });
+      loadUsers(usersPage, userSearch);
+    } catch (error) {
+      toast({ title: '❌ خطأ', description: 'فشل رفع الحظر', variant: 'destructive' });
+    }
+  };
+
+  const handleDeleteUser = async (userId, userName) => {
+    if (!window.confirm(`⚠️ تحذير: سيتم حذف المستخدم "${userName}" وجميع بياناته نهائياً. هل أنت متأكد؟`)) return;
+    
+    try {
+      const headers = getAuthHeaders();
+      await axios.delete(`${API}/admin/users/${userId}`, { headers });
+      toast({ title: '✅ تم', description: 'تم حذف المستخدم' });
+      loadUsers(usersPage, userSearch);
+    } catch (error) {
+      toast({ title: '❌ خطأ', description: 'فشل حذف المستخدم', variant: 'destructive' });
     }
   };
 
