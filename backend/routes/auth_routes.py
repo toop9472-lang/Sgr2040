@@ -8,6 +8,7 @@ from passlib.hash import bcrypt
 from datetime import datetime
 import os
 import uuid
+import asyncio
 
 router = APIRouter(prefix='/auth', tags=['Authentication'])
 
@@ -155,6 +156,18 @@ async def register_email(data: EmailRegister):
     }
     
     await db.users.insert_one(user_doc)
+    
+    # Send welcome email (fire and forget - don't block registration)
+    async def send_welcome():
+        try:
+            from services.email_service import send_welcome_email, get_email_settings
+            settings = await get_email_settings()
+            if settings and settings.get('email_enabled') and settings.get('send_welcome_email'):
+                await send_welcome_email(data.email, data.name, 'ar')
+        except Exception as e:
+            print(f"Failed to send welcome email: {e}")
+    
+    asyncio.create_task(send_welcome())
     
     # Create token
     token = create_access_token(user_id)
