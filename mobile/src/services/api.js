@@ -94,6 +94,34 @@ export const adsAPI = {
   },
 };
 
+// Notifications API
+export const notificationsAPI = {
+  registerDevice: async (token, platform) => {
+    const response = await api.post('/notifications/register-device', { token, platform });
+    return response.data;
+  },
+  
+  unregisterDevice: async (token) => {
+    const response = await api.delete('/notifications/unregister-device', { params: { token } });
+    return response.data;
+  },
+  
+  getMyNotifications: async (limit = 50) => {
+    const response = await api.get('/notifications/my-notifications', { params: { limit } });
+    return response.data;
+  },
+  
+  markAsRead: async (notificationId) => {
+    const response = await api.put(`/notifications/mark-read/${notificationId}`);
+    return response.data;
+  },
+  
+  markAllAsRead: async () => {
+    const response = await api.put('/notifications/mark-all-read');
+    return response.data;
+  },
+};
+
 // User API
 export const userAPI = {
   getProfile: async () => {
