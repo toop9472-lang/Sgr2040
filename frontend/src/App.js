@@ -323,6 +323,10 @@ function MainApp() {
         isAdmin ? <AdminDashboard admin={adminData} onLogout={handleAdminLogout} /> : <Navigate to="/admin/login" />
       } />
       
+      {/* Payment Routes */}
+      <Route path="/payment/success" element={<PaymentSuccess />} />
+      <Route path="/payment/cancel" element={<PaymentCancel />} />
+      
       {/* User Routes */}
       <Route path="/*" element={
         <>
