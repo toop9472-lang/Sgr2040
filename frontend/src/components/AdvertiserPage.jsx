@@ -531,7 +531,7 @@ const AdvertiserPage = ({ onNavigate }) => {
                     <CreditCard className="text-white" size={24} />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-bold text-gray-800">الدفع ببطاقة الائتمان</h4>
+                    <h4 className="font-bold text-gray-800">الدفع ببطاقة الائتمان (عالمي)</h4>
                     <p className="text-sm text-gray-600">Visa, Mastercard, Apple Pay, Google Pay</p>
                   </div>
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">فوري</span>
@@ -542,9 +542,36 @@ const AdvertiserPage = ({ onNavigate }) => {
                   className="w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white"
                   data-testid="stripe-pay-btn"
                 >
-                  {isSubmitting ? 'جاري التحويل...' : 'ادفع الآن'}
+                  {isSubmitting ? 'جاري التحويل...' : 'ادفع الآن عبر Stripe'}
                 </Button>
               </div>
+
+              {/* Tap Payment Option - Saudi Local */}
+              {tapAvailable && (
+                <div 
+                  className="p-4 rounded-lg border-2 border-green-200 bg-green-50 cursor-pointer hover:border-green-400 transition-all"
+                  onClick={handleTapPayment}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center">
+                      <Smartphone className="text-white" size={24} />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-gray-800">الدفع المحلي (السعودية)</h4>
+                      <p className="text-sm text-gray-600">mada, Apple Pay, STC Pay</p>
+                    </div>
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">محلي</span>
+                  </div>
+                  <Button
+                    onClick={handleTapPayment}
+                    disabled={isSubmitting}
+                    className="w-full mt-3 bg-green-600 hover:bg-green-700 text-white"
+                    data-testid="tap-pay-btn"
+                  >
+                    {isSubmitting ? 'جاري التحويل...' : 'ادفع الآن عبر Tap'}
+                  </Button>
+                </div>
+              )}
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
