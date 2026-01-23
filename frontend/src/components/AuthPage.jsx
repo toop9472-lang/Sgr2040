@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { toast } from '../hooks/use-toast';
+import { useLanguage } from '../i18n/LanguageContext';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -13,6 +15,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
  * REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
  */
 const AuthPage = ({ onLogin, onGuestMode }) => {
+  const { t, isRTL } = useLanguage();
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,18 +32,16 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
   };
 
   const handleAppleLogin = () => {
-    // Apple Sign In is typically only available on native iOS apps
-    // For web, we'll show a message
     toast({
-      title: 'قريباً',
-      description: 'تسجيل الدخول بـ Apple متاح فقط في تطبيق iOS',
+      title: t('comingSoon'),
+      description: isRTL ? 'تسجيل الدخول بـ Apple متاح فقط في تطبيق iOS' : 'Apple Sign In is only available on iOS app',
     });
   };
 
   const handleGuestMode = () => {
     const guestUser = {
       id: 'guest_' + Date.now(),
-      name: 'زائر',
+      name: isRTL ? 'زائر' : 'Guest',
       email: 'guest@saqr.app',
       avatar: 'https://ui-avatars.com/api/?name=Guest&background=94A3B8&color=fff',
       provider: 'guest',
@@ -73,15 +74,15 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
       }
 
       toast({
-        title: isRegister ? '✅ تم إنشاء الحساب' : '✅ تم تسجيل الدخول',
-        description: `مرحباً ${data.user.name}!`,
+        title: isRegister ? '✅ ' + t('success') : '✅ ' + t('login'),
+        description: `${t('welcome')} ${data.user.name}!`,
       });
 
       onLogin(data.user);
     } catch (error) {
       console.error('Auth error:', error);
       toast({
-        title: '❌ خطأ',
+        title: '❌ ' + t('error'),
         description: error.message,
         variant: 'destructive'
       });
@@ -93,43 +94,51 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
   if (showEmailForm) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
+        {/* Language Switcher */}
+        <div className="fixed top-4 left-4 z-50">
+          <LanguageSwitcher className="!bg-indigo-600 hover:!bg-indigo-700" />
+        </div>
+
         <Card className="w-full max-w-md shadow-xl border-0">
-          <CardHeader className="text-center pb-6 pt-8">
+          <CardHeader className="text-center pb-6 pt-8 relative">
             <button
               onClick={() => setShowEmailForm(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} text-gray-500 hover:text-gray-700`}
             >
-              ←
+              {isRTL ? '←' : '→'}
             </button>
             <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg">
               <span className="text-3xl">🦅</span>
             </div>
             <CardTitle className="text-2xl font-bold text-gray-800">
-              {isRegister ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
+              {isRegister ? t('register') : t('login')}
             </CardTitle>
             <CardDescription className="text-gray-600">
-              {isRegister ? 'أدخل بياناتك لإنشاء حساب' : 'أدخل بريدك الإلكتروني وكلمة المرور'}
+              {isRegister 
+                ? (isRTL ? 'أدخل بياناتك لإنشاء حساب' : 'Enter your details to create an account')
+                : (isRTL ? 'أدخل بريدك الإلكتروني وكلمة المرور' : 'Enter your email and password')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pb-8">
             <form onSubmit={handleEmailAuth} className="space-y-4">
               {isRegister && (
                 <div>
-                  <Label htmlFor="name">الاسم</Label>
+                  <Label htmlFor="name">{t('name')}</Label>
                   <Input
                     id="name"
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
-                    placeholder="اسمك الكامل"
+                    placeholder={isRTL ? 'اسمك الكامل' : 'Your full name'}
                     className="mt-1"
+                    dir={isRTL ? 'rtl' : 'ltr'}
                     data-testid="auth-name-input"
                   />
                 </div>
               )}
               <div>
-                <Label htmlFor="email">البريد الإلكتروني</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -138,11 +147,12 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
                   required
                   placeholder="your@email.com"
                   className="mt-1"
+                  dir="ltr"
                   data-testid="auth-email-input"
                 />
               </div>
               <div>
-                <Label htmlFor="password">كلمة المرور</Label>
+                <Label htmlFor="password">{t('password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -161,7 +171,7 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
                 className="w-full h-12 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
                 data-testid="auth-submit-btn"
               >
-                {isLoading ? 'جاري التحميل...' : (isRegister ? 'إنشاء حساب' : 'تسجيل الدخول')}
+                {isLoading ? t('loading') : (isRegister ? t('register') : t('login'))}
               </Button>
             </form>
             
@@ -171,7 +181,7 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
                 onClick={() => setIsRegister(!isRegister)}
                 className="text-indigo-600 hover:underline text-sm"
               >
-                {isRegister ? 'لديك حساب؟ سجّل الدخول' : 'ليس لديك حساب؟ سجّل الآن'}
+                {isRegister ? t('haveAccount') : t('noAccount')}
               </button>
             </div>
           </CardContent>
@@ -182,16 +192,21 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
+      {/* Language Switcher */}
+      <div className="fixed top-4 left-4 z-50">
+        <LanguageSwitcher className="!bg-indigo-600 hover:!bg-indigo-700" />
+      </div>
+
       <Card className="w-full max-w-md shadow-xl border-0">
         <CardHeader className="text-center pb-8 pt-10">
           <div className="mx-auto mb-6 w-20 h-20 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg">
             <span className="text-4xl">🦅</span>
           </div>
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            صقر
+            {t('appName')}
           </CardTitle>
           <CardDescription className="text-base mt-3 text-gray-600">
-            شاهد الإعلانات واكسب النقاط
+            {t('watchAdsEarnPoints')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 pb-10">
@@ -219,7 +234,7 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            <span className="font-medium">تسجيل الدخول بواسطة Google</span>
+            <span className="font-medium">{t('loginWithGoogle')}</span>
           </Button>
 
           <Button
@@ -230,7 +245,7 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
             </svg>
-            <span className="font-medium">تسجيل الدخول بواسطة Apple</span>
+            <span className="font-medium">{t('loginWithApple')}</span>
           </Button>
 
           <div className="relative my-4">
@@ -238,7 +253,7 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
               <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">أو</span>
+              <span className="px-2 bg-white text-gray-500">{t('or')}</span>
             </div>
           </div>
 
@@ -251,7 +266,7 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            <span className="font-medium">تسجيل بالبريد الإلكتروني</span>
+            <span className="font-medium">{t('loginWithEmail')}</span>
           </Button>
 
           <Button
@@ -264,18 +279,18 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            <span className="font-medium">زيارة (تصفح بدون تسجيل)</span>
+            <span className="font-medium">{t('guestMode')}</span>
           </Button>
 
           <div className="pt-4">
             <p className="text-center text-xs text-gray-500 leading-relaxed">
-              بتسجيل الدخول، أنت توافق على{' '}
+              {t('termsText')}{' '}
               <a href="#" className="text-indigo-600 hover:underline">
-                الشروط والأحكام
+                {t('termsLink')}
               </a>{' '}
-              و{' '}
+              {t('and')}{' '}
               <a href="#" className="text-indigo-600 hover:underline">
-                سياسة الخصوصية
+                {t('privacyLink')}
               </a>
             </p>
           </div>
