@@ -79,6 +79,14 @@ async def watch_ad(data: dict, user_id: str = Depends(get_current_user_id)):
             detail='ad_id is required'
         )
     
+    # Anti-cheat: Minimum watch time validation (at least 30 seconds)
+    MIN_WATCH_TIME = 30
+    if watch_time < MIN_WATCH_TIME:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f'Minimum watch time is {MIN_WATCH_TIME} seconds'
+        )
+    
     # Get ad
     ad = await db.ads.find_one({'id': ad_id})
     if not ad:
@@ -87,13 +95,21 @@ async def watch_ad(data: dict, user_id: str = Depends(get_current_user_id)):
             detail='Ad not found'
         )
     
-    # Get user
-    user = await db.users.find_one({'id': user_id})
+    # Get user - handle both 'id' and 'user_id' fields
+    user = await db.users.find_one({
+        '$or': [
+            {'id': user_id},
+            {'user_id': user_id}
+        ]
+    })
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='User not found'
         )
+    
+    # Get the actual user_id field from the user document
+    actual_user_id = user.get('id') or user.get('user_id')
     
     # Anti-cheat: Check if ad was already watched
     watched_ads = user.get('watched_ads', [])
@@ -101,21 +117,34 @@ async def watch_ad(data: dict, user_id: str = Depends(get_current_user_id)):
         if watched_ad.get('ad_id') == ad_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail='This ad has already been watched. Each ad can only be watched once.'
+                detail='لقد شاهدت هذا الإعلان من قبل. كل إعلان يمكن مشاهدته مرة واحدة فقط.'
             )
     
-    # Validate watch time
+    # Anti-cheat: Check for rapid watching (max 5 ads per 10 minutes)
+    from datetime import timedelta
+    ten_minutes_ago = datetime.utcnow() - timedelta(minutes=10)
+    recent_watches = [
+        w for w in watched_ads 
+        if w.get('watched_at') and w['watched_at'] > ten_minutes_ago
+    ]
+    if len(recent_watches) >= 5:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail='أنت تشاهد الإعلانات بسرعة كبيرة. يرجى الانتظار قليلاً.'
+        )
+    
+    # Validate watch time - cannot exceed ad duration
     max_watch_time = ad['duration']
     if watch_time > max_watch_time:
         watch_time = max_watch_time
     
     # Calculate points (1 point per minute)
-    points_earned = (watch_time // 60) * ad['points_per_minute']
+    points_earned = (watch_time // 60) * ad.get('points_per_minute', 1)
     
     if points_earned <= 0:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Watch time too short to earn points'
+            detail='وقت المشاهدة قصير جداً لكسب النقاط. شاهد لمدة دقيقة على الأقل.'
         )
     
     # Create watched ad record
@@ -128,7 +157,7 @@ async def watch_ad(data: dict, user_id: str = Depends(get_current_user_id)):
     
     # Update user points and watched ads
     await db.users.update_one(
-        {'id': user_id},
+        {'$or': [{'id': actual_user_id}, {'user_id': actual_user_id}]},
         {
             '$inc': {
                 'points': points_earned,
@@ -140,11 +169,13 @@ async def watch_ad(data: dict, user_id: str = Depends(get_current_user_id)):
     )
     
     # Get updated user
-    updated_user = await db.users.find_one({'id': user_id})
+    updated_user = await db.users.find_one({
+        '$or': [{'id': actual_user_id}, {'user_id': actual_user_id}]
+    })
     
     return {
         'success': True,
         'points_earned': points_earned,
-        'total_points': updated_user['points'],
-        'message': f'Earned {points_earned} points!'
+        'total_points': updated_user.get('points', 0),
+        'message': f'حصلت على {points_earned} نقطة!'
     }
