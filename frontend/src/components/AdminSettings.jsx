@@ -237,6 +237,11 @@ const AdminSettings = () => {
           </Card>
         </TabsContent>
 
+        {/* Wallet Tab */}
+        <TabsContent value="wallet">
+          <AdminWallet />
+        </TabsContent>
+
         {/* Maintenance Tab */}
         <TabsContent value="maintenance">
           <Card className={appSettings.maintenance_mode ? 'border-2 border-orange-500' : ''}>
