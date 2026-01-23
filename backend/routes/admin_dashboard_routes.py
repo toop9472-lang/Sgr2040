@@ -112,6 +112,14 @@ async def approve_withdrawal(
     """
     db = get_db()
     
+    # Get withdrawal first
+    withdrawal = await db.withdrawals.find_one({'id': withdrawal_id})
+    if not withdrawal:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Withdrawal not found'
+        )
+    
     result = await db.withdrawals.update_one(
         {'id': withdrawal_id},
         {'$set': {
@@ -126,6 +134,17 @@ async def approve_withdrawal(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Withdrawal not found'
         )
+    
+    # Send notification to user
+    from routes.notification_routes import send_notification_to_user
+    await send_notification_to_user(
+        db=db,
+        user_id=withdrawal['user_id'],
+        title='✅ تمت الموافقة على طلب السحب',
+        body=f'تمت الموافقة على طلب السحب الخاص بك بقيمة ${withdrawal.get("amount", 0):.2f}',
+        notification_type='withdrawal_approved',
+        data={'withdrawal_id': withdrawal_id, 'amount': withdrawal.get('amount', 0)}
+    )
     
     return {'success': True, 'message': 'تمت الموافقة على طلب السحب'}
 
