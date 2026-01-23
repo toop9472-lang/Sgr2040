@@ -1,16 +1,20 @@
 """
 Admin Users Management Routes
 Manage users - ban, delete, view details
+Protected admin accounts cannot be modified
 """
 from fastapi import APIRouter, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from typing import Optional, List
 from auth.dependencies import get_current_user_id
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 router = APIRouter(prefix='/admin/users', tags=['Admin Users Management'])
+
+# Protected admin emails - cannot be deleted or banned
+PROTECTED_ADMINS = ['sky-321@hotmail.com']
 
 def get_db():
     mongo_url = os.environ['MONGO_URL']
@@ -25,6 +29,29 @@ async def verify_admin(user_id: str, db):
     return admin
 
 
+async def get_user_by_id(db, target_user_id: str):
+    """Get user by user_id or id"""
+    user = await db.users.find_one(
+        {'$or': [{'user_id': target_user_id}, {'id': target_user_id}]},
+        {'_id': 0}
+    )
+    return user
+
+
+async def check_protected_user(db, target_user_id: str):
+    """Check if user is a protected admin"""
+    user = await get_user_by_id(db, target_user_id)
+    if user and user.get('email') in PROTECTED_ADMINS:
+        raise HTTPException(status_code=403, detail='لا يمكن تعديل حساب المدير الرئيسي')
+    
+    # Also check admins collection
+    admin = await db.admins.find_one({'$or': [{'id': target_user_id}, {'email': target_user_id}]})
+    if admin and admin.get('email') in PROTECTED_ADMINS:
+        raise HTTPException(status_code=403, detail='لا يمكن تعديل حساب المدير الرئيسي')
+    
+    return user
+
+
 @router.get('/list')
 async def get_all_users(
     page: int = 1,
@@ -33,16 +60,20 @@ async def get_all_users(
     status: str = "all",
     user_id: str = Depends(get_current_user_id)
 ):
-    """Get all users with pagination and filtering"""
+    """Get all users (excluding admins) with pagination and filtering"""
     db = get_db()
     await verify_admin(user_id, db)
     
-    query = {}
+    # Exclude admin emails from the list
+    query = {'email': {'$nin': PROTECTED_ADMINS}}
     
     if search:
-        query['$or'] = [
-            {'name': {'$regex': search, '$options': 'i'}},
-            {'email': {'$regex': search, '$options': 'i'}}
+        query['$and'] = [
+            {'email': {'$nin': PROTECTED_ADMINS}},
+            {'$or': [
+                {'name': {'$regex': search, '$options': 'i'}},
+                {'email': {'$regex': search, '$options': 'i'}}
+            ]}
         ]
     
     if status == "banned":
@@ -61,7 +92,7 @@ async def get_all_users(
         'users': users,
         'total': total,
         'page': page,
-        'pages': (total + limit - 1) // limit
+        'pages': (total + limit - 1) // limit if total > 0 else 1
     }
 
 
@@ -74,10 +105,7 @@ async def get_user_details(
     db = get_db()
     await verify_admin(user_id, db)
     
-    user = await db.users.find_one(
-        {'$or': [{'id': target_user_id}, {'user_id': target_user_id}]},
-        {'_id': 0, 'password': 0}
-    )
+    user = await get_user_by_id(db, target_user_id)
     
     if not user:
         raise HTTPException(status_code=404, detail='المستخدم غير موجود')
@@ -107,12 +135,15 @@ async def ban_user(
     reason: str = "",
     user_id: str = Depends(get_current_user_id)
 ):
-    """Ban a user"""
+    """Ban a user (protected admins cannot be banned)"""
     db = get_db()
     admin = await verify_admin(user_id, db)
     
+    # Check if protected
+    await check_protected_user(db, target_user_id)
+    
     result = await db.users.update_one(
-        {'$or': [{'id': target_user_id}, {'user_id': target_user_id}]},
+        {'$or': [{'user_id': target_user_id}, {'id': target_user_id}]},
         {'$set': {
             'is_banned': True,
             'ban_reason': reason,
@@ -137,7 +168,7 @@ async def unban_user(
     await verify_admin(user_id, db)
     
     result = await db.users.update_one(
-        {'$or': [{'id': target_user_id}, {'user_id': target_user_id}]},
+        {'$or': [{'user_id': target_user_id}, {'id': target_user_id}]},
         {'$set': {
             'is_banned': False,
             'ban_reason': '',
@@ -156,19 +187,22 @@ async def delete_user(
     target_user_id: str,
     user_id: str = Depends(get_current_user_id)
 ):
-    """Delete a user permanently"""
+    """Delete a user permanently (protected admins cannot be deleted)"""
     db = get_db()
     await verify_admin(user_id, db)
     
+    # Check if protected
+    await check_protected_user(db, target_user_id)
+    
     # Delete user
     result = await db.users.delete_one(
-        {'$or': [{'id': target_user_id}, {'user_id': target_user_id}]}
+        {'$or': [{'user_id': target_user_id}, {'id': target_user_id}]}
     )
     
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail='المستخدم غير موجود')
     
-    # Delete user's data
+    # Delete user's related data
     await db.withdrawals.delete_many({'user_id': target_user_id})
     await db.notifications.delete_many({'user_id': target_user_id})
     await db.devices.delete_many({'user_id': target_user_id})
@@ -187,9 +221,7 @@ async def update_user_points(
     db = get_db()
     admin = await verify_admin(user_id, db)
     
-    user = await db.users.find_one(
-        {'$or': [{'id': target_user_id}, {'user_id': target_user_id}]}
-    )
+    user = await get_user_by_id(db, target_user_id)
     
     if not user:
         raise HTTPException(status_code=404, detail='المستخدم غير موجود')
@@ -201,7 +233,7 @@ async def update_user_points(
         raise HTTPException(status_code=400, detail='لا يمكن أن يكون الرصيد سالباً')
     
     await db.users.update_one(
-        {'$or': [{'id': target_user_id}, {'user_id': target_user_id}]},
+        {'$or': [{'user_id': target_user_id}, {'id': target_user_id}]},
         {
             '$set': {'points': new_points},
             '$push': {
@@ -233,15 +265,18 @@ async def get_users_overview(user_id: str = Depends(get_current_user_id)):
     this_week = today - timedelta(days=7)
     this_month = today - timedelta(days=30)
     
-    total = await db.users.count_documents({})
-    banned = await db.users.count_documents({'is_banned': True})
-    new_today = await db.users.count_documents({'created_at': {'$gte': today}})
-    new_this_week = await db.users.count_documents({'created_at': {'$gte': this_week}})
-    new_this_month = await db.users.count_documents({'created_at': {'$gte': this_month}})
+    # Exclude protected admins from counts
+    base_query = {'email': {'$nin': PROTECTED_ADMINS}}
+    
+    total = await db.users.count_documents(base_query)
+    banned = await db.users.count_documents({**base_query, 'is_banned': True})
+    new_today = await db.users.count_documents({**base_query, 'created_at': {'$gte': today}})
+    new_this_week = await db.users.count_documents({**base_query, 'created_at': {'$gte': this_week}})
+    new_this_month = await db.users.count_documents({**base_query, 'created_at': {'$gte': this_month}})
     
     # Top users by points
     top_users = await db.users.find(
-        {},
+        base_query,
         {'_id': 0, 'id': 1, 'user_id': 1, 'name': 1, 'email': 1, 'points': 1, 'total_earned': 1}
     ).sort('total_earned', -1).limit(10).to_list(10)
     
@@ -254,6 +289,3 @@ async def get_users_overview(user_id: str = Depends(get_current_user_id)):
         'new_this_month': new_this_month,
         'top_users': top_users
     }
-
-
-from datetime import timedelta
