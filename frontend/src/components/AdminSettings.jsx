@@ -47,7 +47,13 @@ const AdminSettings = () => {
   // OAuth Settings
   const [oauthSettings, setOauthSettings] = useState({
     google_enabled: true,
-    apple_enabled: false
+    google_client_id: '',
+    google_client_secret: '',
+    apple_enabled: false,
+    apple_client_id: '',
+    apple_team_id: '',
+    apple_key_id: '',
+    apple_private_key: ''
   });
   
   // App Settings
