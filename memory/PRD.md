@@ -200,5 +200,5 @@
 
 | الخدمة | الرابط |
 |--------|--------|
-| الموقع | https://adrewards-37.preview.emergentagent.com |
-| API Docs | https://adrewards-37.preview.emergentagent.com/docs |
+| الموقع | https://adpoints-4.preview.emergentagent.com |
+| API Docs | https://adpoints-4.preview.emergentagent.com/docs |
