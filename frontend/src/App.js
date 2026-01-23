@@ -219,7 +219,7 @@ function App() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50">
         <div className="text-center">
-          <div className="w-32 h-32 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4 animate-pulse">
+          <div className="w-24 h-24 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4 animate-pulse">
             <img 
               src="https://customer-assets.emergentagent.com/job_adreward-app-5/artifacts/8im25ksz_IMG_3313.jpeg" 
               alt="صقر"
