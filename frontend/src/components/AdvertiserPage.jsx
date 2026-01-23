@@ -29,7 +29,21 @@ const AdvertiserPage = ({ onNavigate }) => {
   const [createdAd, setCreatedAd] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('');
   const [paymentProof, setPaymentProof] = useState('');
-  const [pricing, setPricing] = useState(null);
+  const [pricing, setPricing] = useState({
+    price_per_month: 500,
+    currency: 'SAR',
+    features: [
+      'عرض إعلانك لجميع المستخدمين',
+      'إحصائيات مشاهدة مفصلة',
+      'مدة شهر كامل',
+      'دعم فني كامل'
+    ],
+    payment_methods: [
+      { id: 'bank', name: 'تحويل بنكي', icon: '🏦' },
+      { id: 'stcpay', name: 'STC Pay', icon: '📱' },
+      { id: 'cash', name: 'نقدي', icon: '💵' }
+    ]
+  });
 
   // Load pricing on mount
   React.useEffect(() => {
@@ -39,6 +53,7 @@ const AdvertiserPage = ({ onNavigate }) => {
         setPricing(response.data);
       } catch (error) {
         console.error('Failed to load pricing:', error);
+        // Keep default pricing data
       }
     };
     loadPricing();
