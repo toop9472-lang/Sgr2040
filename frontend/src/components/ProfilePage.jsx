@@ -8,6 +8,7 @@ import { Progress } from './ui/progress';
 const ProfilePage = ({ user, onLogout, onNavigate }) => {
   const pointsToNextDollar = 500 - (user.points % 500);
   const progressToNextDollar = ((user.points % 500) / 500) * 100;
+  const isGuest = user?.isGuest || false;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 pb-20">
@@ -33,16 +34,44 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
           <div>
             <h2 className="text-white text-xl font-bold">{user.name}</h2>
             <p className="text-white/80 text-sm">{user.email}</p>
-            <p className="text-white/60 text-xs mt-1">
-              عضو منذ {new Date(user.joinedDate).toLocaleDateString('ar-SA')}
-            </p>
+            {isGuest && (
+              <div className="mt-1 bg-yellow-500/20 text-yellow-100 px-2 py-1 rounded text-xs">
+                👤 وضع الزائر
+              </div>
+            )}
+            {!isGuest && (
+              <p className="text-white/60 text-xs mt-1">
+                عضو منذ {new Date(user.joined_date || user.joinedDate).toLocaleDateString('ar-SA')}
+              </p>
+            )}
           </div>
         </div>
       </div>
 
       <div className="px-4 -mt-16 space-y-4">
+        {/* Guest Warning */}
+        {isGuest && (
+          <Card className="shadow-lg border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-amber-50">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <div className="text-4xl mb-2">🔒</div>
+                <h3 className="font-bold text-lg mb-2">أنت في وضع الزائر</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  سجّل الدخول للحصول على النقاط وكسب المال!
+                </p>
+                <Button
+                  onClick={onLogout}
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                >
+                  تسجيل الدخول الآن
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Points Card */}
-        <Card className="shadow-lg border-0">
+        {!isGuest && (
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
               <Award className="text-yellow-500" size={24} />
