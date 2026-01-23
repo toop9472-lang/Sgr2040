@@ -139,6 +139,7 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
         </div>
 
         {/* Info Card */}
+        {!isGuest && (
         <Card className="shadow-md border-0">
           <CardHeader>
             <CardTitle className="text-lg">كيف يعمل النظام؟</CardTitle>
