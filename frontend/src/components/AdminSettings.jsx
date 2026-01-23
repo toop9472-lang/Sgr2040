@@ -113,12 +113,13 @@ const AdminSettings = () => {
       setIsLoading(true);
       const headers = getAuthHeaders();
 
-      const [paymentRes, oauthRes, appRes, emergencyRes, statsRes] = await Promise.all([
+      const [paymentRes, oauthRes, appRes, emergencyRes, statsRes, emailRes] = await Promise.all([
         axios.get(`${API}/settings/payment-gateways`, { headers }),
         axios.get(`${API}/settings/oauth`, { headers }),
         axios.get(`${API}/settings/app`, { headers }).catch(() => ({ data: appSettings })),
         axios.get(`${API}/settings/emergency`, { headers }).catch(() => ({ data: emergencySettings })),
-        axios.get(`${API}/settings/dashboard/stats`, { headers }).catch(() => ({ data: null }))
+        axios.get(`${API}/settings/dashboard/stats`, { headers }).catch(() => ({ data: null })),
+        axios.get(`${API}/email/settings`, { headers }).catch(() => ({ data: emailSettings }))
       ]);
 
       setPaymentSettings(paymentRes.data);
@@ -126,6 +127,7 @@ const AdminSettings = () => {
       setAppSettings({ ...appSettings, ...appRes.data });
       setEmergencySettings({ ...emergencySettings, ...emergencyRes.data });
       setDashboardStats(statsRes.data);
+      setEmailSettings({ ...emailSettings, ...emailRes.data });
     } catch (error) {
       console.error('Failed to load settings:', error);
     } finally {
