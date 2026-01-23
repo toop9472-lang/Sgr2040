@@ -296,23 +296,23 @@ const AdminDashboard = ({ admin, onLogout }) => {
       {/* Tabs */}
       <div className="px-4">
         <Tabs defaultValue="users" className="w-full">
-          <TabsList className="grid w-full grid-cols-6 text-xs">
-            <TabsTrigger value="users">
+          <TabsList className="flex flex-wrap gap-2 h-auto p-2 bg-gray-100 rounded-lg">
+            <TabsTrigger value="users" className="flex-1 min-w-[100px] text-xs py-2">
               المستخدمون
             </TabsTrigger>
-            <TabsTrigger value="withdrawals">
+            <TabsTrigger value="withdrawals" className="flex-1 min-w-[100px] text-xs py-2">
               السحوبات ({pendingWithdrawals.length})
             </TabsTrigger>
-            <TabsTrigger value="ads">
+            <TabsTrigger value="ads" className="flex-1 min-w-[100px] text-xs py-2">
               الإعلانات ({pendingAds.length})
             </TabsTrigger>
-            <TabsTrigger value="analytics">
+            <TabsTrigger value="analytics" className="flex-1 min-w-[100px] text-xs py-2">
               التحليلات
             </TabsTrigger>
-            <TabsTrigger value="invoices">
+            <TabsTrigger value="invoices" className="flex-1 min-w-[100px] text-xs py-2">
               الفواتير
             </TabsTrigger>
-            <TabsTrigger value="settings">
+            <TabsTrigger value="settings" className="flex-1 min-w-[100px] text-xs py-2">
               الإعدادات
             </TabsTrigger>
           </TabsList>
