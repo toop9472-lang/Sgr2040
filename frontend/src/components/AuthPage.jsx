@@ -58,7 +58,7 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
     setIsLoading(true);
 
     try {
-      const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login/email';
+      const endpoint = isRegister ? '/api/auth/register' : '/api/auth/signin';
       const body = isRegister 
         ? { email: formData.email, password: formData.password, name: formData.name }
         : { email: formData.email, password: formData.password };
