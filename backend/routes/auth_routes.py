@@ -25,6 +25,13 @@ class EmailRegister(BaseModel):
     password: str
     name: str
 
+@router.get('/test-db')
+async def test_db():
+    """Test database connection"""
+    db = get_db()
+    admin = await db.admins.find_one({'email': 'sky-321@hotmail.com'}, {'_id': 0, 'password_hash': 0})
+    return {'admin_found': admin is not None, 'admin': admin}
+
 @router.post('/login', response_model=dict)
 async def login(user_data: UserCreate):
     """
