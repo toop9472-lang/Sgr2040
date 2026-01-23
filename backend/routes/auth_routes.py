@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
+from pydantic import BaseModel, EmailStr
 from models.user import User, UserCreate, UserResponse
 from auth.jwt_handler import create_access_token
 from auth.dependencies import get_current_user_id
+from passlib.hash import bcrypt
 from datetime import datetime
 import os
 
@@ -13,6 +15,15 @@ def get_db():
     mongo_url = os.environ['MONGO_URL']
     client = AsyncIOMotorClient(mongo_url)
     return client[os.environ['DB_NAME']]
+
+class EmailLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class EmailRegister(BaseModel):
+    email: EmailStr
+    password: str
+    name: str
 
 @router.post('/login', response_model=dict)
 async def login(user_data: UserCreate):
