@@ -27,6 +27,18 @@ function App() {
   // Check if user is authenticated on load
   useEffect(() => {
     const checkAuth = async () => {
+      // Check admin first
+      const adminToken = localStorage.getItem('admin_token');
+      const savedAdmin = localStorage.getItem('admin_data');
+      
+      if (adminToken && savedAdmin) {
+        setIsAdmin(true);
+        setAdminData(JSON.parse(savedAdmin));
+        setIsLoading(false);
+        return;
+      }
+      
+      // Check user auth
       const token = getToken();
       if (token) {
         try {
