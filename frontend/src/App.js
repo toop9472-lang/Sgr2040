@@ -219,13 +219,8 @@ function App() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50">
         <div className="text-center">
-          <div className="w-24 h-24 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4 animate-pulse">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_adreward-app-5/artifacts/8im25ksz_IMG_3313.jpeg" 
-              alt="صقر"
-              className="w-full h-full object-contain"
-              style={{ mixBlendMode: 'multiply' }}
-            />
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center animate-pulse">
+            <span className="text-4xl">🦅</span>
           </div>
           <p className="text-gray-600 text-lg">جاري التحميل...</p>
         </div>
