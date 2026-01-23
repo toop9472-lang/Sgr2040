@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
@@ -22,11 +22,31 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [oauthSettings, setOauthSettings] = useState({
+    google_enabled: true,
+    apple_enabled: false
+  });
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     name: ''
   });
+
+  // Load OAuth settings from backend
+  useEffect(() => {
+    const loadOAuthSettings = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/settings/public/oauth`);
+        if (response.ok) {
+          const data = await response.json();
+          setOauthSettings(data);
+        }
+      } catch (error) {
+        console.error('Failed to load OAuth settings:', error);
+      }
+    };
+    loadOAuthSettings();
+  }, []);
 
   const handleGoogleLogin = () => {
     // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
