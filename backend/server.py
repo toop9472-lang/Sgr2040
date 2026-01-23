@@ -15,6 +15,7 @@ from routes.auth_routes import router as auth_router
 from routes.ad_routes import router as ad_router
 from routes.withdrawal_routes import router as withdrawal_router
 from routes.user_routes import router as user_router
+from routes.advertiser_routes import router as advertiser_router
 
 
 ROOT_DIR = Path(__file__).parent
