@@ -110,7 +110,7 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
 
         {/* Stats Cards */}
         {!isGuest && (
-        <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
           <Card className="shadow-md border-0">
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
