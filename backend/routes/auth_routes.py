@@ -7,6 +7,7 @@ from auth.dependencies import get_current_user_id
 from passlib.hash import bcrypt
 from datetime import datetime
 import os
+import uuid
 
 router = APIRouter(prefix='/auth', tags=['Authentication'])
 
@@ -25,32 +26,12 @@ class EmailRegister(BaseModel):
     password: str
     name: str
 
-@router.get('/test-db')
-async def test_db():
-    """Test database connection"""
-    db = get_db()
-    admin = await db.admins.find_one({'email': 'sky-321@hotmail.com'}, {'_id': 0, 'password_hash': 0})
-    return {'admin_found': admin is not None, 'admin': admin}
-
-@router.post('/test-password')
-async def test_password(credentials: EmailLogin):
-    """Test password verification"""
-    db = get_db()
-    admin = await db.admins.find_one({'email': credentials.email}, {'_id': 0})
-    if not admin:
-        return {'error': 'Admin not found'}
-    
-    try:
-        result = bcrypt.verify(credentials.password, admin['password_hash'])
-        return {'password_valid': result, 'hash_used': admin['password_hash'][:20] + '...'}
-    except Exception as e:
-        return {'error': str(e)}
 
 @router.post('/signin', response_model=dict)
 async def signin(credentials: EmailLogin):
     """
     Unified sign in - checks both admins and users
-    If admin credentials, returns admin role for redirect
+    If admin credentials, returns admin role for redirect to admin dashboard
     """
     db = get_db()
     
@@ -126,6 +107,71 @@ async def signin(credentials: EmailLogin):
         detail='البريد الإلكتروني أو كلمة المرور غير صحيحة'
     )
 
+
+@router.post('/register', response_model=dict)
+async def register_email(data: EmailRegister):
+    """
+    Register new user with email/password
+    """
+    db = get_db()
+    
+    # Check if email already exists
+    existing = await db.users.find_one({'email': data.email})
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='البريد الإلكتروني مسجل بالفعل'
+        )
+    
+    # Check if admin with this email exists
+    admin_exists = await db.admins.find_one({'email': data.email})
+    if admin_exists:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='البريد الإلكتروني مسجل بالفعل'
+        )
+    
+    # Hash password
+    password_hash = bcrypt.hash(data.password)
+    
+    # Create user
+    user_id = str(uuid.uuid4())
+    
+    user_doc = {
+        'id': user_id,
+        'email': data.email,
+        'name': data.name,
+        'password_hash': password_hash,
+        'provider': 'email',
+        'provider_id': data.email,
+        'avatar': f"https://ui-avatars.com/api/?name={data.name}&background=6366f1&color=fff",
+        'points': 0,
+        'total_earned': 0,
+        'watched_ads': [],
+        'created_at': datetime.utcnow(),
+        'updated_at': datetime.utcnow()
+    }
+    
+    await db.users.insert_one(user_doc)
+    
+    # Create token
+    token = create_access_token(user_id)
+    
+    return {
+        'token': token,
+        'role': 'user',
+        'user': {
+            'id': user_id,
+            'email': data.email,
+            'name': data.name,
+            'avatar': user_doc['avatar'],
+            'points': 0,
+            'total_earned': 0,
+            'joined_date': user_doc['created_at'].isoformat()
+        }
+    }
+
+
 @router.post('/login', response_model=dict)
 async def login(user_data: UserCreate):
     """
@@ -181,161 +227,6 @@ async def login(user_data: UserCreate):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f'Login failed: {str(e)}'
         )
-
-@router.post('/login/email', response_model=dict)
-async def login_email(credentials: EmailLogin):
-    """
-    Unified email login - checks both admins and users
-    If admin credentials, returns admin role for redirect
-    """
-    import logging
-    logger = logging.getLogger('uvicorn.error')
-    
-    try:
-        db = get_db()
-        logger.info(f"Login attempt for: {credentials.email}")
-        
-        # First, check if this is an admin
-        admin = await db.admins.find_one({'email': credentials.email}, {'_id': 0})
-        logger.info(f"Admin found: {admin is not None}")
-        
-        if admin:
-            # Verify admin password
-            try:
-                password_valid = bcrypt.verify(credentials.password, admin['password_hash'])
-                logger.info(f"Password valid: {password_valid}")
-            except Exception as e:
-                logger.error(f"Password check error: {e}")
-                password_valid = False
-            
-            if password_valid:
-                admin_id = admin.get('id', admin['email'])
-                logger.info(f"Admin login successful: {admin_id}")
-                
-                # Update last login
-                await db.admins.update_one(
-                    {'email': credentials.email},
-                    {'$set': {'last_login': datetime.utcnow()}}
-                )
-                
-                # Create token
-                token = create_access_token(admin_id)
-                
-                return {
-                    'token': token,
-                    'role': 'admin',
-                    'user': {
-                        'id': admin_id,
-                        'email': admin['email'],
-                        'name': admin.get('name', 'Admin'),
-                        'role': admin.get('role', 'admin')
-                    }
-                }
-        
-        # Not admin, check regular users
-        user = await db.users.find_one({'email': credentials.email}, {'_id': 0})
-        
-        if user:
-            # Check password
-            try:
-                password_valid = user.get('password_hash') and bcrypt.verify(credentials.password, user['password_hash'])
-            except Exception:
-                password_valid = False
-            
-            if password_valid:
-                token = create_access_token(user['id'])
-                
-                return {
-                    'token': token,
-                    'role': 'user',
-                    'user': {
-                        'id': user['id'],
-                        'email': user['email'],
-                        'name': user['name'],
-                        'avatar': user.get('avatar'),
-                        'points': user.get('points', 0),
-                        'total_earned': user.get('total_earned', 0),
-                        'joined_date': user.get('created_at', datetime.utcnow()).isoformat() if isinstance(user.get('created_at'), datetime) else str(user.get('created_at', ''))
-                    }
-                }
-        
-        # No user found or wrong password
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='البريد الإلكتروني أو كلمة المرور غير صحيحة'
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f'Login error: {str(e)}'
-        )
-
-
-@router.post('/register', response_model=dict)
-async def register_email(data: EmailRegister):
-    """
-    Register new user with email/password
-    """
-    db = get_db()
-    
-    # Check if email already exists
-    existing = await db.users.find_one({'email': data.email})
-    if existing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='البريد الإلكتروني مسجل بالفعل'
-        )
-    
-    # Check if admin with this email exists
-    admin_exists = await db.admins.find_one({'email': data.email})
-    if admin_exists:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='البريد الإلكتروني مسجل بالفعل'
-        )
-    
-    # Hash password
-    password_hash = bcrypt.hash(data.password)
-    
-    # Create user
-    import uuid
-    user_id = str(uuid.uuid4())
-    
-    user_doc = {
-        'id': user_id,
-        'email': data.email,
-        'name': data.name,
-        'password_hash': password_hash,
-        'provider': 'email',
-        'provider_id': data.email,
-        'avatar': f"https://ui-avatars.com/api/?name={data.name}&background=6366f1&color=fff",
-        'points': 0,
-        'total_earned': 0,
-        'watched_ads': [],
-        'created_at': datetime.utcnow(),
-        'updated_at': datetime.utcnow()
-    }
-    
-    await db.users.insert_one(user_doc)
-    
-    # Create token
-    token = create_access_token(user_id)
-    
-    return {
-        'token': token,
-        'role': 'user',
-        'user': {
-            'id': user_id,
-            'email': data.email,
-            'name': data.name,
-            'avatar': user_doc['avatar'],
-            'points': 0,
-            'total_earned': 0,
-            'joined_date': user_doc['created_at'].isoformat()
-        }
-    }
 
 
 @router.get('/me', response_model=dict)
