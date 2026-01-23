@@ -18,6 +18,7 @@ from routes.user_routes import router as user_router
 from routes.advertiser_routes import router as advertiser_router
 from routes.admin_auth_routes import router as admin_auth_router
 from routes.admin_dashboard_routes import router as admin_dashboard_router
+from routes.payment_routes import router as payment_router
 
 
 ROOT_DIR = Path(__file__).parent
