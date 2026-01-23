@@ -7,8 +7,8 @@ const BottomNav = ({ currentPage, onNavigate }) => {
 
   const navItems = [
     { id: 'home', label: t('home'), icon: Home },
-    { id: 'notifications', label: isRTL ? 'الإشعارات' : 'Notifications', icon: Bell },
-    { id: 'advertiser', label: t('advertiser'), icon: PlusCircle },
+    { id: 'notifications', label: t('notifications'), icon: Bell },
+    { id: 'advertiser', label: t('advertiseNow'), icon: PlusCircle },
     { id: 'profile', label: t('profile'), icon: User },
   ];
 

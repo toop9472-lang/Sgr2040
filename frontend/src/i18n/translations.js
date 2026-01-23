@@ -33,6 +33,8 @@ export const translations = {
     home: 'الرئيسية',
     profile: 'حسابي',
     advertiser: 'أضف إعلانك',
+    advertiseNow: 'أعلن الآن',
+    notifications: 'الإشعارات',
     withdraw: 'سحب الرصيد',
     
     // Home/Ads
@@ -202,6 +204,8 @@ export const translations = {
     home: 'Home',
     profile: 'Profile',
     advertiser: 'Add Your Ad',
+    advertiseNow: 'Advertise',
+    notifications: 'Notifications',
     withdraw: 'Withdraw',
     
     // Home/Ads
