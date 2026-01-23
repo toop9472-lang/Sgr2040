@@ -401,7 +401,14 @@ const AdvertiserPage = ({ onNavigate }) => {
             <CardHeader>
               <CardTitle>اختر طريقة الدفع</CardTitle>
               <CardDescription>
-                المبلغ المطلوب: <strong>{createdAd.payment.amount} ريال</strong>
+                المبلغ المطلوب: <strong>{getCurrentPackage()?.amount || createdAd.payment.amount} ريال</strong>
+                {getCurrentPackage()?.duration_months > 1 && (
+                  <span className="text-green-600 text-sm mr-2">
+                    (خصم {getCurrentPackage()?.duration_months === 3 ? '10%' : 
+                           getCurrentPackage()?.duration_months === 6 ? '20%' : 
+                           getCurrentPackage()?.duration_months === 12 ? '30%' : ''})
+                  </span>
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
