@@ -85,10 +85,27 @@ const AuthScreen = () => {
           name: formData.name,
         });
       } else {
-        response = await authAPI.loginEmail({
+        // Use unified signin endpoint
+        response = await authAPI.signin({
           email: formData.email,
           password: formData.password,
         });
+      }
+
+      // Save token if present
+      if (response.token) {
+        await setToken(response.token);
+      }
+
+      // Check if admin login (redirect to web app)
+      if (response.role === 'admin') {
+        Alert.alert(
+          'تنبيه',
+          'تسجيل دخول المشرفين متاح فقط عبر الموقع الإلكتروني',
+          [{ text: 'حسناً' }]
+        );
+        setIsLoading(false);
+        return;
       }
 
       await login(response.user);
