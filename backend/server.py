@@ -25,6 +25,7 @@ from routes.notification_routes import router as notification_router
 from routes.invoice_routes import router as invoice_router
 from routes.analytics_routes import router as analytics_router
 from routes.withdrawal_methods_routes import router as withdrawal_methods_router
+from routes.activity_routes import router as activity_router
 
 
 ROOT_DIR = Path(__file__).parent
