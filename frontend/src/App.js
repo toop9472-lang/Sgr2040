@@ -139,10 +139,10 @@ function MainApp() {
           setAds([]);
         }
         
-        toast({
-          title: '👋 مرحباً بك كزائر',
-          description: 'يمكنك تصفح الإعلانات. سجّل الدخول لكسب النقاط!',
-        });
+        // No welcome toast for guests
+        setIsLoading(false);
+        return;
+      }
         
         setIsLoading(false);
         return;
