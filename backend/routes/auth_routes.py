@@ -87,18 +87,26 @@ async def login_email(credentials: EmailLogin):
     Unified email login - checks both admins and users
     If admin credentials, returns admin role for redirect
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     db = get_db()
+    
+    logger.info(f"Login attempt for email: {credentials.email}")
     
     # First, check if this is an admin
     admin = await db.admins.find_one({'email': credentials.email}, {'_id': 0})
     
+    logger.info(f"Admin found: {admin is not None}")
+    
     if admin:
+        logger.info(f"Admin password_hash exists: {'password_hash' in admin}")
         # Verify admin password
         try:
             password_valid = bcrypt.verify(credentials.password, admin['password_hash'])
+            logger.info(f"Password valid: {password_valid}")
         except Exception as e:
-            import logging
-            logging.error(f"Password verification error: {e}")
+            logger.error(f"Password verification error: {e}")
             password_valid = False
         
         if password_valid:
