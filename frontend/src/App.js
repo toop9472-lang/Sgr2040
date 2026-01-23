@@ -132,10 +132,6 @@ function App() {
     setCurrentPage(page);
   };
 
-  const handleNavigate = (page) => {
-    setCurrentPage(page);
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50">
