@@ -46,6 +46,86 @@ async def test_password(credentials: EmailLogin):
     except Exception as e:
         return {'error': str(e)}
 
+@router.post('/signin', response_model=dict)
+async def signin(credentials: EmailLogin):
+    """
+    Unified sign in - checks both admins and users
+    If admin credentials, returns admin role for redirect
+    """
+    db = get_db()
+    
+    # First, check if this is an admin
+    admin = await db.admins.find_one({'email': credentials.email}, {'_id': 0})
+    
+    if admin:
+        # Verify admin password
+        try:
+            password_valid = bcrypt.verify(credentials.password, admin['password_hash'])
+        except Exception:
+            password_valid = False
+        
+        if password_valid:
+            admin_id = admin.get('id', admin['email'])
+            
+            # Update last login
+            await db.admins.update_one(
+                {'email': credentials.email},
+                {'$set': {'last_login': datetime.utcnow()}}
+            )
+            
+            # Create token
+            token = create_access_token(admin_id)
+            
+            return {
+                'token': token,
+                'role': 'admin',
+                'user': {
+                    'id': admin_id,
+                    'email': admin['email'],
+                    'name': admin.get('name', 'Admin'),
+                    'role': admin.get('role', 'admin')
+                }
+            }
+    
+    # Not admin, check regular users
+    user = await db.users.find_one({'email': credentials.email}, {'_id': 0})
+    
+    if user:
+        # Check password
+        try:
+            password_valid = user.get('password_hash') and bcrypt.verify(credentials.password, user['password_hash'])
+        except Exception:
+            password_valid = False
+        
+        if password_valid:
+            token = create_access_token(user['id'])
+            
+            created_at = user.get('created_at')
+            if isinstance(created_at, datetime):
+                joined_date = created_at.isoformat()
+            else:
+                joined_date = str(created_at) if created_at else datetime.utcnow().isoformat()
+            
+            return {
+                'token': token,
+                'role': 'user',
+                'user': {
+                    'id': user['id'],
+                    'email': user['email'],
+                    'name': user['name'],
+                    'avatar': user.get('avatar'),
+                    'points': user.get('points', 0),
+                    'total_earned': user.get('total_earned', 0),
+                    'joined_date': joined_date
+                }
+            }
+    
+    # No user found or wrong password
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail='البريد الإلكتروني أو كلمة المرور غير صحيحة'
+    )
+
 @router.post('/login', response_model=dict)
 async def login(user_data: UserCreate):
     """
