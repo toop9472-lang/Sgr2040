@@ -87,82 +87,81 @@ async def login_email(credentials: EmailLogin):
     Unified email login - checks both admins and users
     If admin credentials, returns admin role for redirect
     """
-    import sys
-    db = get_db()
-    
-    sys.stdout.write(f"Login attempt for email: {credentials.email}\n")
-    sys.stdout.flush()
-    
-    # First, check if this is an admin
-    admin = await db.admins.find_one({'email': credentials.email}, {'_id': 0})
-    
-    sys.stdout.write(f"Admin found: {admin is not None}\n")
-    sys.stdout.flush()
-    if admin:
-        sys.stdout.write(f"Admin data: {admin.get('email')}, has password_hash: {'password_hash' in admin}\n")
-        sys.stdout.flush()
-    
-    if admin:
-        # Verify admin password
-        try:
-            password_valid = bcrypt.verify(credentials.password, admin['password_hash'])
-            sys.stdout.write(f"Password valid: {password_valid}\n")
-            sys.stdout.flush()
-        except Exception as e:
-            sys.stdout.write(f"Password verification error: {e}\n")
-            sys.stdout.flush()
-            password_valid = False
+    try:
+        db = get_db()
         
-        if password_valid:
-            admin_id = admin.get('id', admin['email'])
+        # First, check if this is an admin
+        admin = await db.admins.find_one({'email': credentials.email}, {'_id': 0})
+        
+        if admin:
+            # Verify admin password
+            try:
+                password_valid = bcrypt.verify(credentials.password, admin['password_hash'])
+            except Exception:
+                password_valid = False
             
-            # Update last login
-            await db.admins.update_one(
-                {'email': credentials.email},
-                {'$set': {'last_login': datetime.utcnow()}}
-            )
-            
-            # Create token
-            token = create_access_token(admin_id)
-            
-            return {
-                'token': token,
-                'role': 'admin',
-                'user': {
-                    'id': admin_id,
-                    'email': admin['email'],
-                    'name': admin.get('name', 'Admin'),
-                    'role': admin.get('role', 'admin')
+            if password_valid:
+                admin_id = admin.get('id', admin['email'])
+                
+                # Update last login
+                await db.admins.update_one(
+                    {'email': credentials.email},
+                    {'$set': {'last_login': datetime.utcnow()}}
+                )
+                
+                # Create token
+                token = create_access_token(admin_id)
+                
+                return {
+                    'token': token,
+                    'role': 'admin',
+                    'user': {
+                        'id': admin_id,
+                        'email': admin['email'],
+                        'name': admin.get('name', 'Admin'),
+                        'role': admin.get('role', 'admin')
+                    }
                 }
-            }
-    
-    # Not admin, check regular users
-    user = await db.users.find_one({'email': credentials.email}, {'_id': 0})
-    
-    if user:
-        # Check password
-        if user.get('password_hash') and bcrypt.verify(credentials.password, user['password_hash']):
-            token = create_access_token(user['id'])
+        
+        # Not admin, check regular users
+        user = await db.users.find_one({'email': credentials.email}, {'_id': 0})
+        
+        if user:
+            # Check password
+            try:
+                password_valid = user.get('password_hash') and bcrypt.verify(credentials.password, user['password_hash'])
+            except Exception:
+                password_valid = False
             
-            return {
-                'token': token,
-                'role': 'user',
-                'user': {
-                    'id': user['id'],
-                    'email': user['email'],
-                    'name': user['name'],
-                    'avatar': user.get('avatar'),
-                    'points': user.get('points', 0),
-                    'total_earned': user.get('total_earned', 0),
-                    'joined_date': user.get('created_at', datetime.utcnow()).isoformat() if isinstance(user.get('created_at'), datetime) else str(user.get('created_at', ''))
+            if password_valid:
+                token = create_access_token(user['id'])
+                
+                return {
+                    'token': token,
+                    'role': 'user',
+                    'user': {
+                        'id': user['id'],
+                        'email': user['email'],
+                        'name': user['name'],
+                        'avatar': user.get('avatar'),
+                        'points': user.get('points', 0),
+                        'total_earned': user.get('total_earned', 0),
+                        'joined_date': user.get('created_at', datetime.utcnow()).isoformat() if isinstance(user.get('created_at'), datetime) else str(user.get('created_at', ''))
+                    }
                 }
-            }
-    
-    # No user found or wrong password
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail='البريد الإلكتروني أو كلمة المرور غير صحيحة'
-    )
+        
+        # No user found or wrong password
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='البريد الإلكتروني أو كلمة المرور غير صحيحة'
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f'Login error: {str(e)}'
+        )
 
 
 @router.post('/register', response_model=dict)
