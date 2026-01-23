@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 from auth.dependencies import get_current_user_id
+from datetime import datetime
 import os
 
 router = APIRouter(prefix='/users', tags=['Users'])
