@@ -244,7 +244,7 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
         </div>
       )}
 
-      {/* Right Side Actions - TikTok Style */}
+      {/* Right Side Actions - Minimal */}
       <div className="absolute right-3 bottom-32 flex flex-col items-center gap-5 z-20">
         {/* Profile */}
         <div className="flex flex-col items-center">
@@ -255,33 +255,6 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
             <span className="text-white text-xs">+</span>
           </div>
         </div>
-
-        {/* Like */}
-        <button 
-          onClick={(e) => { e.stopPropagation(); setLiked(!liked); }}
-          className="flex flex-col items-center"
-        >
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${liked ? 'bg-red-500' : 'bg-white/20 backdrop-blur-sm'}`}>
-            <Heart className={`w-6 h-6 ${liked ? 'text-white fill-white' : 'text-white'}`} />
-          </div>
-          <span className="text-white text-xs mt-1 font-semibold">{Math.floor(Math.random() * 1000) + 100}</span>
-        </button>
-
-        {/* Comments */}
-        <button className="flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
-          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <MessageCircle className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-white text-xs mt-1 font-semibold">{Math.floor(Math.random() * 100) + 10}</span>
-        </button>
-
-        {/* Share */}
-        <button className="flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
-          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <Share2 className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-white text-xs mt-1 font-semibold">{isRTL ? 'مشاركة' : 'Share'}</span>
-        </button>
 
         {/* Mute Toggle */}
         <button 
