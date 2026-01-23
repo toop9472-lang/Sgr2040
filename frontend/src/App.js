@@ -132,6 +132,23 @@ function App() {
     setCurrentPage(page);
   };
 
+  const handleNavigate = (page) => {
+    setCurrentPage(page);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+        <div className="text-center">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center animate-pulse">
+            <span className="text-4xl">🦅</span>
+          </div>
+          <p className="text-gray-600 text-lg">جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <>
@@ -145,9 +162,9 @@ function App() {
     <div className="App">
       {currentPage === 'home' && (
         <AdViewer 
-          ads={mockAds} 
+          ads={ads} 
           onAdWatched={handleAdWatched}
-          watchedAds={watchedAds}
+          user={user}
         />
       )}
       {currentPage === 'profile' && (
