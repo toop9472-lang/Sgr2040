@@ -226,5 +226,5 @@
 
 | الخدمة | الرابط |
 |--------|--------|
-| الموقع | https://adpoints-4.preview.emergentagent.com |
-| API Docs | https://adpoints-4.preview.emergentagent.com/docs |
+| الموقع | https://reelcoin.preview.emergentagent.com |
+| API Docs | https://reelcoin.preview.emergentagent.com/docs |

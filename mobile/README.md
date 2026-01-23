@@ -82,7 +82,7 @@ mobile/
 ## الـ API
 التطبيق يتصل بـ Backend على:
 ```
-https://adpoints-4.preview.emergentagent.com/api
+https://reelcoin.preview.emergentagent.com/api
 ```
 
 ## النشر
