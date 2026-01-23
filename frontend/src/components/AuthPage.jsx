@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
@@ -12,10 +13,12 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 /**
  * AuthPage Component
  * Supports Google OAuth, Apple OAuth, Email/Password, and Guest mode
+ * UNIFIED LOGIN: If admin credentials are entered, redirects to admin dashboard
  * REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
  */
-const AuthPage = ({ onLogin, onGuestMode }) => {
+const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
   const { t, isRTL } = useLanguage();
+  const navigate = useNavigate();
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
