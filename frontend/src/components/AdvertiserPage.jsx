@@ -29,10 +29,17 @@ const AdvertiserPage = ({ onNavigate }) => {
   const [paymentMethod, setPaymentMethod] = useState('');
   const [paymentProof, setPaymentProof] = useState('');
   const [packages, setPackages] = useState([]);
-  const [tapAvailable, setTapAvailable] = useState(false);
+  const [enabledGateways, setEnabledGateways] = useState({
+    stripe: true,
+    tap: false,
+    tabby: false,
+    tamara: false,
+    stcpay: false,
+    paypal: false
+  });
   const [selectedPackage, setSelectedPackage] = useState('ad_1_month');
 
-  // Load pricing packages and check Tap availability on mount
+  // Load pricing packages and enabled payment gateways on mount
   useEffect(() => {
     const loadPackages = async () => {
       try {
@@ -44,18 +51,18 @@ const AdvertiserPage = ({ onNavigate }) => {
       }
     };
     
-    const checkTapStatus = async () => {
+    const loadEnabledGateways = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/tap/status`);
+        const response = await fetch(`${API_URL}/api/settings/public/payment-gateways`);
         const data = await response.json();
-        setTapAvailable(data.configured);
+        setEnabledGateways(data);
       } catch (error) {
-        console.error('Failed to check Tap status:', error);
+        console.error('Failed to load payment gateways:', error);
       }
     };
     
     loadPackages();
-    checkTapStatus();
+    loadEnabledGateways();
   }, []);
 
   // Check for payment return
