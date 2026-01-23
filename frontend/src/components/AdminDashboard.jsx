@@ -294,8 +294,11 @@ const AdminDashboard = ({ admin, onLogout }) => {
 
       {/* Tabs */}
       <div className="px-4">
-        <Tabs defaultValue="withdrawals" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="users" className="w-full">
+          <TabsList className="grid w-full grid-cols-5 text-xs">
+            <TabsTrigger value="users">
+              المستخدمون
+            </TabsTrigger>
             <TabsTrigger value="withdrawals">
               السحوبات ({pendingWithdrawals.length})
             </TabsTrigger>
@@ -309,6 +312,57 @@ const AdminDashboard = ({ admin, onLogout }) => {
               الفواتير
             </TabsTrigger>
           </TabsList>
+
+          {/* Active Users Tab - NEW */}
+          <TabsContent value="users" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  المستخدمون النشطون
+                </CardTitle>
+                <CardDescription>
+                  نشط آخر ساعة: {userStats?.users?.active_1h || 0} | 
+                  آخر 24 ساعة: {userStats?.users?.active_24h || 0} | 
+                  آخر أسبوع: {userStats?.users?.active_7d || 0}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {userStats?.recent_active_users?.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">لا يوجد مستخدمون نشطون حالياً</p>
+                ) : (
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {userStats?.recent_active_users?.map((user) => (
+                      <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <img 
+                              src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=6366f1&color=fff`}
+                              alt={user.name}
+                              className="w-10 h-10 rounded-full"
+                            />
+                            <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+                              user.status === 'online' ? 'bg-green-500' : 'bg-yellow-500'
+                            }`} />
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">{user.name}</p>
+                            <p className="text-xs text-gray-500">{user.email}</p>
+                          </div>
+                        </div>
+                        <div className="text-left">
+                          <p className="font-bold text-indigo-600">{user.points} نقطة</p>
+                          <p className="text-xs text-gray-500">
+                            {user.status === 'online' ? '🟢 متصل' : '🟡 بعيد'}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Pending Withdrawals */}
           <TabsContent value="withdrawals" className="space-y-4 mt-4">
