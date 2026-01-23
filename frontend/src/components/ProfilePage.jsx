@@ -171,6 +171,7 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
             </div>
           </CardContent>
         </Card>
+        )}
       </div>
     </div>
   );
