@@ -282,41 +282,84 @@ function App() {
   }
 
   return (
-    <div className="App">
-      {currentPage === 'home' && (
-        <AdViewer 
-          ads={ads} 
-          onAdWatched={handleAdWatched}
-          user={user}
-        />
-      )}
-      {currentPage === 'profile' && (
-        <ProfilePage 
-          user={user} 
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      )}
-      {currentPage === 'advertiser' && (
-        <AdvertiserPage 
-          onNavigate={handleNavigate}
-        />
-      )}
-      {currentPage === 'withdraw' && (
-        <WithdrawPage 
-          user={user}
-          onNavigate={handleNavigate}
-          onWithdrawRequest={handleWithdrawRequest}
-        />
-      )}
-      {currentPage !== 'withdraw' && (
-        <BottomNav 
-          currentPage={currentPage}
-          onNavigate={handleNavigate}
-        />
-      )}
-      <Toaster />
-    </div>
+    <BrowserRouter>
+      <div className="App">
+        <Routes>
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={
+            isAdmin ? <Navigate to="/admin/dashboard" /> : <AdminLoginPage onAdminLogin={handleAdminLogin} />
+          } />
+          <Route path="/admin/dashboard" element={
+            isAdmin ? <AdminDashboard admin={adminData} onLogout={handleAdminLogout} /> : <Navigate to="/admin/login" />
+          } />
+          
+          {/* User Routes */}
+          <Route path="/*" element={
+            <>
+              {currentPage === 'advertiser-preview' ? (
+                <AdvertiserPage onNavigate={(page) => {
+                  if (page === 'home') {
+                    setCurrentPage('home');
+                    setIsAuthenticated(false);
+                  } else {
+                    setCurrentPage(page);
+                  }
+                }} />
+              ) : !isAuthenticated ? (
+                <>
+                  <AuthPage onLogin={handleLogin} onGuestMode={handleLogin} />
+                  <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+                    <button
+                      onClick={() => setCurrentPage('advertiser-preview')}
+                      className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg font-semibold flex items-center gap-2"
+                    >
+                      <span>💼</span>
+                      <span>أضف إعلانك</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {currentPage === 'home' && (
+                    <AdViewer 
+                      ads={ads} 
+                      onAdWatched={handleAdWatched}
+                      user={user}
+                    />
+                  )}
+                  {currentPage === 'profile' && (
+                    <ProfilePage 
+                      user={user} 
+                      onLogout={handleLogout}
+                      onNavigate={handleNavigate}
+                    />
+                  )}
+                  {currentPage === 'advertiser' && (
+                    <AdvertiserPage 
+                      onNavigate={handleNavigate}
+                    />
+                  )}
+                  {currentPage === 'withdraw' && (
+                    <WithdrawPage 
+                      user={user}
+                      onNavigate={handleNavigate}
+                      onWithdrawRequest={handleWithdrawRequest}
+                    />
+                  )}
+                  {currentPage !== 'withdraw' && (
+                    <BottomNav 
+                      currentPage={currentPage}
+                      onNavigate={handleNavigate}
+                    />
+                  )}
+                </>
+              )}
+            </>
+          } />
+        </Routes>
+        <Toaster />
+      </div>
+    </BrowserRouter>
   );
 }
 
