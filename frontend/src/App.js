@@ -155,10 +155,15 @@ function MainApp() {
       // Load ads
       await loadAds();
       
-      toast({
-        title: '✅ تم تسجيل الدخول',
-        description: `مرحباً ${userData.name}!`,
-      });
+      // Show welcome message only once (check localStorage)
+      const welcomeShown = localStorage.getItem('welcome_shown_' + userData.id);
+      if (!welcomeShown) {
+        toast({
+          title: '✅ مرحباً بك!',
+          description: `أهلاً ${userData.name}! ابدأ مشاهدة الإعلانات واكسب النقاط`,
+        });
+        localStorage.setItem('welcome_shown_' + userData.id, 'true');
+      }
     } catch (error) {
       console.error('Login failed:', error);
       toast({
