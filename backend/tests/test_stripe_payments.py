@@ -82,7 +82,7 @@ class TestStripeCheckout:
         checkout_data = {
             "package_id": "ad_1_month",
             "ad_id": ad_id,
-            "origin_url": "https://adpoints-4.preview.emergentagent.com",
+            "origin_url": "https://reelcoin.preview.emergentagent.com",
             "advertiser_email": "test@example.com"
         }
         
@@ -107,7 +107,7 @@ class TestStripeCheckout:
         checkout_data = {
             "package_id": "ad_3_months",
             "ad_id": ad_id,
-            "origin_url": "https://adpoints-4.preview.emergentagent.com"
+            "origin_url": "https://reelcoin.preview.emergentagent.com"
         }
         
         response = requests.post(f"{BASE_URL}/api/payments/checkout", json=checkout_data)
@@ -128,7 +128,7 @@ class TestStripeCheckout:
         checkout_data = {
             "package_id": "invalid_package",
             "ad_id": ad_id,
-            "origin_url": "https://adpoints-4.preview.emergentagent.com"
+            "origin_url": "https://reelcoin.preview.emergentagent.com"
         }
         
         response = requests.post(f"{BASE_URL}/api/payments/checkout", json=checkout_data)
@@ -141,7 +141,7 @@ class TestStripeCheckout:
         checkout_data = {
             "package_id": "ad_1_month",
             "ad_id": "nonexistent-ad-id",
-            "origin_url": "https://adpoints-4.preview.emergentagent.com"
+            "origin_url": "https://reelcoin.preview.emergentagent.com"
         }
         
         response = requests.post(f"{BASE_URL}/api/payments/checkout", json=checkout_data)
@@ -184,7 +184,7 @@ class TestPaymentStatus:
         checkout_data = {
             "package_id": "ad_1_month",
             "ad_id": ad_id,
-            "origin_url": "https://adpoints-4.preview.emergentagent.com"
+            "origin_url": "https://reelcoin.preview.emergentagent.com"
         }
         
         checkout_response = requests.post(f"{BASE_URL}/api/payments/checkout", json=checkout_data)
