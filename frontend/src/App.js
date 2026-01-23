@@ -15,6 +15,7 @@ import BottomNav from "./components/BottomNav";
 import { Toaster } from "./components/ui/toaster";
 import { toast } from "./hooks/use-toast";
 import { adAPI } from "./services/api";
+import { LanguageProvider } from "./i18n/LanguageContext";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
