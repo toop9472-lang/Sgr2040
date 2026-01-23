@@ -6,85 +6,126 @@ import ProfilePage from "./components/ProfilePage";
 import WithdrawPage from "./components/WithdrawPage";
 import BottomNav from "./components/BottomNav";
 import { Toaster } from "./components/ui/toaster";
-import { mockAds, mockUser } from "./mockData";
+import { toast } from "./hooks/use-toast";
+import { authAPI, userAPI, adAPI, withdrawalAPI, getToken } from "./services/api";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [ads, setAds] = useState([]);
   const [currentPage, setCurrentPage] = useState('home');
-  const [watchedAds, setWatchedAds] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load user data from localStorage
+  // Check if user is authenticated on load
   useEffect(() => {
-    const savedUser = localStorage.getItem('saqr_user');
-    const savedWatchedAds = localStorage.getItem('saqr_watched_ads');
+    const checkAuth = async () => {
+      const token = getToken();
+      if (token) {
+        try {
+          const response = await authAPI.getMe();
+          setUser(response.user);
+          setIsAuthenticated(true);
+          
+          // Load ads
+          const adsData = await adAPI.getAds();
+          setAds(adsData);
+        } catch (error) {
+          console.error('Auth check failed:', error);
+          authAPI.logout();
+        }
+      }
+      setIsLoading(false);
+    };
     
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-      setIsAuthenticated(true);
-    }
-    
-    if (savedWatchedAds) {
-      setWatchedAds(JSON.parse(savedWatchedAds));
-    }
+    checkAuth();
   }, []);
 
-  // Save user data to localStorage
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('saqr_user', JSON.stringify(user));
+  // Refresh user data
+  const refreshUser = async () => {
+    try {
+      const response = await userAPI.getProfile();
+      setUser(response.user);
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
     }
-  }, [user]);
+  };
 
-  // Save watched ads to localStorage
-  useEffect(() => {
-    localStorage.setItem('saqr_watched_ads', JSON.stringify(watchedAds));
-  }, [watchedAds]);
-
-  const handleLogin = (userData) => {
-    const newUser = {
-      ...mockUser,
-      ...userData,
-      points: 0,
-      totalEarned: 0,
-      watchedAds: [],
-      joinedDate: new Date().toISOString()
-    };
-    setUser(newUser);
-    setIsAuthenticated(true);
+  const handleLogin = async (userData) => {
+    try {
+      setIsLoading(true);
+      const response = await authAPI.login(userData.provider, userData);
+      
+      setUser(response.user);
+      setIsAuthenticated(true);
+      
+      // Load ads
+      const adsData = await adAPI.getAds();
+      setAds(adsData);
+      
+      toast({
+        title: '✅ تم تسجيل الدخول',
+        description: `مرحباً ${response.user.name}!`,
+      });
+    } catch (error) {
+      console.error('Login failed:', error);
+      toast({
+        title: '❌ فشل تسجيل الدخول',
+        description: 'حدث خطأ، يرجى المحاولة مرة أخرى',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('saqr_user');
-    localStorage.removeItem('saqr_watched_ads');
+    authAPI.logout();
     setIsAuthenticated(false);
     setUser(null);
-    setWatchedAds([]);
+    setAds([]);
     setCurrentPage('home');
+    
+    toast({
+      title: 'تم تسجيل الخروج',
+      description: 'نراك قريباً!',
+    });
   };
 
-  const handleAdWatched = (adId, points) => {
-    // Check if ad was already watched (anti-cheat)
-    if (watchedAds.includes(adId)) {
-      return;
+  const handleAdWatched = async (adId, watchTime) => {
+    try {
+      const response = await adAPI.watchAd(adId, watchTime);
+      
+      // Refresh user data to get updated points
+      await refreshUser();
+      
+      return response;
+    } catch (error) {
+      console.error('Watch ad error:', error);
+      
+      if (error.response?.status === 400) {
+        toast({
+          title: '⚠️ تنبيه',
+          description: error.response.data.detail || 'لقد شاهدت هذا الإعلان بالفعل',
+          variant: 'destructive'
+        });
+      }
+      
+      throw error;
     }
-
-    setUser(prev => ({
-      ...prev,
-      points: prev.points + points,
-      totalEarned: prev.totalEarned + points,
-      watchedAds: [...prev.watchedAds, adId]
-    }));
-
-    setWatchedAds(prev => [...prev, adId]);
   };
 
-  const handleWithdrawRequest = (request) => {
-    // Deduct points after admin approval (for now just simulate)
-    setUser(prev => ({
-      ...prev,
-      points: prev.points - request.points
-    }));
+  const handleWithdrawRequest = async (request) => {
+    try {
+      const response = await withdrawalAPI.createWithdrawal(request);
+      
+      // Refresh user data
+      await refreshUser();
+      
+      return response;
+    } catch (error) {
+      console.error('Withdrawal error:', error);
+      throw error;
+    }
   };
 
   const handleNavigate = (page) => {
