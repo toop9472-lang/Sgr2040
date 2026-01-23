@@ -133,6 +133,23 @@ function App() {
     setCurrentPage(page);
   };
 
+  // Show advertiser page for non-authenticated users
+  if (currentPage === 'advertiser-preview') {
+    return (
+      <>
+        <AdvertiserPage onNavigate={(page) => {
+          if (page === 'home') {
+            setCurrentPage('home');
+            setIsAuthenticated(false);
+          } else {
+            setCurrentPage(page);
+          }
+        }} />
+        <Toaster />
+      </>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50">
