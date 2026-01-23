@@ -12,7 +12,9 @@ import AuthScreen from '../screens/AuthScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import WithdrawScreen from '../screens/WithdrawScreen';
+import WithdrawalHistoryScreen from '../screens/WithdrawalHistoryScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
+import AdvertiserScreen from '../screens/AdvertiserScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -41,6 +43,15 @@ const MainTabs = () => {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon icon="🏠" label="الرئيسية" focused={focused} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Advertiser"
+        component={AdvertiserScreen}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <TabIcon icon="📢" label="للمعلنين" focused={focused} />
           ),
         }}
       />
@@ -78,6 +89,7 @@ const MainStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="MainTabs" component={MainTabs} />
     <Stack.Screen name="Withdraw" component={WithdrawScreen} />
+    <Stack.Screen name="WithdrawalHistory" component={WithdrawalHistoryScreen} />
   </Stack.Navigator>
 );
 
@@ -139,7 +151,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.1 }],
   },
   tabLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#9CA3AF',
   },
   tabLabelFocused: {
