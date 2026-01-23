@@ -41,7 +41,9 @@ const AdminSettings = () => {
     stcpay_api_key: '',
     paypal_enabled: false,
     paypal_client_id: '',
-    paypal_secret: ''
+    paypal_secret: '',
+    applepay_enabled: false,
+    applepay_merchant_id: ''
   });
   
   // OAuth Settings
