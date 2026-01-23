@@ -106,6 +106,7 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
             </Button>
           </CardContent>
         </Card>
+        )}
 
         {/* Stats Cards */}
         {!isGuest && (
