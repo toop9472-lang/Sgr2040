@@ -181,11 +181,26 @@ async def get_oauth_settings(user_id: str = Depends(get_current_user_id)):
     settings = await db.settings.find_one({'type': 'oauth'}, {'_id': 0})
     
     if not settings:
-        return {'google_enabled': True, 'apple_enabled': False}
+        return {
+            'google_enabled': True,
+            'google_client_id': mask_key(os.environ.get('GOOGLE_CLIENT_ID', '')),
+            'google_client_secret': mask_key(os.environ.get('GOOGLE_CLIENT_SECRET', '')),
+            'apple_enabled': False,
+            'apple_client_id': '',
+            'apple_team_id': '',
+            'apple_key_id': '',
+            'apple_private_key': ''
+        }
     
     return {
         'google_enabled': settings.get('google_enabled', True),
-        'apple_enabled': settings.get('apple_enabled', False)
+        'google_client_id': mask_key(settings.get('google_client_id', '')),
+        'google_client_secret': mask_key(settings.get('google_client_secret', '')),
+        'apple_enabled': settings.get('apple_enabled', False),
+        'apple_client_id': mask_key(settings.get('apple_client_id', '')),
+        'apple_team_id': mask_key(settings.get('apple_team_id', '')),
+        'apple_key_id': mask_key(settings.get('apple_key_id', '')),
+        'apple_private_key': '****' if settings.get('apple_private_key') else ''
     }
 
 
@@ -198,14 +213,50 @@ async def update_oauth_settings(
     db = get_db()
     await verify_admin(user_id, db)
     
+    current = await db.settings.find_one({'type': 'oauth'}, {'_id': 0})
+    
+    update_data = {
+        'type': 'oauth',
+        'google_enabled': settings.google_enabled,
+        'apple_enabled': settings.apple_enabled,
+        'updated_at': datetime.utcnow()
+    }
+    
+    # Google credentials
+    if settings.google_client_id and not settings.google_client_id.startswith('****'):
+        update_data['google_client_id'] = settings.google_client_id
+    elif current:
+        update_data['google_client_id'] = current.get('google_client_id', '')
+    
+    if settings.google_client_secret and not settings.google_client_secret.startswith('****'):
+        update_data['google_client_secret'] = settings.google_client_secret
+    elif current:
+        update_data['google_client_secret'] = current.get('google_client_secret', '')
+    
+    # Apple credentials
+    if settings.apple_client_id and not settings.apple_client_id.startswith('****'):
+        update_data['apple_client_id'] = settings.apple_client_id
+    elif current:
+        update_data['apple_client_id'] = current.get('apple_client_id', '')
+    
+    if settings.apple_team_id and not settings.apple_team_id.startswith('****'):
+        update_data['apple_team_id'] = settings.apple_team_id
+    elif current:
+        update_data['apple_team_id'] = current.get('apple_team_id', '')
+    
+    if settings.apple_key_id and not settings.apple_key_id.startswith('****'):
+        update_data['apple_key_id'] = settings.apple_key_id
+    elif current:
+        update_data['apple_key_id'] = current.get('apple_key_id', '')
+    
+    if settings.apple_private_key and not settings.apple_private_key.startswith('****'):
+        update_data['apple_private_key'] = settings.apple_private_key
+    elif current:
+        update_data['apple_private_key'] = current.get('apple_private_key', '')
+    
     await db.settings.update_one(
         {'type': 'oauth'},
-        {'$set': {
-            'type': 'oauth',
-            'google_enabled': settings.google_enabled,
-            'apple_enabled': settings.apple_enabled,
-            'updated_at': datetime.utcnow()
-        }},
+        {'$set': update_data},
         upsert=True
     )
     
