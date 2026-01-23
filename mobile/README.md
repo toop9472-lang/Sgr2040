@@ -82,7 +82,7 @@ mobile/
 ## الـ API
 التطبيق يتصل بـ Backend على:
 ```
-https://pointads.preview.emergentagent.com/api
+https://adrewards-37.preview.emergentagent.com/api
 ```
 
 ## النشر

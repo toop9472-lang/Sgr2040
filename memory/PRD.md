@@ -52,7 +52,7 @@
 ### المدير
 - **Email:** sky-321@hotmail.com
 - **Password:** Wsxzaq123
-- **URL:** https://pointads.preview.emergentagent.com/admin/login
+- **URL:** https://adrewards-37.preview.emergentagent.com/admin/login
 
 ### مستخدم اختبار
 - **Email:** test@saqr.com
@@ -86,9 +86,9 @@
 
 | الخدمة | الرابط |
 |--------|--------|
-| الموقع | https://pointads.preview.emergentagent.com |
-| لوحة المدير | https://pointads.preview.emergentagent.com/admin/login |
-| API | https://pointads.preview.emergentagent.com/api |
+| الموقع | https://adrewards-37.preview.emergentagent.com |
+| لوحة المدير | https://adrewards-37.preview.emergentagent.com/admin/login |
+| API | https://adrewards-37.preview.emergentagent.com/api |
 
 ---
 
