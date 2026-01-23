@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AuthPage from "./components/AuthPage";
 import AdViewer from "./components/AdViewer";
 import ProfilePage from "./components/ProfilePage";
 import WithdrawPage from "./components/WithdrawPage";
 import AdvertiserPage from "./components/AdvertiserPage";
+import AdminLoginPage from "./components/AdminLoginPage";
+import AdminDashboard from "./components/AdminDashboard";
 import BottomNav from "./components/BottomNav";
 import { Toaster } from "./components/ui/toaster";
 import { toast } from "./hooks/use-toast";
