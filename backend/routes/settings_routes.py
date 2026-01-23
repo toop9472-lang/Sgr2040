@@ -37,7 +37,13 @@ class PaymentGatewaySettings(BaseModel):
 
 class OAuthSettings(BaseModel):
     google_enabled: bool = True
+    google_client_id: Optional[str] = None
+    google_client_secret: Optional[str] = None
     apple_enabled: bool = False
+    apple_client_id: Optional[str] = None
+    apple_team_id: Optional[str] = None
+    apple_key_id: Optional[str] = None
+    apple_private_key: Optional[str] = None
 
 
 class AppSettings(BaseModel):
