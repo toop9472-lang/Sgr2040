@@ -260,14 +260,13 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
 
       {/* Right Side Actions - Minimal */}
       <div className="absolute right-3 bottom-32 flex flex-col items-center gap-5 z-20">
-        {/* Profile */}
+        {/* Watching Now Indicator */}
         <div className="flex flex-col items-center">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg border-2 border-white shadow-lg">
-            {currentAd.advertiser?.[0] || 'A'}
+          <div className="w-12 h-12 rounded-full bg-red-500/80 backdrop-blur-sm flex items-center justify-center border-2 border-white shadow-lg">
+            <Eye className="w-5 h-5 text-white" />
           </div>
-          <div className="w-5 h-5 -mt-2 rounded-full bg-red-500 flex items-center justify-center">
-            <span className="text-white text-xs">+</span>
-          </div>
+          <span className="text-white text-xs mt-1 font-semibold">{viewersCount || 1}</span>
+          <span className="text-white/60 text-[10px]">{isRTL ? 'يشاهد' : 'watching'}</span>
         </div>
 
         {/* Three Dots Menu - Semi-transparent */}
