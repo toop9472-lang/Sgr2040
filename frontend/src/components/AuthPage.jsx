@@ -1,34 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { toast } from '../hooks/use-toast';
 
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+/**
+ * AuthPage Component
+ * Supports Google OAuth, Apple OAuth, Email/Password, and Guest mode
+ * REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
+ */
 const AuthPage = ({ onLogin, onGuestMode }) => {
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [isRegister, setIsRegister] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name: ''
+  });
+
   const handleGoogleLogin = () => {
-    // Mock login - will be replaced with actual Google Auth
-    const mockUser = {
-      id: 'user_' + Date.now(),
-      name: 'مستخدم جديد',
-      email: 'user@gmail.com',
-      avatar: 'https://ui-avatars.com/api/?name=User&background=4F46E5&color=fff',
-      provider: 'google'
-    };
-    onLogin(mockUser);
+    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
+    const redirectUrl = window.location.origin + '/';
+    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
   const handleAppleLogin = () => {
-    // Mock login - will be replaced with actual Apple Auth
-    const mockUser = {
-      id: 'user_' + Date.now(),
-      name: 'مستخدم جديد',
-      email: 'user@icloud.com',
-      avatar: 'https://ui-avatars.com/api/?name=User&background=000000&color=fff',
-      provider: 'apple'
-    };
-    onLogin(mockUser);
+    // Apple Sign In is typically only available on native iOS apps
+    // For web, we'll show a message
+    toast({
+      title: 'قريباً',
+      description: 'تسجيل الدخول بـ Apple متاح فقط في تطبيق iOS',
+    });
   };
 
   const handleGuestMode = () => {
-    // Guest mode
     const guestUser = {
       id: 'guest_' + Date.now(),
       name: 'زائر',
@@ -39,6 +48,137 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
     };
     onGuestMode(guestUser);
   };
+
+  const handleEmailAuth = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login/email';
+      const body = isRegister 
+        ? { email: formData.email, password: formData.password, name: formData.name }
+        : { email: formData.email, password: formData.password };
+
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Authentication failed');
+      }
+
+      toast({
+        title: isRegister ? '✅ تم إنشاء الحساب' : '✅ تم تسجيل الدخول',
+        description: `مرحباً ${data.user.name}!`,
+      });
+
+      onLogin(data.user);
+    } catch (error) {
+      console.error('Auth error:', error);
+      toast({
+        title: '❌ خطأ',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (showEmailForm) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
+        <Card className="w-full max-w-md shadow-xl border-0">
+          <CardHeader className="text-center pb-6 pt-8">
+            <button
+              onClick={() => setShowEmailForm(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              ←
+            </button>
+            <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg">
+              <span className="text-3xl">🦅</span>
+            </div>
+            <CardTitle className="text-2xl font-bold text-gray-800">
+              {isRegister ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
+            </CardTitle>
+            <CardDescription className="text-gray-600">
+              {isRegister ? 'أدخل بياناتك لإنشاء حساب' : 'أدخل بريدك الإلكتروني وكلمة المرور'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 pb-8">
+            <form onSubmit={handleEmailAuth} className="space-y-4">
+              {isRegister && (
+                <div>
+                  <Label htmlFor="name">الاسم</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    placeholder="اسمك الكامل"
+                    className="mt-1"
+                    data-testid="auth-name-input"
+                  />
+                </div>
+              )}
+              <div>
+                <Label htmlFor="email">البريد الإلكتروني</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                  placeholder="your@email.com"
+                  className="mt-1"
+                  data-testid="auth-email-input"
+                />
+              </div>
+              <div>
+                <Label htmlFor="password">كلمة المرور</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
+                  placeholder="••••••••"
+                  className="mt-1"
+                  minLength={6}
+                  data-testid="auth-password-input"
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-12 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+                data-testid="auth-submit-btn"
+              >
+                {isLoading ? 'جاري التحميل...' : (isRegister ? 'إنشاء حساب' : 'تسجيل الدخول')}
+              </Button>
+            </form>
+            
+            <div className="text-center pt-2">
+              <button
+                type="button"
+                onClick={() => setIsRegister(!isRegister)}
+                className="text-indigo-600 hover:underline text-sm"
+              >
+                {isRegister ? 'لديك حساب؟ سجّل الدخول' : 'ليس لديك حساب؟ سجّل الآن'}
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
@@ -59,6 +199,7 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
             onClick={handleGoogleLogin}
             className="w-full h-12 bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-3 transition-all shadow-sm hover:shadow"
             variant="outline"
+            data-testid="google-login-btn"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -84,6 +225,7 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
           <Button
             onClick={handleAppleLogin}
             className="w-full h-12 bg-black hover:bg-gray-900 text-white flex items-center justify-center gap-3 transition-all shadow-sm hover:shadow"
+            data-testid="apple-login-btn"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
@@ -101,9 +243,22 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
           </div>
 
           <Button
+            onClick={() => setShowEmailForm(true)}
+            variant="outline"
+            className="w-full h-12 border-2 border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 text-indigo-700 flex items-center justify-center gap-3 transition-all"
+            data-testid="email-login-btn"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <span className="font-medium">تسجيل بالبريد الإلكتروني</span>
+          </Button>
+
+          <Button
             onClick={handleGuestMode}
             variant="outline"
-            className="w-full h-12 border-2 border-gray-300 hover:border-indigo-400 hover:bg-indigo-50 text-gray-700 flex items-center justify-center gap-3 transition-all"
+            className="w-full h-12 border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-700 flex items-center justify-center gap-3 transition-all"
+            data-testid="guest-mode-btn"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
