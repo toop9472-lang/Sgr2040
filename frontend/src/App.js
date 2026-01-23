@@ -116,6 +116,30 @@ function MainApp() {
     }
   };
 
+  // Heartbeat to track online users
+  useEffect(() => {
+    if (!isAuthenticated || !user || user.isGuest) return;
+
+    const sendHeartbeat = async () => {
+      try {
+        await fetch(`${API_URL}/api/activity/heartbeat`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+      } catch (error) {
+        console.error('Heartbeat failed:', error);
+      }
+    };
+
+    // Send heartbeat immediately
+    sendHeartbeat();
+
+    // Send heartbeat every 30 seconds
+    const interval = setInterval(sendHeartbeat, 30000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, user]);
+
   const handleLogin = async (userData) => {
     try {
       setIsLoading(true);
