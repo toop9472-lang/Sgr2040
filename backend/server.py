@@ -87,6 +87,7 @@ api_router.include_router(auth_router)
 api_router.include_router(ad_router)
 api_router.include_router(withdrawal_router)
 api_router.include_router(user_router)
+api_router.include_router(advertiser_router)
 
 # Include the router in the main app
 app.include_router(api_router)
