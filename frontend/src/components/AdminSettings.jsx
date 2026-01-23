@@ -163,6 +163,29 @@ const AdminSettings = () => {
     }
   };
 
+  const sendTestEmail = async () => {
+    if (!testEmail) {
+      toast({ title: '❌ خطأ', description: 'الرجاء إدخال بريد إلكتروني', variant: 'destructive' });
+      return;
+    }
+    
+    try {
+      setIsSendingTest(true);
+      const headers = getAuthHeaders();
+      await axios.post(`${API}/email/test`, { to_email: testEmail, email_type: 'welcome' }, { headers });
+      toast({ title: '✅ تم الإرسال', description: `تم إرسال البريد التجريبي إلى ${testEmail}` });
+      setTestEmail('');
+    } catch (error) {
+      toast({ 
+        title: '❌ خطأ', 
+        description: error.response?.data?.detail || 'فشل إرسال البريد التجريبي', 
+        variant: 'destructive' 
+      });
+    } finally {
+      setIsSendingTest(false);
+    }
+  };
+
   const toggleShowKey = (key) => setShowKeys(prev => ({ ...prev, [key]: !prev[key] }));
 
   if (isLoading) {
