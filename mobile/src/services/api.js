@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Update this with your backend URL
-const BACKEND_URL = 'https://adreward-app-5.preview.emergentagent.com';
+const BACKEND_URL = 'https://pointads.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 // Token management
