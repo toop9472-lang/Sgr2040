@@ -173,24 +173,40 @@
 │   │   ├── notification_routes.py  # نظام الإشعارات
 │   │   ├── invoice_routes.py       # الفواتير
 │   │   ├── analytics_routes.py     # التحليلات
-│   │   ├── settings_routes.py      # إعدادات API والمصادقة (جديد!)
+│   │   ├── settings_routes.py      # إعدادات API والمصادقة
+│   │   ├── email_routes.py         # خدمة البريد الإلكتروني (جديد!)
 │   │   ├── withdrawal_methods_routes.py # طرق السحب
 │   │   └── admin_dashboard_routes.py
-│   ├── models/
-│   │   ├── notification.py
-│   │   └── invoice.py
+│   ├── services/
+│   │   └── email_service.py        # خدمة Resend (جديد!)
 │   └── .env
 ├── frontend/
 │   └── src/components/
-│       ├── AdminDashboard.jsx      # مع تبويبات التحليلات والفواتير والإعدادات
-│       ├── AdminSettings.jsx       # إدارة مفاتيح API والمصادقة (جديد!)
-│       ├── AdminLogin.jsx          # صفحة تسجيل دخول المدير (جديد!)
+│       ├── AdminDashboard.jsx      # لوحة تحكم شاملة
+│       ├── AdminSettings.jsx       # إدارة جميع الإعدادات + البريد
 │       ├── NotificationsPage.jsx
 │       ├── AnalyticsPage.jsx
 │       └── InvoicesPage.jsx
-└── mobile/
-    └── src/screens/
-        └── NotificationsScreen.js
+└── mobile/                          # تطبيق React Native (محدّث!)
+    ├── App.js
+    ├── app.json
+    ├── eas.json                     # إعدادات EAS Build
+    ├── README.md                    # دليل شامل
+    └── src/
+        ├── screens/
+        │   ├── AuthScreen.js        # تسجيل الدخول
+        │   ├── HomeScreen.js        # عرض الإعلانات (TikTok style)
+        │   ├── ProfileScreen.js     # الملف الشخصي
+        │   ├── WithdrawScreen.js    # طلب السحب
+        │   ├── WithdrawalHistoryScreen.js # سجل السحوبات (جديد!)
+        │   ├── AdvertiserScreen.js  # للمعلنين (جديد!)
+        │   └── NotificationsScreen.js
+        ├── navigation/
+        │   └── AppNavigator.js      # 4 تبويبات
+        ├── services/
+        │   └── api.js               # جميع APIs
+        └── context/
+            └── AuthContext.js
 ```
 
 ---
