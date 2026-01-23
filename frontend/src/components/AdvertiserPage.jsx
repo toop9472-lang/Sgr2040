@@ -119,14 +119,6 @@ const AdvertiserPage = ({ onNavigate }) => {
     }
   };
 
-  if (!pricing) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-        <p className="text-gray-600">جاري التحميل...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 pb-20">
       {/* Header */}
