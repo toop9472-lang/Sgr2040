@@ -118,6 +118,50 @@ const AdvertiserPage = ({ onNavigate }) => {
     }
   };
 
+  // Poll Tap payment status
+  const pollTapPaymentStatus = async (chargeId, attempts = 0) => {
+    const maxAttempts = 10;
+    const pollInterval = 2000;
+
+    if (attempts >= maxAttempts) {
+      toast({
+        title: '⚠️ انتهت المهلة',
+        description: 'يرجى التحقق من بريدك الإلكتروني للتأكيد',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/tap/status/${chargeId}`);
+      const data = await response.json();
+
+      if (data.payment_status === 'paid') {
+        setStep(4);
+        setCreatedAd({ ad: { id: data.ad_id } });
+        toast({
+          title: '✅ تم الدفع بنجاح!',
+          description: 'سيتم مراجعة إعلانك وتفعيله قريباً',
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      } else if (data.payment_status === 'failed') {
+        toast({
+          title: '❌ فشل الدفع',
+          description: 'يرجى المحاولة مرة أخرى',
+          variant: 'destructive'
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      setStep(3);
+      setTimeout(() => pollTapPaymentStatus(chargeId, attempts + 1), pollInterval);
+    } catch (error) {
+      console.error('Error checking Tap payment status:', error);
+    }
+  };
+
   const handleInputChange = (e) => {
     setAdData({
       ...adData,
