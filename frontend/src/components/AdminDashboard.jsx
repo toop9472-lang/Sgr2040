@@ -433,7 +433,7 @@ const AdminDashboard = ({ admin, onLogout }) => {
                         <div className="flex items-center gap-2">
                           {user.is_banned ? (
                             <Button
-                              onClick={() => handleUnbanUser(user.id || user.user_id)}
+                              onClick={() => handleUnbanUser(user.user_id || user.id)}
                               variant="outline"
                               size="sm"
                               className="text-green-600 border-green-300"
