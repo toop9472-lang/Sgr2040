@@ -70,19 +70,27 @@ async def end_ad_view(ad_id: str, user_id: str = Depends(get_current_user_id)):
 @router.get('/ad-viewers/{ad_id}')
 async def get_ad_viewers_count(ad_id: str):
     """
-    Get number of users currently viewing an ad
+    Get number of users currently viewing an ad (real count)
     """
     db = get_db()
     
     # Count viewers active in last 60 seconds
     one_minute_ago = datetime.utcnow() - timedelta(seconds=60)
     
-    count = await db.ad_viewers.count_documents({
+    active_viewers = await db.ad_viewers.count_documents({
         'ad_id': ad_id,
         'last_ping': {'$gte': one_minute_ago}
     })
     
-    return {'viewers': count}
+    # Also get total views for this ad (from watched_ads)
+    total_views = await db.users.count_documents({
+        'watched_ads.ad_id': ad_id
+    })
+    
+    return {
+        'viewers': active_viewers,
+        'total_views': total_views
+    }
 
 
 @router.get('/online-users')
