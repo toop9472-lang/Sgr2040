@@ -7,6 +7,7 @@ import AdViewer from "./components/AdViewer";
 import ProfilePage from "./components/ProfilePage";
 import WithdrawPage from "./components/WithdrawPage";
 import AdvertiserPage from "./components/AdvertiserPage";
+import AdminLogin from "./components/AdminLogin";
 import AdminDashboard from "./components/AdminDashboard";
 import PaymentSuccess from "./components/PaymentSuccess";
 import PaymentCancel from "./components/PaymentCancel";
