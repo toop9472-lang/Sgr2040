@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import AuthPage from "./components/AuthPage";
+import AuthCallback from "./components/AuthCallback";
 import AdViewer from "./components/AdViewer";
 import ProfilePage from "./components/ProfilePage";
 import WithdrawPage from "./components/WithdrawPage";
@@ -11,11 +12,26 @@ import AdminDashboard from "./components/AdminDashboard";
 import BottomNav from "./components/BottomNav";
 import { Toaster } from "./components/ui/toaster";
 import { toast } from "./hooks/use-toast";
-import { authAPI, userAPI, adAPI, withdrawalAPI, getToken } from "./services/api";
+import { adAPI } from "./services/api";
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+// Router wrapper to detect session_id in URL
+function AppRouter() {
+  const location = useLocation();
+  
+  // Check URL fragment for session_id (from Google OAuth)
+  if (location.hash?.includes('session_id=')) {
+    return <AuthCallback />;
+  }
+  
+  return <MainApp />;
+}
+
+function MainApp() {
+  const location = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState(location.state?.user ? true : null);
+  const [user, setUser] = useState(location.state?.user || null);
   const [ads, setAds] = useState([]);
   const [currentPage, setCurrentPage] = useState('home');
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +42,13 @@ function App() {
 
   // Check if user is authenticated on load
   useEffect(() => {
+    // Skip if user came from AuthCallback
+    if (location.state?.user) {
+      setIsLoading(false);
+      loadAds();
+      return;
+    }
+
     const checkAuth = async () => {
       // Check admin first
       const adminToken = localStorage.getItem('admin_token');
@@ -38,33 +61,51 @@ function App() {
         return;
       }
       
-      // Check user auth
-      const token = getToken();
-      if (token) {
-        try {
-          const response = await authAPI.getMe();
-          setUser(response.user);
+      // Check user session via /auth/me
+      try {
+        const response = await fetch(`${API_URL}/api/auth/me`, {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
           setIsAuthenticated(true);
-          
-          // Load ads
-          const adsData = await adAPI.getAds();
-          setAds(adsData);
-        } catch (error) {
-          console.error('Auth check failed:', error);
-          authAPI.logout();
+          await loadAds();
+        } else {
+          setIsAuthenticated(false);
         }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        setIsAuthenticated(false);
       }
+      
       setIsLoading(false);
     };
     
     checkAuth();
-  }, []);
+  }, [location.state]);
+
+  const loadAds = async () => {
+    try {
+      const adsData = await adAPI.getAds();
+      setAds(adsData);
+    } catch (error) {
+      console.error('Failed to load ads:', error);
+    }
+  };
 
   // Refresh user data
   const refreshUser = async () => {
     try {
-      const response = await userAPI.getProfile();
-      setUser(response.user);
+      const response = await fetch(`${API_URL}/api/auth/me`, {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      }
     } catch (error) {
       console.error('Failed to refresh user:', error);
     }
@@ -91,7 +132,6 @@ function App() {
           setAds(adsData);
         } catch (error) {
           console.error('Failed to load ads:', error);
-          // Fallback to empty array if API fails
           setAds([]);
         }
         
@@ -104,18 +144,16 @@ function App() {
         return;
       }
       
-      const response = await authAPI.login(userData.provider, userData);
-      
-      setUser(response.user);
+      // For email/social login, user data comes from auth response
+      setUser(userData);
       setIsAuthenticated(true);
       
       // Load ads
-      const adsData = await adAPI.getAds();
-      setAds(adsData);
+      await loadAds();
       
       toast({
         title: '✅ تم تسجيل الدخول',
-        description: `مرحباً ${response.user.name}!`,
+        description: `مرحباً ${userData.name}!`,
       });
     } catch (error) {
       console.error('Login failed:', error);
@@ -129,8 +167,16 @@ function App() {
     }
   };
 
-  const handleLogout = () => {
-    authAPI.logout();
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    
     setIsAuthenticated(false);
     setUser(null);
     setAds([]);
@@ -154,35 +200,60 @@ function App() {
     }
     
     try {
-      const response = await adAPI.watchAd(adId, watchTime);
+      const response = await fetch(`${API_URL}/api/ads/watch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ ad_id: adId, watch_time: watchTime })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        if (response.status === 400) {
+          toast({
+            title: '⚠️ تنبيه',
+            description: data.detail || 'لقد شاهدت هذا الإعلان بالفعل',
+            variant: 'destructive'
+          });
+        }
+        throw new Error(data.detail);
+      }
       
       // Refresh user data to get updated points
       await refreshUser();
       
-      return response;
+      toast({
+        title: '🎉 رائع!',
+        description: `حصلت على ${data.points_earned} نقطة!`,
+      });
+      
+      return data;
     } catch (error) {
       console.error('Watch ad error:', error);
-      
-      if (error.response?.status === 400) {
-        toast({
-          title: '⚠️ تنبيه',
-          description: error.response.data.detail || 'لقد شاهدت هذا الإعلان بالفعل',
-          variant: 'destructive'
-        });
-      }
-      
       throw error;
     }
   };
 
   const handleWithdrawRequest = async (request) => {
     try {
-      const response = await withdrawalAPI.createWithdrawal(request);
+      const response = await fetch(`${API_URL}/api/withdrawals`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(request)
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.detail);
+      }
       
       // Refresh user data
       await refreshUser();
       
-      return response;
+      return data;
     } catch (error) {
       console.error('Withdrawal error:', error);
       throw error;
@@ -247,6 +318,7 @@ function App() {
           <button
             onClick={() => setCurrentPage('advertiser-preview')}
             className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg font-semibold flex items-center gap-2"
+            data-testid="add-your-ad-btn"
           >
             <span>💼</span>
             <span>أضف إعلانك</span>
@@ -258,81 +330,87 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      <div className="App">
-        <Routes>
-          {/* Admin Routes */}
-          <Route path="/admin/login" element={
-            isAdmin ? <Navigate to="/admin/dashboard" /> : <AdminLoginPage onAdminLogin={handleAdminLogin} />
-          } />
-          <Route path="/admin/dashboard" element={
-            isAdmin ? <AdminDashboard admin={adminData} onLogout={handleAdminLogout} /> : <Navigate to="/admin/login" />
-          } />
-          
-          {/* User Routes */}
-          <Route path="/*" element={
+    <Routes>
+      {/* Admin Routes */}
+      <Route path="/admin/login" element={
+        isAdmin ? <Navigate to="/admin/dashboard" /> : <AdminLoginPage onAdminLogin={handleAdminLogin} />
+      } />
+      <Route path="/admin/dashboard" element={
+        isAdmin ? <AdminDashboard admin={adminData} onLogout={handleAdminLogout} /> : <Navigate to="/admin/login" />
+      } />
+      
+      {/* User Routes */}
+      <Route path="/*" element={
+        <>
+          {currentPage === 'advertiser-preview' ? (
+            <AdvertiserPage onNavigate={(page) => {
+              if (page === 'home') {
+                setCurrentPage('home');
+                setIsAuthenticated(false);
+              } else {
+                setCurrentPage(page);
+              }
+            }} />
+          ) : !isAuthenticated ? (
             <>
-              {currentPage === 'advertiser-preview' ? (
-                <AdvertiserPage onNavigate={(page) => {
-                  if (page === 'home') {
-                    setCurrentPage('home');
-                    setIsAuthenticated(false);
-                  } else {
-                    setCurrentPage(page);
-                  }
-                }} />
-              ) : !isAuthenticated ? (
-                <>
-                  <AuthPage onLogin={handleLogin} onGuestMode={handleLogin} />
-                  <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-                    <button
-                      onClick={() => setCurrentPage('advertiser-preview')}
-                      className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg font-semibold flex items-center gap-2"
-                    >
-                      <span>💼</span>
-                      <span>أضف إعلانك</span>
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  {currentPage === 'home' && (
-                    <AdViewer 
-                      ads={ads} 
-                      onAdWatched={handleAdWatched}
-                      user={user}
-                    />
-                  )}
-                  {currentPage === 'profile' && (
-                    <ProfilePage 
-                      user={user} 
-                      onLogout={handleLogout}
-                      onNavigate={handleNavigate}
-                    />
-                  )}
-                  {currentPage === 'advertiser' && (
-                    <AdvertiserPage 
-                      onNavigate={handleNavigate}
-                    />
-                  )}
-                  {currentPage === 'withdraw' && (
-                    <WithdrawPage 
-                      user={user}
-                      onNavigate={handleNavigate}
-                      onWithdrawRequest={handleWithdrawRequest}
-                    />
-                  )}
-                  {currentPage !== 'withdraw' && (
-                    <BottomNav 
-                      currentPage={currentPage}
-                      onNavigate={handleNavigate}
-                    />
-                  )}
-                </>
+              <AuthPage onLogin={handleLogin} onGuestMode={handleLogin} />
+              <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+                <button
+                  onClick={() => setCurrentPage('advertiser-preview')}
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg font-semibold flex items-center gap-2"
+                >
+                  <span>💼</span>
+                  <span>أضف إعلانك</span>
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              {currentPage === 'home' && (
+                <AdViewer 
+                  ads={ads} 
+                  onAdWatched={handleAdWatched}
+                  user={user}
+                />
+              )}
+              {currentPage === 'profile' && (
+                <ProfilePage 
+                  user={user} 
+                  onLogout={handleLogout}
+                  onNavigate={handleNavigate}
+                />
+              )}
+              {currentPage === 'advertiser' && (
+                <AdvertiserPage 
+                  onNavigate={handleNavigate}
+                />
+              )}
+              {currentPage === 'withdraw' && (
+                <WithdrawPage 
+                  user={user}
+                  onNavigate={handleNavigate}
+                  onWithdrawRequest={handleWithdrawRequest}
+                />
+              )}
+              {currentPage !== 'withdraw' && (
+                <BottomNav 
+                  currentPage={currentPage}
+                  onNavigate={handleNavigate}
+                />
               )}
             </>
-          } />
-        </Routes>
+          )}
+        </>
+      } />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="App">
+        <AppRouter />
         <Toaster />
       </div>
     </BrowserRouter>
