@@ -414,7 +414,7 @@ const AdminDashboard = ({ admin, onLogout }) => {
                 ) : (
                   <div className="space-y-2 max-h-[500px] overflow-y-auto">
                     {allUsers.map((user) => (
-                      <div key={user.id || user.user_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={user.user_id || user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${user.is_banned ? 'bg-red-100' : 'bg-indigo-100'}`}>
                             <span className="text-lg">{user.is_banned ? '🚫' : '👤'}</span>
