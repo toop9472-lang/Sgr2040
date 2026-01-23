@@ -17,6 +17,7 @@ const AdvertiserPage = ({ onNavigate }) => {
     advertiser_name: '',
     advertiser_email: '',
     advertiser_phone: '',
+    website_url: '',
     title: '',
     description: '',
     video_url: '',
