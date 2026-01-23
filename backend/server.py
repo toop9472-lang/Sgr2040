@@ -103,6 +103,9 @@ api_router.include_router(admin_dashboard_router)
 api_router.include_router(payment_router)
 api_router.include_router(tap_router)
 api_router.include_router(notification_router)
+api_router.include_router(invoice_router)
+api_router.include_router(analytics_router)
+api_router.include_router(withdrawal_methods_router)
 
 # Include the router in the main app
 app.include_router(api_router)
