@@ -45,6 +45,15 @@ const MainTabs = () => {
         }}
       />
       <Tab.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <TabIcon icon="🔔" label="الإشعارات" focused={focused} />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
