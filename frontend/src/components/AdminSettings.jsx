@@ -390,6 +390,44 @@ const AdminSettings = () => {
                     )}
                   </div>
                 ))}
+                
+                {/* PayPal Special */}
+                <div className={`p-4 rounded-lg border-2 ${paymentSettings.paypal_enabled ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-semibold">PayPal</span>
+                    <Switch
+                      checked={paymentSettings.paypal_enabled}
+                      onCheckedChange={(checked) => setPaymentSettings(prev => ({ ...prev, paypal_enabled: checked }))}
+                    />
+                  </div>
+                  {paymentSettings.paypal_enabled && (
+                    <div className="space-y-2">
+                      <Input
+                        type={showKeys['paypal_id'] ? 'text' : 'password'}
+                        value={paymentSettings.paypal_client_id}
+                        onChange={(e) => setPaymentSettings(prev => ({ ...prev, paypal_client_id: e.target.value }))}
+                        placeholder="Client ID"
+                      />
+                      <Input
+                        type={showKeys['paypal_secret'] ? 'text' : 'password'}
+                        value={paymentSettings.paypal_secret}
+                        onChange={(e) => setPaymentSettings(prev => ({ ...prev, paypal_secret: e.target.value }))}
+                        placeholder="Secret"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <Button onClick={() => saveSettings('payments', paymentSettings, 'payment-gateways')} disabled={isSaving} className="w-full">
+                <Save className="w-4 h-4 ml-2" /> حفظ إعدادات الدفع
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Email Settings Tab */}
+        <TabsContent value="email">
           <div className="space-y-4">
             <Card className={emailSettings.email_enabled ? 'border-2 border-green-200' : ''}>
               <CardHeader>
@@ -408,7 +446,6 @@ const AdminSettings = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* API Key */}
                 <div>
                   <Label>مفتاح Resend API</Label>
                   <div className="relative">
@@ -426,7 +463,6 @@ const AdminSettings = () => {
                   </div>
                 </div>
                 
-                {/* Sender Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label>اسم المرسل</Label>
@@ -449,14 +485,13 @@ const AdminSettings = () => {
                   </div>
                 </div>
                 
-                {/* Email Types */}
                 <div className="space-y-3 pt-4 border-t">
                   <Label className="text-base font-semibold">أنواع الإشعارات</Label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div className={`flex items-center justify-between p-3 rounded-lg ${emailSettings.send_welcome_email ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}`}>
                       <div className="flex items-center gap-2">
                         <CheckCircle className={`w-4 h-4 ${emailSettings.send_welcome_email ? 'text-green-600' : 'text-gray-400'}`} />
-                        <span className="text-sm">ترحيب المستخدمين الجدد</span>
+                        <span className="text-sm">ترحيب المستخدمين</span>
                       </div>
                       <Switch
                         checked={emailSettings.send_welcome_email}
@@ -492,13 +527,11 @@ const AdminSettings = () => {
               </CardContent>
             </Card>
             
-            {/* Test Email */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Send className="w-5 h-5" /> إرسال بريد تجريبي
                 </CardTitle>
-                <CardDescription>اختبر إعدادات البريد الإلكتروني بإرسال رسالة تجريبية</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex gap-3">
@@ -515,22 +548,15 @@ const AdminSettings = () => {
                     disabled={isSendingTest || !emailSettings.email_enabled}
                     className="bg-green-600 hover:bg-green-700"
                   >
-                    {isSendingTest ? (
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4 ml-2" /> إرسال
-                      </>
-                    )}
+                    {isSendingTest ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><Send className="w-4 h-4 ml-2" /> إرسال</>}
                   </Button>
                 </div>
                 {!emailSettings.email_enabled && (
-                  <p className="text-xs text-orange-600 mt-2">⚠️ يجب تفعيل خدمة البريد الإلكتروني أولاً</p>
+                  <p className="text-xs text-orange-600 mt-2">⚠️ يجب تفعيل خدمة البريد أولاً</p>
                 )}
               </CardContent>
             </Card>
             
-            {/* Setup Guide */}
             <Card className="border-blue-200 bg-blue-50">
               <CardContent className="pt-4">
                 <h4 className="font-semibold text-blue-800 mb-2">💡 كيفية إعداد Resend:</h4>
@@ -538,47 +564,11 @@ const AdminSettings = () => {
                   <li>أنشئ حساب مجاني على <a href="https://resend.com" target="_blank" rel="noopener noreferrer" className="underline">resend.com</a></li>
                   <li>اذهب إلى API Keys واضغط على "Create API Key"</li>
                   <li>انسخ المفتاح (يبدأ بـ re_) والصقه هنا</li>
-                  <li>للإنتاج: أضف نطاقك واستخدم بريد مخصص</li>
                 </ol>
                 <p className="text-xs text-blue-600 mt-2">✨ المستوى المجاني: 3000 رسالة/شهر</p>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-                
-                {/* PayPal Special */}
-                <div className={`p-4 rounded-lg border-2 ${paymentSettings.paypal_enabled ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'}`}>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-semibold">PayPal</span>
-                    <Switch
-                      checked={paymentSettings.paypal_enabled}
-                      onCheckedChange={(checked) => setPaymentSettings(prev => ({ ...prev, paypal_enabled: checked }))}
-                    />
-                  </div>
-                  {paymentSettings.paypal_enabled && (
-                    <div className="space-y-2">
-                      <Input
-                        type={showKeys['paypal_id'] ? 'text' : 'password'}
-                        value={paymentSettings.paypal_client_id}
-                        onChange={(e) => setPaymentSettings(prev => ({ ...prev, paypal_client_id: e.target.value }))}
-                        placeholder="Client ID"
-                      />
-                      <Input
-                        type={showKeys['paypal_secret'] ? 'text' : 'password'}
-                        value={paymentSettings.paypal_secret}
-                        onChange={(e) => setPaymentSettings(prev => ({ ...prev, paypal_secret: e.target.value }))}
-                        placeholder="Secret"
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              <Button onClick={() => saveSettings('payments', paymentSettings, 'payment-gateways')} disabled={isSaving} className="w-full">
-                <Save className="w-4 h-4 ml-2" /> حفظ إعدادات الدفع
-              </Button>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* Auth Tab */}
