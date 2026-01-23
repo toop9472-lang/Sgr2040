@@ -171,7 +171,7 @@ const AdminDashboard = ({ admin, onLogout }) => {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-4 pt-8 pb-16 shadow-lg">
+      <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-4 pt-8 pb-20 shadow-lg">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-white text-2xl font-bold">لوحة التحكم</h1>
@@ -187,45 +187,109 @@ const AdminDashboard = ({ admin, onLogout }) => {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="px-4 -mt-8 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="shadow-lg border-0">
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <p className="text-sm text-gray-600">إجمالي الإيرادات</p>
-                <p className="text-3xl font-bold text-green-600">{stats?.total_revenue || 0} ر.س</p>
+      {/* User Status Cards - NEW */}
+      <div className="px-4 -mt-12 mb-4">
+        <div className="grid grid-cols-3 gap-3">
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-blue-500 to-blue-600">
+            <CardContent className="pt-4 pb-4">
+              <div className="text-center text-white">
+                <p className="text-xs opacity-80">إجمالي المستخدمين</p>
+                <p className="text-3xl font-bold">{userStats?.users?.total || stats?.total_users || 0}</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-0">
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <p className="text-sm text-gray-600">المدفوعات للمستخدمين</p>
-                <p className="text-3xl font-bold text-red-600">{stats?.total_payouts || 0} $</p>
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-green-500 to-green-600">
+            <CardContent className="pt-4 pb-4">
+              <div className="text-center text-white">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                  <p className="text-xs opacity-80">نشط الآن</p>
+                </div>
+                <p className="text-3xl font-bold">{userStats?.users?.online || 0}</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-0">
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <p className="text-sm text-gray-600">صافي الربح</p>
-                <p className="text-3xl font-bold text-indigo-600">{stats?.net_profit || 0} ر.س</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-lg border-0">
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <p className="text-sm text-gray-600">إجمالي المستخدمين</p>
-                <p className="text-3xl font-bold text-blue-600">{stats?.total_users || 0}</p>
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-gray-500 to-gray-600">
+            <CardContent className="pt-4 pb-4">
+              <div className="text-center text-white">
+                <p className="text-xs opacity-80">غير متصل</p>
+                <p className="text-3xl font-bold">{userStats?.users?.offline || 0}</p>
               </div>
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Financial Stats Cards */}
+      <div className="px-4 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Card className="shadow-lg border-0">
+            <CardContent className="pt-4 pb-4">
+              <div className="text-center">
+                <p className="text-xs text-gray-600">الإيرادات</p>
+                <p className="text-2xl font-bold text-green-600">{stats?.total_revenue || 0} ر.س</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg border-0">
+            <CardContent className="pt-4 pb-4">
+              <div className="text-center">
+                <p className="text-xs text-gray-600">المدفوعات</p>
+                <p className="text-2xl font-bold text-red-600">{stats?.total_payouts || 0} $</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg border-0">
+            <CardContent className="pt-4 pb-4">
+              <div className="text-center">
+                <p className="text-xs text-gray-600">صافي الربح</p>
+                <p className="text-2xl font-bold text-indigo-600">{stats?.net_profit || 0} ر.س</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg border-0">
+            <CardContent className="pt-4 pb-4">
+              <div className="text-center">
+                <p className="text-xs text-gray-600">إعلانات نشطة</p>
+                <p className="text-2xl font-bold text-purple-600">{stats?.active_ads || 0}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Ad Stats Cards - NEW */}
+      <div className="px-4 mb-6">
+        <Card className="shadow-lg border-0">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">إحصائيات الإعلانات</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-4 gap-4">
+              <div className="text-center p-3 bg-blue-50 rounded-lg">
+                <p className="text-2xl font-bold text-blue-600">{userStats?.ads?.total_views || 0}</p>
+                <p className="text-xs text-gray-600">مشاهدات</p>
+              </div>
+              <div className="text-center p-3 bg-green-50 rounded-lg">
+                <p className="text-2xl font-bold text-green-600">{userStats?.ads?.completed_views || 0}</p>
+                <p className="text-xs text-gray-600">مكتملة</p>
+              </div>
+              <div className="text-center p-3 bg-purple-50 rounded-lg">
+                <p className="text-2xl font-bold text-purple-600">{userStats?.ads?.completion_rate || 0}%</p>
+                <p className="text-xs text-gray-600">نسبة الإكمال</p>
+              </div>
+              <div className="text-center p-3 bg-orange-50 rounded-lg">
+                <p className="text-2xl font-bold text-orange-600">{userStats?.ads?.avg_views_per_ad || 0}</p>
+                <p className="text-xs text-gray-600">متوسط/إعلان</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Tabs */}
