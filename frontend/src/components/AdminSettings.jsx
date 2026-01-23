@@ -212,6 +212,9 @@ const AdminSettings = () => {
           <TabsTrigger value="payments" className="flex items-center gap-1 text-xs">
             <CreditCard className="w-3 h-3" /> بوابات الدفع
           </TabsTrigger>
+          <TabsTrigger value="email" className="flex items-center gap-1 text-xs">
+            <Mail className="w-3 h-3" /> البريد
+          </TabsTrigger>
           <TabsTrigger value="auth" className="flex items-center gap-1 text-xs">
             <Shield className="w-3 h-3" /> تسجيل الدخول
           </TabsTrigger>
