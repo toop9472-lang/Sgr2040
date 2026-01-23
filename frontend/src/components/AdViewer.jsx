@@ -232,18 +232,21 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
 
       {/* Ad Counter */}
       <div className="absolute top-1/2 right-4 -translate-y-1/2 flex flex-col gap-2">
-        {ads.map((ad, index) => (
-          <div
-            key={ad.id}
-            className={`w-1 h-12 rounded-full transition-all ${
-              index === currentIndex
-                ? 'bg-white'
-                : watchedAds.includes(ad.id)
-                ? 'bg-green-500'
-                : 'bg-white/30'
-            }`}
-          />
-        ))}
+        {ads.map((ad, index) => {
+          const adWatched = user?.watched_ads?.some(w => w.ad_id === ad.id) || false;
+          return (
+            <div
+              key={ad.id}
+              className={`w-1 h-12 rounded-full transition-all ${
+                index === currentIndex
+                  ? 'bg-white'
+                  : adWatched
+                  ? 'bg-green-500'
+                  : 'bg-white/30'
+              }`}
+            />
+          );
+        })}
       </div>
     </div>
   );
