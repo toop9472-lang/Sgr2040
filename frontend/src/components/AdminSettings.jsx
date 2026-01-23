@@ -419,6 +419,29 @@ const AdminSettings = () => {
                     </div>
                   )}
                 </div>
+                
+                {/* Apple Pay */}
+                <div className={`p-4 rounded-lg border-2 ${paymentSettings.applepay_enabled ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-gray-50'}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`font-semibold ${paymentSettings.applepay_enabled ? 'text-white' : ''}`}> Apple Pay</span>
+                    <Switch
+                      checked={paymentSettings.applepay_enabled}
+                      onCheckedChange={(checked) => setPaymentSettings(prev => ({ ...prev, applepay_enabled: checked }))}
+                    />
+                  </div>
+                  {paymentSettings.applepay_enabled && (
+                    <div className="space-y-2">
+                      <Input
+                        type={showKeys['applepay'] ? 'text' : 'password'}
+                        value={paymentSettings.applepay_merchant_id}
+                        onChange={(e) => setPaymentSettings(prev => ({ ...prev, applepay_merchant_id: e.target.value }))}
+                        placeholder="Merchant ID"
+                        className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
+                      />
+                      <p className="text-xs text-gray-400">يعمل من خلال Stripe - تأكد من تفعيل Stripe أولاً</p>
+                    </div>
+                  )}
+                </div>
               </div>
               
               <Button onClick={() => saveSettings('payments', paymentSettings, 'payment-gateways')} disabled={isSaving} className="w-full">
