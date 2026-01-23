@@ -19,6 +19,10 @@ function App() {
   const [ads, setAds] = useState([]);
   const [currentPage, setCurrentPage] = useState('home');
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Admin state
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminData, setAdminData] = useState(null);
 
   // Check if user is authenticated on load
   useEffect(() => {
