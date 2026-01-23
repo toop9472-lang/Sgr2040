@@ -410,65 +410,86 @@ const AdminDashboard = ({ admin, onLogout }) => {
               </CardHeader>
               <CardContent>
                 {allUsers.length === 0 ? (
-                  <p className="text-gray-500 text-center py-4">لا يوجد مستخدمون</p>
+                  <p className="text-gray-500 text-center py-8">لا يوجد مستخدمون</p>
                 ) : (
-                  <div className="space-y-2 max-h-[500px] overflow-y-auto">
-                    {allUsers.map((user) => (
-                      <div key={user.user_id || user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${user.is_banned ? 'bg-red-100' : 'bg-indigo-100'}`}>
-                            <span className="text-lg">{user.is_banned ? '🚫' : '👤'}</span>
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-800 flex items-center gap-2">
-                              {user.name || 'بدون اسم'}
-                              {user.is_banned && <Badge variant="destructive" className="text-xs">محظور</Badge>}
-                            </p>
-                            <p className="text-xs text-gray-500">{user.email}</p>
-                            <p className="text-xs text-gray-400">
-                              النقاط: {user.points || 0} | المكتسبة: {user.total_earned || 0}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {user.is_banned ? (
-                            <Button
-                              onClick={() => handleUnbanUser(user.user_id || user.id)}
-                              variant="outline"
-                              size="sm"
-                              className="text-green-600 border-green-300"
-                            >
-                              <UserCheck className="w-4 h-4 ml-1" />
-                              رفع الحظر
-                            </Button>
-                          ) : (
-                            <Button
-                              onClick={() => handleBanUser(user.user_id || user.id, user.name)}
-                              variant="outline"
-                              size="sm"
-                              className="text-orange-600 border-orange-300"
-                            >
-                              <Ban className="w-4 h-4 ml-1" />
-                              حظر
-                            </Button>
-                          )}
-                          <Button
-                            onClick={() => handleDeleteUser(user.user_id || user.id, user.name)}
-                            variant="outline"
-                            size="sm"
-                            className="text-red-600 border-red-300"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="text-right p-3 text-sm font-semibold text-gray-700">المستخدم</th>
+                          <th className="text-right p-3 text-sm font-semibold text-gray-700">البريد</th>
+                          <th className="text-center p-3 text-sm font-semibold text-gray-700">النقاط</th>
+                          <th className="text-center p-3 text-sm font-semibold text-gray-700">الحالة</th>
+                          <th className="text-center p-3 text-sm font-semibold text-gray-700">الإجراءات</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {allUsers.map((user) => (
+                          <tr key={user.user_id || user.id} className="hover:bg-gray-50">
+                            <td className="p-3">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${user.is_banned ? 'bg-red-500' : 'bg-indigo-500'}`}>
+                                  {(user.name || 'U')[0].toUpperCase()}
+                                </div>
+                                <span className="font-medium">{user.name || 'بدون اسم'}</span>
+                              </div>
+                            </td>
+                            <td className="p-3 text-sm text-gray-600" dir="ltr">{user.email}</td>
+                            <td className="p-3 text-center">
+                              <span className="font-bold text-indigo-600">{user.points || 0}</span>
+                              <span className="text-xs text-gray-400 block">مكتسبة: {user.total_earned || 0}</span>
+                            </td>
+                            <td className="p-3 text-center">
+                              {user.is_banned ? (
+                                <Badge variant="destructive">محظور</Badge>
+                              ) : (
+                                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">نشط</Badge>
+                              )}
+                            </td>
+                            <td className="p-3">
+                              <div className="flex items-center justify-center gap-1">
+                                {user.is_banned ? (
+                                  <Button
+                                    onClick={() => handleUnbanUser(user.user_id || user.id)}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                    title="رفع الحظر"
+                                  >
+                                    <UserCheck className="w-4 h-4" />
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    onClick={() => handleBanUser(user.user_id || user.id, user.name)}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                                    title="حظر"
+                                  >
+                                    <Ban className="w-4 h-4" />
+                                  </Button>
+                                )}
+                                <Button
+                                  onClick={() => handleDeleteUser(user.user_id || user.id, user.name)}
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  title="حذف"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 )}
                 
                 {/* Pagination */}
                 {totalUsers > 20 && (
-                  <div className="flex justify-center gap-2 mt-4">
+                  <div className="flex justify-center gap-2 mt-4 pt-4 border-t">
                     <Button
                       onClick={() => loadUsers(usersPage - 1, userSearch)}
                       disabled={usersPage <= 1}
@@ -477,7 +498,7 @@ const AdminDashboard = ({ admin, onLogout }) => {
                     >
                       السابق
                     </Button>
-                    <span className="px-4 py-2 text-sm">
+                    <span className="px-4 py-2 text-sm bg-gray-100 rounded">
                       صفحة {usersPage} من {Math.ceil(totalUsers / 20)}
                     </span>
                     <Button
