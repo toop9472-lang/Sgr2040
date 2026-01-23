@@ -131,9 +131,21 @@ const ProfileScreen = ({ navigation }) => {
 
       {/* Menu Items */}
       <View style={styles.menuCard}>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity 
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('WithdrawalHistory')}
+        >
           <Text style={styles.menuIcon}>📋</Text>
           <Text style={styles.menuText}>سجل السحوبات</Text>
+          <Text style={styles.menuArrow}>←</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Advertiser')}
+        >
+          <Text style={styles.menuIcon}>📢</Text>
+          <Text style={styles.menuText}>أعلن معنا</Text>
           <Text style={styles.menuArrow}>←</Text>
         </TouchableOpacity>
 
