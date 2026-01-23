@@ -30,6 +30,7 @@ from routes.payment_gateways_routes import router as payment_gateways_router
 from routes.settings_routes import router as settings_router
 from routes.wallet_routes import router as wallet_router
 from routes.admin_users_routes import router as admin_users_router
+from routes.email_routes import router as email_router
 
 
 ROOT_DIR = Path(__file__).parent
@@ -116,6 +117,7 @@ api_router.include_router(payment_gateways_router)
 api_router.include_router(settings_router)
 api_router.include_router(wallet_router)
 api_router.include_router(admin_users_router)
+api_router.include_router(email_router)
 
 # Include the router in the main app
 app.include_router(api_router)
