@@ -4,6 +4,36 @@
 
 ---
 
+## 📁 ملفات البيئة (.env)
+
+### Backend (`/app/backend/.env`)
+```env
+MONGO_URL=mongodb://localhost:27017
+DB_NAME=saqr_db
+CORS_ORIGINS=*
+STRIPE_API_KEY=sk_test_emergent
+TAP_API_KEY=
+TABBY_API_KEY=
+TAMARA_API_KEY=
+STCPAY_API_KEY=
+PAYPAL_CLIENT_ID=
+PAYPAL_SECRET=
+```
+
+### Frontend (`/app/frontend/.env`)
+```env
+REACT_APP_BACKEND_URL=https://reelcoin.preview.emergentagent.com
+WDS_SOCKET_PORT=443
+ENABLE_HEALTH_CHECK=false
+```
+
+### Mobile (`/app/mobile/.env`)
+```env
+API_URL=https://reelcoin.preview.emergentagent.com
+```
+
+---
+
 ## 👤 حساب المدير (Admin)
 
 | الحقل | القيمة |
