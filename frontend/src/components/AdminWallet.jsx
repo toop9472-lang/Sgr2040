@@ -6,8 +6,8 @@ import { Label } from './ui/label';
 import { toast } from '../hooks/use-toast';
 import { 
   Wallet, Plus, ArrowDownCircle, ArrowUpCircle, CreditCard, 
-  Building2, RefreshCw, AlertTriangle, CheckCircle, Clock,
-  DollarSign, TrendingUp, TrendingDown, History
+  Building2, RefreshCw, AlertTriangle, Clock, Trash2,
+  DollarSign, History
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -26,9 +26,6 @@ const AdminWallet = () => {
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [depositAmount, setDepositAmount] = useState('');
-  const [depositMethod, setDepositMethod] = useState('stripe');
-  const [manualReference, setManualReference] = useState('');
-  const [manualNotes, setManualNotes] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Bank account form
@@ -129,36 +126,33 @@ const AdminWallet = () => {
     }
   };
 
-  const handleManualDeposit = async () => {
-    if (!depositAmount || parseFloat(depositAmount) <= 0) {
-      toast({ title: '⚠️ تنبيه', description: 'أدخل مبلغ صحيح', variant: 'destructive' });
+  const deleteTransaction = async (transactionId) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذه المعاملة؟ سيتم عكس تأثيرها على الرصيد.')) {
       return;
     }
 
     try {
-      setIsProcessing(true);
       const headers = getAuthHeaders();
-      
-      await axios.post(`${API}/wallet/deposit/manual`, null, {
-        headers,
-        params: {
-          amount: parseFloat(depositAmount),
-          method: depositMethod,
-          reference: manualReference,
-          notes: manualNotes
-        }
-      });
-
-      toast({ title: '✅ تم الإيداع', description: `تم إيداع ${depositAmount} ريال بنجاح` });
-      setShowDepositModal(false);
-      setDepositAmount('');
-      setManualReference('');
-      setManualNotes('');
+      await axios.delete(`${API}/wallet/transactions/${transactionId}`, { headers });
+      toast({ title: '✅ تم الحذف', description: 'تم حذف المعاملة بنجاح' });
       loadWalletData();
     } catch (error) {
-      toast({ title: '❌ خطأ', description: error.response?.data?.detail || 'فشل الإيداع', variant: 'destructive' });
-    } finally {
-      setIsProcessing(false);
+      toast({ title: '❌ خطأ', description: error.response?.data?.detail || 'فشل حذف المعاملة', variant: 'destructive' });
+    }
+  };
+
+  const resetWallet = async () => {
+    if (!window.confirm('⚠️ تحذير: سيتم حذف جميع المعاملات وإعادة الرصيد إلى صفر. هل أنت متأكد؟')) {
+      return;
+    }
+
+    try {
+      const headers = getAuthHeaders();
+      await axios.delete(`${API}/wallet/reset`, { headers });
+      toast({ title: '✅ تم', description: 'تم إعادة تعيين المحفظة' });
+      loadWalletData();
+    } catch (error) {
+      toast({ title: '❌ خطأ', description: 'فشل إعادة التعيين', variant: 'destructive' });
     }
   };
 
@@ -269,9 +263,9 @@ const AdminWallet = () => {
       )}
 
       {/* Action Buttons */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 flex-wrap">
         <Button onClick={() => setShowDepositModal(true)} className="bg-green-600 hover:bg-green-700">
-          <Plus className="w-4 h-4 ml-2" /> إيداع رصيد
+          <Plus className="w-4 h-4 ml-2" /> إيداع رصيد (Stripe)
         </Button>
         <Button onClick={() => setShowSettingsModal(true)} variant="outline">
           <Building2 className="w-4 h-4 ml-2" /> إعدادات الحساب البنكي
@@ -279,18 +273,23 @@ const AdminWallet = () => {
         <Button onClick={loadWalletData} variant="ghost">
           <RefreshCw className="w-4 h-4" />
         </Button>
+        {transactions.length > 0 && (
+          <Button onClick={resetWallet} variant="destructive" size="sm">
+            <Trash2 className="w-4 h-4 ml-2" /> مسح السجل
+          </Button>
+        )}
       </div>
 
-      {/* Deposit Modal */}
+      {/* Deposit Modal - Stripe Only */}
       {showDepositModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Plus className="w-5 h-5 text-green-600" />
-                إيداع رصيد في المحفظة
+                <CreditCard className="w-5 h-5 text-indigo-600" />
+                إيداع رصيد عبر Stripe
               </CardTitle>
-              <CardDescription>أضف رصيداً لتتمكن من دفع طلبات السحب للمستخدمين</CardDescription>
+              <CardDescription>ادفع ببطاقة الائتمان أو الخصم لإيداع رصيد حقيقي في المحفظة</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -301,62 +300,36 @@ const AdminWallet = () => {
                   onChange={(e) => setDepositAmount(e.target.value)}
                   placeholder="1000"
                   min="100"
+                  className="text-lg"
                 />
                 <p className="text-xs text-gray-500 mt-1">الحد الأدنى: 100 ريال</p>
               </div>
 
-              <div>
-                <Label>طريقة الإيداع</Label>
-                <div className="grid grid-cols-2 gap-2 mt-2">
-                  <button
-                    onClick={() => setDepositMethod('stripe')}
-                    className={`p-3 rounded-lg border-2 text-center transition-all ${depositMethod === 'stripe' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}`}
-                  >
-                    <CreditCard className="w-6 h-6 mx-auto mb-1 text-indigo-600" />
-                    <span className="text-sm font-medium">بطاقة ائتمان</span>
-                    <p className="text-xs text-gray-500">Stripe</p>
-                  </button>
-                  <button
-                    onClick={() => setDepositMethod('bank_transfer')}
-                    className={`p-3 rounded-lg border-2 text-center transition-all ${depositMethod === 'bank_transfer' ? 'border-green-500 bg-green-50' : 'border-gray-200'}`}
-                  >
-                    <Building2 className="w-6 h-6 mx-auto mb-1 text-green-600" />
-                    <span className="text-sm font-medium">تحويل بنكي</span>
-                    <p className="text-xs text-gray-500">يدوي</p>
-                  </button>
+              <div className="p-4 bg-indigo-50 rounded-lg">
+                <div className="flex items-center gap-3 mb-2">
+                  <CreditCard className="w-8 h-8 text-indigo-600" />
+                  <div>
+                    <p className="font-semibold text-indigo-800">Stripe Checkout</p>
+                    <p className="text-xs text-indigo-600">دفع آمن ببطاقة الائتمان</p>
+                  </div>
                 </div>
+                <p className="text-xs text-indigo-700">
+                  سيتم توجيهك إلى صفحة Stripe الآمنة لإتمام الدفع
+                </p>
               </div>
-
-              {depositMethod === 'bank_transfer' && (
-                <div className="space-y-3 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-700">تفاصيل التحويل اليدوي:</p>
-                  <div>
-                    <Label>رقم المرجع / الإيصال</Label>
-                    <Input
-                      value={manualReference}
-                      onChange={(e) => setManualReference(e.target.value)}
-                      placeholder="رقم الحوالة أو الإيصال"
-                    />
-                  </div>
-                  <div>
-                    <Label>ملاحظات</Label>
-                    <Input
-                      value={manualNotes}
-                      onChange={(e) => setManualNotes(e.target.value)}
-                      placeholder="أي ملاحظات إضافية"
-                    />
-                  </div>
-                </div>
-              )}
 
               <div className="flex gap-2 pt-4">
                 <Button 
-                  onClick={depositMethod === 'stripe' ? handleStripeDeposit : handleManualDeposit}
-                  disabled={isProcessing}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  onClick={handleStripeDeposit}
+                  disabled={isProcessing || !depositAmount}
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700"
                 >
-                  {isProcessing ? <RefreshCw className="w-4 h-4 animate-spin ml-2" /> : <Plus className="w-4 h-4 ml-2" />}
-                  {depositMethod === 'stripe' ? 'الدفع ببطاقة الائتمان' : 'تأكيد الإيداع'}
+                  {isProcessing ? (
+                    <RefreshCw className="w-4 h-4 animate-spin ml-2" />
+                  ) : (
+                    <CreditCard className="w-4 h-4 ml-2" />
+                  )}
+                  الدفع الآن
                 </Button>
                 <Button onClick={() => setShowDepositModal(false)} variant="outline">
                   إلغاء
@@ -491,6 +464,7 @@ const AdminWallet = () => {
             <div className="text-center py-8 text-gray-500">
               <Wallet className="w-12 h-12 mx-auto mb-3 opacity-30" />
               <p>لا توجد معاملات بعد</p>
+              <p className="text-sm mt-1">قم بإيداع رصيد لبدء استخدام المحفظة</p>
             </div>
           ) : (
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
@@ -514,13 +488,23 @@ const AdminWallet = () => {
                       {tx.reference && <p className="text-xs text-gray-400">مرجع: {tx.reference}</p>}
                     </div>
                   </div>
-                  <div className="text-left">
-                    <p className={`font-bold ${tx.type === 'deposit' ? 'text-green-600' : 'text-red-600'}`}>
-                      {tx.type === 'deposit' ? '+' : ''}{tx.amount?.toLocaleString()} ر.س
-                    </p>
-                    <p className={`text-xs ${tx.status === 'completed' ? 'text-green-600' : 'text-yellow-600'}`}>
-                      {tx.status === 'completed' ? '✓ مكتمل' : '⏳ معلق'}
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <div className="text-left">
+                      <p className={`font-bold ${tx.type === 'deposit' ? 'text-green-600' : 'text-red-600'}`}>
+                        {tx.type === 'deposit' ? '+' : ''}{tx.amount?.toLocaleString()} ر.س
+                      </p>
+                      <p className={`text-xs ${tx.status === 'completed' ? 'text-green-600' : 'text-yellow-600'}`}>
+                        {tx.status === 'completed' ? '✓ مكتمل' : '⏳ معلق'}
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => deleteTransaction(tx.id)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-100"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
