@@ -320,7 +320,7 @@ function MainApp() {
     <Routes>
       {/* Admin Routes - accessible without user auth */}
       <Route path="/admin/login" element={
-        isAdmin ? <Navigate to="/admin/dashboard" /> : <AdminLoginPage onAdminLogin={handleAdminLogin} />
+        isAdmin ? <Navigate to="/admin/dashboard" /> : <AdminLogin onAdminLogin={handleAdminLogin} />
       } />
       <Route path="/admin/dashboard" element={
         isAdmin ? <AdminDashboard admin={adminData} onLogout={handleAdminLogout} /> : <Navigate to="/admin/login" />
