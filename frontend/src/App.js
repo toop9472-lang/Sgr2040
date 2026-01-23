@@ -181,22 +181,6 @@ function App() {
     );
   }
 
-  // Show advertiser page for non-authenticated users
-  if (currentPage === 'advertiser-preview') {
-    return (
-      <>
-        <AdvertiserPage onNavigate={(page) => {
-          if (page === 'home') {
-            setCurrentPage('home');
-          } else {
-            setCurrentPage(page);
-          }
-        }} />
-        <Toaster />
-      </>
-    );
-  }
-
   return (
     <div className="App">
       {currentPage === 'home' && (
