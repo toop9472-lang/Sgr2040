@@ -11,6 +11,7 @@ import AdminLoginPage from "./components/AdminLoginPage";
 import AdminDashboard from "./components/AdminDashboard";
 import PaymentSuccess from "./components/PaymentSuccess";
 import PaymentCancel from "./components/PaymentCancel";
+import NotificationsPage from "./components/NotificationsPage";
 import BottomNav from "./components/BottomNav";
 import { Toaster } from "./components/ui/toaster";
 import { toast } from "./hooks/use-toast";
