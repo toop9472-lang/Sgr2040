@@ -22,15 +22,17 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
   const currentAd = ads[currentIndex];
   const isWatched = user?.watched_ads?.some(w => w.ad_id === currentAd?.id) || false;
 
-  // Fetch viewers count
+  // Fetch viewers count (real data)
   const fetchViewers = useCallback(async () => {
     if (!currentAd) return;
     try {
       const res = await fetch(`${API_URL}/api/activity/ad-viewers/${currentAd.id}`);
       const data = await res.json();
-      setViewersCount(data.viewers || Math.floor(Math.random() * 50) + 10);
+      setViewersCount(data.viewers || 0);
+      setTotalViews(data.total_views || 0);
     } catch {
-      setViewersCount(Math.floor(Math.random() * 50) + 10);
+      setViewersCount(0);
+      setTotalViews(0);
     }
   }, [currentAd]);
 
