@@ -24,10 +24,14 @@
 
 ### 4. صفحة المعلنين
 - ✅ نموذج إضافة إعلان جديد
-- ✅ السعر: **500 ريال سعودي/شهر** (مع خصومات للباقات الأطول)
-- ✅ خيارات الدفع: تحويل بنكي، STC Pay، نقدي
-- ✅ **تكامل بوابة دفع Stripe** (بطاقات ائتمان، Apple Pay، Google Pay)
-- ✅ **تكامل بوابة دفع Tap** (جاهز - يحتاج TAP_API_KEY)
+- ✅ باقات متعددة:
+  - 500 ريال/شهر
+  - 1,350 ريال/3 أشهر (خصم 10%)
+  - 2,400 ريال/6 أشهر (خصم 20%)
+  - 4,200 ريال/سنة (خصم 30%)
+- ✅ **تكامل Stripe** (بطاقات ائتمان، Apple Pay، Google Pay)
+- ✅ **تكامل Tap** (جاهز - يحتاج TAP_API_KEY في .env)
+- ✅ خيارات يدوية: تحويل بنكي، STC Pay
 
 ### 5. نظام السحب
 - ✅ طلب سحب عبر PayPal
@@ -55,22 +59,30 @@
 ### الجلسة الحالية (يناير 2025)
 
 #### إصلاحات حرجة
-1. **إصلاح مشكلة CORS/Network** - كان هناك خطأ syntax في auth_routes.py يمنع بدء الـ backend
+1. **إصلاح مشكلة CORS/Network** - كان هناك خطأ syntax يمنع بدء الـ backend
 2. **إصلاح صفحة AdminDashboard** - كانت هناك escaped quotes خاطئة
 3. **إصلاح MongoDB _id serialization** - إضافة `{'_id': 0}` في جميع الـ queries
 
 #### الميزات الجديدة
-1. **نظام مصادقة كامل** جديد (`oauth_routes.py`):
+1. **نظام مصادقة كامل** (`oauth_routes.py`):
    - Google OAuth عبر Emergent Auth
    - تسجيل بالبريد الإلكتروني
-   - تسجيل دخول بالبريد الإلكتروني
    - إدارة الجلسات عبر cookies
 
-2. **صفحة AuthPage محدثة** - تدعم جميع طرق المصادقة
+2. **تكامل Stripe** (`payment_routes.py`):
+   - 4 باقات سعرية
+   - Checkout sessions
+   - Payment status polling
+   - Webhook handling
 
-3. **AuthCallback component** - للتعامل مع Google OAuth redirect
+3. **تكامل Tap Payments** (`tap_routes.py`):
+   - جاهز للعمل فور إضافة TAP_API_KEY
+   - يدعم mada, Visa, Mastercard, Apple Pay
 
-4. **إنشاء مستخدم أدمن** - `admin@saqr.com` / `admin123`
+4. **تطبيق React Native** (`/app/mobile`):
+   - 4 شاشات رئيسية
+   - نظام تنقل
+   - اتصال بالـ API
 
 ---
 
@@ -84,16 +96,10 @@
 │   ├── ad_routes.py         # Ads API
 │   ├── advertiser_routes.py # Advertiser API
 │   ├── withdrawal_routes.py # Withdrawal API
-│   ├── user_routes.py       # User API
+│   ├── payment_routes.py    # Stripe payments
+│   ├── tap_routes.py        # Tap payments
 │   ├── admin_auth_routes.py # Admin login
 │   └── admin_dashboard_routes.py # Admin dashboard
-├── models/
-│   ├── user.py
-│   ├── ad.py
-│   ├── advertiser.py
-│   ├── withdrawal.py
-│   ├── admin.py
-│   └── dashboard.py
 └── server.py
 ```
 
@@ -101,26 +107,34 @@
 ```
 /app/frontend/src/
 ├── components/
-│   ├── AuthPage.jsx         # Login page
-│   ├── AuthCallback.jsx     # OAuth callback
-│   ├── AdViewer.jsx         # Ad viewing
-│   ├── ProfilePage.jsx      # User profile
-│   ├── WithdrawPage.jsx     # Withdrawal form
-│   ├── AdvertiserPage.jsx   # Advertiser form
-│   ├── AdminLoginPage.jsx   # Admin login
-│   ├── AdminDashboard.jsx   # Admin panel
-│   └── BottomNav.jsx        # Navigation
+│   ├── AuthPage.jsx
+│   ├── AuthCallback.jsx
+│   ├── AdViewer.jsx
+│   ├── ProfilePage.jsx
+│   ├── WithdrawPage.jsx
+│   ├── AdvertiserPage.jsx (with Stripe + Tap)
+│   ├── AdminLoginPage.jsx
+│   ├── AdminDashboard.jsx
+│   ├── PaymentSuccess.jsx
+│   └── PaymentCancel.jsx
 └── App.js
 ```
 
-### Database (MongoDB)
-- **users**: معلومات المستخدمين والنقاط
-- **user_sessions**: جلسات المستخدمين
-- **ads**: الإعلانات النشطة
-- **advertiser_ads**: طلبات الإعلانات من المعلنين
-- **advertiser_payments**: مدفوعات المعلنين
-- **withdrawals**: طلبات السحب
-- **admins**: حسابات المشرفين
+### Mobile (React Native/Expo)
+```
+/app/mobile/
+├── App.js
+├── src/
+│   ├── screens/
+│   │   ├── AuthScreen.js
+│   │   ├── HomeScreen.js
+│   │   ├── ProfileScreen.js
+│   │   └── WithdrawScreen.js
+│   ├── context/AuthContext.js
+│   ├── navigation/AppNavigator.js
+│   └── services/api.js
+└── package.json
+```
 
 ---
 
@@ -139,16 +153,16 @@
 ## المهام القادمة (Upcoming)
 
 ### أولوية عالية (P1)
-1. 🔲 تكامل بوابة دفع **Stripe** للمعلنين
-2. 🔲 تكامل بوابة دفع **Tap** للمعلنين
+1. 🔲 إضافة **TAP_API_KEY** لتفعيل Tap Payments
+2. 🔲 نشر تطبيق الموبايل على App Store و Google Play
 
 ### أولوية متوسطة (P2)
-3. 🔲 تحويل التطبيق إلى **React Native**
-4. 🔲 نظام الفواتير للمعلنين
+3. 🔲 نظام الفواتير للمعلنين
+4. 🔲 Push Notifications
 
 ### أولوية منخفضة (P3)
-5. 🔲 إحصائيات مفصلة للمعلنين
-6. 🔲 نظام إشعارات
+5. 🔲 Dark Mode
+6. 🔲 إحصائيات مفصلة للمعلنين
 
 ---
 
@@ -165,10 +179,15 @@
 - `GET /api/ads` - Get all active ads
 - `POST /api/ads/watch` - Record ad watch
 
-### Advertiser
-- `GET /api/advertiser/pricing` - Get pricing info
-- `POST /api/advertiser/ads` - Create ad request
-- `POST /api/advertiser/ads/{id}/payment` - Submit payment
+### Payments (Stripe)
+- `GET /api/payments/packages` - Get pricing packages
+- `POST /api/payments/checkout` - Create Stripe checkout
+- `GET /api/payments/status/{session_id}` - Check payment status
+
+### Payments (Tap)
+- `GET /api/tap/status` - Check Tap availability
+- `POST /api/tap/checkout` - Create Tap checkout
+- `GET /api/tap/status/{charge_id}` - Check Tap payment status
 
 ### Withdrawals
 - `POST /api/withdrawals` - Create withdrawal request
@@ -179,8 +198,6 @@
 - `GET /api/admin/dashboard/stats` - Dashboard stats
 - `GET /api/admin/dashboard/withdrawals/pending` - Pending withdrawals
 - `GET /api/admin/dashboard/ads/pending` - Pending ads
-- `PUT /api/admin/dashboard/withdrawals/{id}/approve` - Approve withdrawal
-- `PUT /api/admin/dashboard/ads/{id}/approve` - Approve ad
 
 ---
 
@@ -189,3 +206,14 @@
 - **Frontend**: https://pointads.preview.emergentagent.com
 - **Admin Panel**: https://pointads.preview.emergentagent.com/admin/login
 - **API Base**: https://pointads.preview.emergentagent.com/api
+
+---
+
+## لتفعيل Tap Payments
+
+أضف المفتاح في `/app/backend/.env`:
+```
+TAP_API_KEY=sk_live_xxxxx
+```
+
+احصل على المفتاح من: https://dashboard.tap.company/settings/api-keys
