@@ -562,7 +562,7 @@ const AdminSettings = () => {
                 <h4 className="font-semibold text-blue-800 mb-2">💡 كيفية إعداد Resend:</h4>
                 <ol className="list-decimal list-inside text-sm text-blue-700 space-y-1">
                   <li>أنشئ حساب مجاني على <a href="https://resend.com" target="_blank" rel="noopener noreferrer" className="underline">resend.com</a></li>
-                  <li>اذهب إلى API Keys واضغط على "Create API Key"</li>
+                  <li>اذهب إلى API Keys واضغط على Create API Key</li>
                   <li>انسخ المفتاح (يبدأ بـ re_) والصقه هنا</li>
                 </ol>
                 <p className="text-xs text-blue-600 mt-2">✨ المستوى المجاني: 3000 رسالة/شهر</p>
