@@ -15,7 +15,13 @@ def get_db():
 # Simple admin check (in production, create proper admin middleware)
 async def verify_admin(user_id: str = Depends(get_current_user_id)):
     db = get_db()
-    admin = await db.admins.find_one({'id': user_id})
+    # Check by both id and email since admin_id is sometimes the email
+    admin = await db.admins.find_one({
+        '$or': [
+            {'id': user_id},
+            {'email': user_id}
+        ]
+    })
     if not admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
