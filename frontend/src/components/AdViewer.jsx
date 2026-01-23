@@ -12,6 +12,7 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [watchTime, setWatchTime] = useState(0);
   const [viewersCount, setViewersCount] = useState(0);
+  const [totalViews, setTotalViews] = useState(0);
   const [liked, setLiked] = useState(false);
   const videoRef = useRef(null);
   const watchTimerRef = useRef(null);
