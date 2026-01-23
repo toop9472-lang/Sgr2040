@@ -1,11 +1,11 @@
 """
 Admin Settings Routes
-Manage API keys and OAuth settings
+Manage API keys, OAuth settings, and app configuration
 """
 from fastapi import APIRouter, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 from auth.dependencies import get_current_user_id
 from datetime import datetime
 import os
@@ -40,9 +40,31 @@ class OAuthSettings(BaseModel):
     apple_enabled: bool = False
 
 
-class AllSettings(BaseModel):
-    payment_gateways: PaymentGatewaySettings
-    oauth: OAuthSettings
+class AppSettings(BaseModel):
+    maintenance_mode: bool = False
+    maintenance_message: str = "التطبيق تحت الصيانة، سنعود قريباً"
+    maintenance_message_en: str = "App is under maintenance, we'll be back soon"
+    allow_new_registrations: bool = True
+    allow_withdrawals: bool = True
+    allow_ad_submissions: bool = True
+    min_withdrawal_points: int = 500
+    points_per_minute: int = 1
+    ad_price_per_month: int = 500
+    max_ads_per_10min: int = 5
+    min_watch_seconds: int = 30
+    contact_email: str = ""
+    contact_phone: str = ""
+    support_whatsapp: str = ""
+    terms_url: str = ""
+    privacy_url: str = ""
+
+
+class EmergencyActions(BaseModel):
+    pause_all_payments: bool = False
+    pause_all_withdrawals: bool = False
+    block_all_logins: bool = False
+    emergency_message: str = ""
+    show_emergency_banner: bool = False
 
 
 async def verify_admin(user_id: str, db):
@@ -64,7 +86,6 @@ async def get_payment_gateway_settings(user_id: str = Depends(get_current_user_i
     settings = await db.settings.find_one({'type': 'payment_gateways'}, {'_id': 0})
     
     if not settings:
-        # Return defaults
         return {
             'stripe_enabled': True,
             'stripe_api_key': mask_key(os.environ.get('STRIPE_API_KEY', '')),
@@ -81,7 +102,6 @@ async def get_payment_gateway_settings(user_id: str = Depends(get_current_user_i
             'paypal_secret': mask_key(os.environ.get('PAYPAL_SECRET', ''))
         }
     
-    # Mask keys before returning
     return {
         'stripe_enabled': settings.get('stripe_enabled', True),
         'stripe_api_key': mask_key(settings.get('stripe_api_key', '')),
@@ -108,7 +128,6 @@ async def update_payment_gateway_settings(
     db = get_db()
     await verify_admin(user_id, db)
     
-    # Get current settings to preserve unchanged keys
     current = await db.settings.find_one({'type': 'payment_gateways'}, {'_id': 0})
     
     update_data = {
@@ -116,43 +135,17 @@ async def update_payment_gateway_settings(
         'updated_at': datetime.utcnow()
     }
     
-    # Handle each gateway - only update key if it's not masked
-    # Stripe
-    update_data['stripe_enabled'] = settings.stripe_enabled
-    if settings.stripe_api_key and not settings.stripe_api_key.startswith('****'):
-        update_data['stripe_api_key'] = settings.stripe_api_key
-    elif current:
-        update_data['stripe_api_key'] = current.get('stripe_api_key', '')
+    # Handle each gateway
+    for field in ['stripe', 'tap', 'tabby', 'tamara', 'stcpay']:
+        update_data[f'{field}_enabled'] = getattr(settings, f'{field}_enabled')
+        key_field = f'{field}_api_key'
+        key_value = getattr(settings, key_field)
+        if key_value and not key_value.startswith('****'):
+            update_data[key_field] = key_value
+        elif current:
+            update_data[key_field] = current.get(key_field, '')
     
-    # Tap
-    update_data['tap_enabled'] = settings.tap_enabled
-    if settings.tap_api_key and not settings.tap_api_key.startswith('****'):
-        update_data['tap_api_key'] = settings.tap_api_key
-    elif current:
-        update_data['tap_api_key'] = current.get('tap_api_key', '')
-    
-    # Tabby
-    update_data['tabby_enabled'] = settings.tabby_enabled
-    if settings.tabby_api_key and not settings.tabby_api_key.startswith('****'):
-        update_data['tabby_api_key'] = settings.tabby_api_key
-    elif current:
-        update_data['tabby_api_key'] = current.get('tabby_api_key', '')
-    
-    # Tamara
-    update_data['tamara_enabled'] = settings.tamara_enabled
-    if settings.tamara_api_key and not settings.tamara_api_key.startswith('****'):
-        update_data['tamara_api_key'] = settings.tamara_api_key
-    elif current:
-        update_data['tamara_api_key'] = current.get('tamara_api_key', '')
-    
-    # STC Pay
-    update_data['stcpay_enabled'] = settings.stcpay_enabled
-    if settings.stcpay_api_key and not settings.stcpay_api_key.startswith('****'):
-        update_data['stcpay_api_key'] = settings.stcpay_api_key
-    elif current:
-        update_data['stcpay_api_key'] = current.get('stcpay_api_key', '')
-    
-    # PayPal
+    # PayPal special handling
     update_data['paypal_enabled'] = settings.paypal_enabled
     if settings.paypal_client_id and not settings.paypal_client_id.startswith('****'):
         update_data['paypal_client_id'] = settings.paypal_client_id
@@ -182,10 +175,7 @@ async def get_oauth_settings(user_id: str = Depends(get_current_user_id)):
     settings = await db.settings.find_one({'type': 'oauth'}, {'_id': 0})
     
     if not settings:
-        return {
-            'google_enabled': True,
-            'apple_enabled': False
-        }
+        return {'google_enabled': True, 'apple_enabled': False}
     
     return {
         'google_enabled': settings.get('google_enabled', True),
@@ -202,34 +192,125 @@ async def update_oauth_settings(
     db = get_db()
     await verify_admin(user_id, db)
     
-    update_data = {
-        'type': 'oauth',
-        'google_enabled': settings.google_enabled,
-        'apple_enabled': settings.apple_enabled,
-        'updated_at': datetime.utcnow()
-    }
-    
     await db.settings.update_one(
         {'type': 'oauth'},
-        {'$set': update_data},
+        {'$set': {
+            'type': 'oauth',
+            'google_enabled': settings.google_enabled,
+            'apple_enabled': settings.apple_enabled,
+            'updated_at': datetime.utcnow()
+        }},
         upsert=True
     )
     
     return {'message': 'تم حفظ إعدادات تسجيل الدخول بنجاح'}
 
 
+@router.get('/app')
+async def get_app_settings(user_id: str = Depends(get_current_user_id)):
+    """Get app settings (admin only)"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    settings = await db.settings.find_one({'type': 'app'}, {'_id': 0})
+    
+    if not settings:
+        return AppSettings().dict()
+    
+    return {k: v for k, v in settings.items() if k != 'type'}
+
+
+@router.put('/app')
+async def update_app_settings(
+    settings: AppSettings,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Update app settings (admin only)"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    update_data = settings.dict()
+    update_data['type'] = 'app'
+    update_data['updated_at'] = datetime.utcnow()
+    
+    await db.settings.update_one(
+        {'type': 'app'},
+        {'$set': update_data},
+        upsert=True
+    )
+    
+    return {'message': 'تم حفظ إعدادات التطبيق بنجاح'}
+
+
+@router.get('/emergency')
+async def get_emergency_settings(user_id: str = Depends(get_current_user_id)):
+    """Get emergency settings (admin only)"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    settings = await db.settings.find_one({'type': 'emergency'}, {'_id': 0})
+    
+    if not settings:
+        return EmergencyActions().dict()
+    
+    return {k: v for k, v in settings.items() if k != 'type'}
+
+
+@router.put('/emergency')
+async def update_emergency_settings(
+    settings: EmergencyActions,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Update emergency settings (admin only)"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    update_data = settings.dict()
+    update_data['type'] = 'emergency'
+    update_data['updated_at'] = datetime.utcnow()
+    
+    await db.settings.update_one(
+        {'type': 'emergency'},
+        {'$set': update_data},
+        upsert=True
+    )
+    
+    return {'message': 'تم حفظ إعدادات الطوارئ بنجاح'}
+
+
+@router.post('/maintenance/toggle')
+async def toggle_maintenance(user_id: str = Depends(get_current_user_id)):
+    """Toggle maintenance mode"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    settings = await db.settings.find_one({'type': 'app'}, {'_id': 0})
+    current_mode = settings.get('maintenance_mode', False) if settings else False
+    
+    await db.settings.update_one(
+        {'type': 'app'},
+        {'$set': {
+            'type': 'app',
+            'maintenance_mode': not current_mode,
+            'updated_at': datetime.utcnow()
+        }},
+        upsert=True
+    )
+    
+    return {
+        'maintenance_mode': not current_mode,
+        'message': 'تم تفعيل وضع الصيانة' if not current_mode else 'تم إلغاء وضع الصيانة'
+    }
+
+
 @router.get('/public/oauth')
 async def get_public_oauth_settings():
     """Get OAuth settings for public use (no auth required)"""
     db = get_db()
-    
     settings = await db.settings.find_one({'type': 'oauth'}, {'_id': 0})
     
     if not settings:
-        return {
-            'google_enabled': True,
-            'apple_enabled': False
-        }
+        return {'google_enabled': True, 'apple_enabled': False}
     
     return {
         'google_enabled': settings.get('google_enabled', True),
@@ -239,13 +320,11 @@ async def get_public_oauth_settings():
 
 @router.get('/public/payment-gateways')
 async def get_public_payment_settings():
-    """Get enabled payment gateways for public use (no auth required)"""
+    """Get enabled payment gateways for public use"""
     db = get_db()
-    
     settings = await db.settings.find_one({'type': 'payment_gateways'}, {'_id': 0})
     
     if not settings:
-        # Return defaults based on env vars
         return {
             'stripe': True,
             'tap': bool(os.environ.get('TAP_API_KEY')),
@@ -262,6 +341,92 @@ async def get_public_payment_settings():
         'tamara': settings.get('tamara_enabled', False),
         'stcpay': settings.get('stcpay_enabled', False),
         'paypal': settings.get('paypal_enabled', False)
+    }
+
+
+@router.get('/public/app')
+async def get_public_app_settings():
+    """Get public app settings (maintenance mode, etc.)"""
+    db = get_db()
+    
+    app_settings = await db.settings.find_one({'type': 'app'}, {'_id': 0})
+    emergency_settings = await db.settings.find_one({'type': 'emergency'}, {'_id': 0})
+    
+    return {
+        'maintenance_mode': app_settings.get('maintenance_mode', False) if app_settings else False,
+        'maintenance_message': app_settings.get('maintenance_message', 'التطبيق تحت الصيانة') if app_settings else 'التطبيق تحت الصيانة',
+        'maintenance_message_en': app_settings.get('maintenance_message_en', 'App is under maintenance') if app_settings else 'App is under maintenance',
+        'allow_new_registrations': app_settings.get('allow_new_registrations', True) if app_settings else True,
+        'show_emergency_banner': emergency_settings.get('show_emergency_banner', False) if emergency_settings else False,
+        'emergency_message': emergency_settings.get('emergency_message', '') if emergency_settings else ''
+    }
+
+
+@router.get('/dashboard/stats')
+async def get_dashboard_stats(user_id: str = Depends(get_current_user_id)):
+    """Get comprehensive dashboard statistics"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    # Users stats
+    total_users = await db.users.count_documents({})
+    today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    new_users_today = await db.users.count_documents({'created_at': {'$gte': today}})
+    
+    # Ads stats
+    total_ads = await db.ads.count_documents({})
+    active_ads = await db.ads.count_documents({'status': 'active'})
+    pending_ads = await db.ads.count_documents({'status': 'pending'})
+    
+    # Withdrawals stats
+    total_withdrawals = await db.withdrawals.count_documents({})
+    pending_withdrawals = await db.withdrawals.count_documents({'status': 'pending'})
+    approved_withdrawals = await db.withdrawals.count_documents({'status': 'approved'})
+    
+    # Revenue
+    revenue_pipeline = [
+        {'$match': {'payment_status': 'paid'}},
+        {'$group': {'_id': None, 'total': {'$sum': '$price'}}}
+    ]
+    revenue_result = await db.ads.aggregate(revenue_pipeline).to_list(1)
+    total_revenue = revenue_result[0]['total'] if revenue_result else 0
+    
+    # Payouts
+    payouts_pipeline = [
+        {'$match': {'status': 'approved'}},
+        {'$group': {'_id': None, 'total': {'$sum': '$amount'}}}
+    ]
+    payouts_result = await db.withdrawals.aggregate(payouts_pipeline).to_list(1)
+    total_payouts = payouts_result[0]['total'] if payouts_result else 0
+    
+    # Points distributed
+    points_pipeline = [
+        {'$group': {'_id': None, 'total': {'$sum': '$total_earned'}}}
+    ]
+    points_result = await db.users.aggregate(points_pipeline).to_list(1)
+    total_points = points_result[0]['total'] if points_result else 0
+    
+    return {
+        'users': {
+            'total': total_users,
+            'new_today': new_users_today
+        },
+        'ads': {
+            'total': total_ads,
+            'active': active_ads,
+            'pending': pending_ads
+        },
+        'withdrawals': {
+            'total': total_withdrawals,
+            'pending': pending_withdrawals,
+            'approved': approved_withdrawals
+        },
+        'financials': {
+            'total_revenue': total_revenue,
+            'total_payouts': total_payouts,
+            'net_profit': total_revenue - total_payouts,
+            'total_points_distributed': total_points
+        }
     }
 
 
