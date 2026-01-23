@@ -248,6 +248,53 @@ const AdvertiserPage = ({ onNavigate }) => {
     }
   };
 
+  const handleTapPayment = async () => {
+    if (!createdAd?.ad?.id) {
+      toast({
+        title: '❌ خطأ',
+        description: 'يرجى إنشاء الإعلان أولاً',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/tap/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          package_id: selectedPackage,
+          ad_id: createdAd.ad.id,
+          origin_url: window.location.origin,
+          advertiser_email: adData.advertiser_email,
+          advertiser_name: adData.advertiser_name,
+          advertiser_phone: adData.advertiser_phone
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to create Tap checkout');
+      }
+
+      const data = await response.json();
+      
+      // Redirect to Tap Checkout
+      window.location.href = data.checkout_url;
+    } catch (error) {
+      console.error('Tap payment error:', error);
+      toast({
+        title: '❌ خطأ في الدفع',
+        description: error.message || 'فشل إنشاء جلسة الدفع',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleManualPayment = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
