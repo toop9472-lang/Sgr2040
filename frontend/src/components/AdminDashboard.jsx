@@ -214,12 +214,18 @@ const AdminDashboard = ({ admin, onLogout }) => {
       {/* Tabs */}
       <div className="px-4">
         <Tabs defaultValue="withdrawals" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="withdrawals">
-              طلبات السحب ({pendingWithdrawals.length})
+              السحوبات ({pendingWithdrawals.length})
             </TabsTrigger>
             <TabsTrigger value="ads">
-              طلبات الإعلانات ({pendingAds.length})
+              الإعلانات ({pendingAds.length})
+            </TabsTrigger>
+            <TabsTrigger value="analytics">
+              التحليلات
+            </TabsTrigger>
+            <TabsTrigger value="invoices">
+              الفواتير
             </TabsTrigger>
           </TabsList>
 
