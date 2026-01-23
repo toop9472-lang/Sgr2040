@@ -49,8 +49,15 @@ export const authAPI = {
     return response.data;
   },
   
+  // Unified signin - works for both users and admins
+  signin: async (data) => {
+    const response = await api.post('/auth/signin', data);
+    return response.data;
+  },
+  
+  // Legacy - keeping for backward compatibility
   loginEmail: async (data) => {
-    const response = await api.post('/auth/login/email', data);
+    const response = await api.post('/auth/signin', data);
     return response.data;
   },
   
