@@ -168,7 +168,8 @@ async def get_pending_ads(admin = Depends(verify_admin)):
     db = get_db()
     
     ads = await db.advertiser_ads.find(
-        {'status': 'pending'}
+        {'status': 'pending'},
+        {'_id': 0}  # Exclude MongoDB _id
     ).sort('created_at', -1).to_list(100)
     
     return {'ads': ads}
