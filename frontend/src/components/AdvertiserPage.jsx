@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Check, AlertCircle, TrendingUp, CreditCard, Building2 } from 'lucide-react';
+import { ArrowRight, Check, AlertCircle, CreditCard, Building2, Smartphone } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
@@ -28,6 +28,7 @@ const AdvertiserPage = ({ onNavigate }) => {
   const [paymentMethod, setPaymentMethod] = useState('');
   const [paymentProof, setPaymentProof] = useState('');
   const [packages, setPackages] = useState([]);
+  const [tapAvailable, setTapAvailable] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState('ad_1_month');
 
   // Load pricing packages on mount
