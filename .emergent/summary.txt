@@ -1,249 +1,222 @@
-<analysis>An analysis of the conversation and codebase has been completed. Here is the summary:
-
-**original_problem_statement:**
-The user wants to create an application named صقر (Saqr), similar to Instagram, but focused solely on advertisements.
+<analysis>**original_problem_statement:**
+The user wants to create an application named صقر (Saqr), which is an advertisement-focused platform similar to Instagram's Reels or TikTok.
 
 **PRODUCT REQUIREMENTS:**
--   **Core Functionality:** Users scroll through ads presented in a vertical feed (like Instagram Reels).
+-   **Core Functionality:** Users scroll through a vertical, full-screen feed of video ads, similar to TikTok/Reels.
 -   **Points System:** Users earn 1 point for every full minute of ad-watching.
 -   **Redemption:** 500 points can be redeemed for .
--   **Anti-cheat:** Prevent users from gaining points by watching the same ad multiple times.
--   **Authentication:** User registration via Google and Apple.
--   **Guest Mode:** Allow users to browse the app without logging in.
+-   **Anti-cheat:** Prevent users from gaining points by watching the same ad multiple times. The system tracks watched ads per user.
+-   **Authentication:**
+    -   User registration via Google, Apple, and standard email/password.
+    -   A single, unified login page for both regular users and admins. Admin credentials automatically redirect to the admin dashboard.
+-   **Guest Mode:** Allow users to browse ads without logging in.
 -   **Withdrawals:**
     -   Admin approval is required for all withdrawal requests.
     -   Supported withdrawal methods: PayPal, STC Pay, and local banks.
--   **Advertiser Feature:**
-    -   A section for advertisers to add their own ad.
-    -   The fee for posting an ad is 500 SAR for one month.
--   **Admin Panel:** A dashboard for the app owner to manage withdrawal requests, view financial statistics, and oversee ad submissions.
--   **Mobile App:** The user requested the web application be converted into a React Native mobile application.
--   **Branding:** The user initially requested an emoji logo (🦅), then provided a custom image, then asked to adjust the custom image, and finally requested to revert back to the original emoji logo.
+-   **Advertiser Features:**
+    -   A section for advertisers to post ads, including a website URL.
+    -   Fee for posting an ad is 500 SAR for one month.
+    -   Payment gateways: Stripe (international), Tap (local), Tabby, Tamara, STC Pay, and PayPal.
+    -   A Visit Website button on the ad viewer.
+-   **Admin Panel:** A comprehensive dashboard for the app owner to:
+    -   Manage withdrawal requests and ad submissions.
+    -   View financial statistics (revenue, payouts, profit).
+    -   View user statistics (total, online, offline).
+    -   View ad performance analytics (completion rates, top ads).
+    -   Manage invoices.
+    -   Admin Login:  / .
+-   **Mobile App:** A React Native mobile application with the same functionality as the web app.
+-   **Localization:** The app must support both Arabic and English.
+-   **Push Notifications:** Users receive notifications for key events (e.g., withdrawal status, ad approval, point milestones).
 
 **User's preferred language**: Arabic
 
 **what currently exists?**
-A full-stack application foundation has been laid out.
--   **Frontend (React):** UI components for most features are created, including login, ad viewing, user profile, withdrawal, and a new advertiser page. However, the connection to the backend is broken due to a persistent network issue, and some pages rely on hardcoded mock data to appear functional.
--   **Backend (FastAPI):** Models and API routes for users, ads, withdrawals, and advertisers have been defined. An initial structure for an admin dashboard has also been created. Data is seeded into the MongoDB database.
--   **React Native (/app/mobile):** A basic project structure for a React Native app was created in a separate directory () at the user's request, but it is not a functional app and development was abandoned in favor of web features.
+The web application is nearly feature-complete. The backend (FastAPI) and frontend (React) are fully integrated.
+-   **Unified Authentication:** A single login page handles both user and admin logins, with automatic redirection for admins. Google OAuth is also integrated.
+-   **Ad Viewer:** The UI has been completely redesigned into a modern, full-screen, TikTok-style feed with real-time viewer counts.
+-   **Admin Dashboard:** A multi-tab dashboard is fully functional, displaying live data for user stats, ad management, withdrawals, financial analytics, and invoices.
+-   **Payment Gateways:** Stripe is fully integrated. Placeholders and UI elements exist for Tap, Tabby, Tamara, STC Pay, and PayPal, but their backend logic is not implemented.
+-   **Push Notifications:** A complete push notification system has been implemented on the backend (using Firebase), with corresponding pages on the web and mobile apps.
+-   **React Native App (/app/mobile):** A well-structured skeleton exists. Key parts like the API service and Auth screen have been updated to align with the latest backend changes, but the UI for most screens still needs to be built.
 
 **Last working item**:
--   Last item agent was working: The agent was creating an admin dashboard. It had just created the backend routes, frontend components (, ), and was in the process of adding the necessary routing to .
+-   Last item agent was working: Adding support for new payment gateways: Tabby, Tamara, STC Pay, and PayPal, as requested by the user. The agent created placeholder backend routes, added environment variables, and updated the advertiser page UI to show these new options.
 -   Status: IN PROGRESS
 -   Agent Testing Done: N
 -   Which testing method agent to use? both
 -   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   Issue 1: (P0) Persistent CORS/Proxy/Network issue.
--   Issue 2: (P1) The Add your ad payment flow is non-functional.
--   Issue 3: (P2) The React Native conversion is highly incomplete and was abandoned.
--   Issue 4: (P3) The user login/registration flow is broken.
--   Issue 5: (P4) The Advertiser Page is stuck on a loading state.
+-   Issue 1: (P0) Complete New Payment Gateway Integrations
+-   Issue 2: (P1) Tap Payments Integration is Incomplete
+-   Issue 3: (P2) Apple OAuth Login is Not Implemented
 
 Issues Detail:
--   **Issue 1: Persistent CORS/Proxy/Network issue**
-    -   **Attempted fixes:** The agent identified the issue as CORS-related. It attempted to fix it by ensuring  was set in the FastAPI middleware and reordering the middleware definition. These attempts failed. The agent then resorted to using hardcoded data on the frontend to simulate functionality, which is not a real fix.
+-   **Issue 1: Complete New Payment Gateway Integrations (Tabby, Tamara, STC Pay, PayPal)**
+    -   **Attempted fixes:** Placeholder backend routes were created in , and the frontend  was updated to display them. No actual payment logic was implemented.
     -   **Next debug checklist:**
-        1.  Verify the  in  is correctly pointing to the backend service.
-        2.  Inspect the browser's network tab for detailed error messages on failed API requests.
-        3.  Check the backend server logs () for any incoming requests or errors when the frontend tries to connect.
-        4.  Use  from within the agent's terminal to test the backend endpoints directly (e.g., ) to confirm the backend is running and accessible internally.
-        5.  The issue is likely related to the proxy/network configuration of the environment, not just the FastAPI CORS settings. The agent should focus on debugging why requests from  (frontend) are not being correctly routed to  (backend).
-    -   **Why fix this issue and what will be achieved with the fix?** This is the highest priority blocker. Fixing it will enable communication between the frontend and backend, allowing the application to become truly functional, save data, and move beyond mock implementations.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** both
-    -   **Blocked on other issue:** None. This issue blocks almost everything else.
-
--   **Issue 2: Add your ad payment flow is non-functional**
-    -   **Attempted fixes:** The agent attempted to test the form submission but was blocked by the CORS issue (Issue 1), receiving an Access to XMLHttpRequest error.
-    -   **Next debug checklist:**
-        1.  Resolve the CORS/Proxy issue first (Issue 1).
-        2.  Implement the backend logic for handling payments. The current  endpoint is a placeholder. A payment gateway like Stripe or Tap needs to be integrated.
-        3.  Connect the frontend form submission in  to the payment processing endpoint.
-    -   **Why fix this issue and what will be achieved with the fix?** This implements a core revenue-generating feature of the application.
+        1.  Ask the user for the API keys for Tabby, Tamara, STC Pay, and PayPal.
+        2.  For each gateway, use  to get the correct implementation details.
+        3.  Implement the backend logic for creating checkout sessions and handling callbacks for each gateway.
+        4.  Connect the frontend UI to the new backend logic.
+    -   **Why fix this issue and what will be achieved with the fix?** Fulfills a direct user request and expands payment options for advertisers.
     -   **Status:** BLOCKED
     -   **Is recurring issue?** N
     -   **Should Test frontend/backend/both after fix?** both
-    -   **Blocked on other issue:** Issue 1: Persistent CORS/Proxy/Network issue
+    -   **Blocked on other issue:** Awaiting API keys from the user.
 
--   **Issue 3: React Native conversion is incomplete**
-    -   **Attempted fixes:** The agent created a basic file structure in  and installed dependencies. However, it immediately pivoted to another task without building any functional components or explaining the switch to the user.
+-   **Issue 2: Tap Payments Integration is Incomplete**
+    -   **Attempted fixes:** Placeholder backend routes and UI exist.
     -   **Next debug checklist:**
-        1.  Clarify with the user if they want to proceed with the React Native app, a Progressive Web App (PWA), or focus on the web app. The agent presented options but then proceeded without confirmation.
-        2.  If React Native is the choice, a full rewrite of the frontend is required, using React Native components and navigation.
-    -   **Why fix this issue and what will be achieved with the fix?** This addresses a direct and major user request for a mobile application.
+        1.  Obtain the  from the user.
+        2.  Implement the payment logic in .
+    -   **Why fix this issue and what will be achieved with the fix?** Fulfills the requirement for a key local payment gateway.
+    -   **Status:** BLOCKED
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** both
+    -   **Blocked on other issue:** Awaiting API key from the user.
+
+-   **Issue 3: Apple OAuth Login is Not Implemented**
+    -   **Attempted fixes:** None.
+    -   **Next debug checklist:**
+        1.  Call  to get the playbook for Apple OAuth.
+        2.  Implement the backend routes for the OAuth flow.
+        3.  Add the Sign in with Apple button to  (Web) and  (Mobile).
+    -   **Why fix this issue and what will be achieved with the fix?** Completes the user's original authentication requirements.
     -   **Status:** NOT STARTED
     -   **Is recurring issue?** N
     -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on other issue:** None.
 
--   **Issue 4: User login/registration flow is broken**
-    -   **Attempted fixes:** The agent tried to implement login functionality but was blocked by the CORS/proxy issue. The frontend makes an API call to  which fails.
-    -   **Next debug checklist:**
-        1.  Resolve the CORS/Proxy issue first (Issue 1).
-        2.  Implement the actual Google/Apple OAuth2 logic on the backend. The current implementation is a placeholder using a dummy username/password.
-        3.  Connect the frontend buttons in  to the correct backend OAuth flow.
-    -   **Why fix this issue and what will be achieved with the fix?** This will enable user authentication, which is fundamental to tracking points and managing user data.
-    -   **Status:** BLOCKED
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** both
-    -   **Blocked on other issue:** Issue 1: Persistent CORS/Proxy/Network issue
-
--   **Issue 5: Advertiser Page is stuck on a loading state**
-    -   **Attempted fixes:** The agent observed the page was stuck loading. It identified the cause as a failing API call (due to the CORS issue) and fixed it by removing the API call and using hardcoded data in . This made the page render but broke its dynamic functionality.
-    -   **Next debug checklist:**
-        1.  Resolve the CORS/Proxy issue first (Issue 1).
-        2.  Re-implement the API call in  to fetch data from the backend.
-        3.  Remove the hardcoded data.
-    -   **Why fix this issue and what will be achieved with the fix?** It will make the advertiser page dynamic and connect it to the backend, which is necessary for the payment flow.
-    -   **Status:** BLOCKED
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** both
-    -   **Blocked on other issue:** Issue 1: Persistent CORS/Proxy/Network issue
-
 **In progress Task List**:
--   **Task 1: Complete the Admin Dashboard** (P1)
-    -   **Where to resume:** The agent has created the basic files (, , and backend routes). The next step is to finish integrating the admin routes into , run the  script to create an admin user, and then build out the dashboard UI to fetch and display data (e.g., withdrawal requests, advertiser submissions) from the backend APIs.
-    -   **What will be achieved with this?** This will provide a control panel for the app owner to manage the application's core operations.
+-   **Task 1: Build Out React Native Mobile App** (P1)
+    -   **Where to resume:** The project is structured in , and the auth flow is updated. The next step is to build the UI for the main screens (, , , ) and connect them to the existing backend APIs, ensuring a user experience consistent with the web app.
+    -   **What will be achieved with this?** A functional cross-platform mobile application for both iOS and Android.
     -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** both
-    -   **Blocked on something:** Blocked by Issue 1 (CORS).
+    -   **Should Test frontend/backend/both after fix?** frontend
+    -   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   (P0) **Resolve Core Network Issue:** Fix the CORS/Proxy problem that prevents frontend-backend communication.
-    -   (P1) **Clarify and Execute App Strategy:** Discuss with the user whether to proceed with the incomplete React Native app, convert the web app to a PWA, or enhance the web app.
-    -   (P2) **Implement Real Authentication:** Integrate Google and Apple OAuth2 for user login.
-    -   (P3) **Implement Payment Gateway:** Integrate a payment provider (like Stripe or Tap) for the advertiser ad submission flow.
-
+    -   (P2) **Implement Withdrawal Processing:** The backend routes and admin UI exist for approving/rejecting withdrawals, but the actual logic to trigger payments via PayPal, STC Pay, or bank transfers needs to be implemented. This will require using the respective APIs for those services.
 -   **Future Tasks:**
-    -   Create an automated invoicing system for advertisers.
-    -   Build out the admin dashboard with full functionality (approving/rejecting withdrawals, viewing analytics).
-    -   Deploy the application to a live server.
-    -   If the mobile path is chosen, prepare and publish the app to the Apple App Store and Google Play Store.
+    -   Deploy the web and backend applications to a production environment.
+    -   Publish the completed mobile app to the Apple App Store and Google Play Store.
 
 **Completed work in this session**
--   **Frontend UI Scaffolding:**
-    -   : Login/Register page UI.
-    -   : Main ad-scrolling interface.
-    -   : User profile with points display.
-    -   : Form for users to request withdrawals.
-    -   : Page for advertisers to submit ads.
-    -   : Main navigation component.
--   **Feature Implementation (Frontend-only/Mocked):**
-    -   Implemented a Guest Mode to allow browsing without login.
-    -   Handled logo changes as requested by the user, finally reverting to an emoji.
--   **Backend Development:**
-    -   Created MongoDB models for User, Ad, Withdrawal, Advertiser, and Admin.
-    -   Developed initial FastAPI routes for authentication, users, ads, and withdrawals.
-    -   : A script to populate the database with initial ad data.
--   **Code/UI Fixes:**
-    -   Corrected JSX syntax errors in .
-    -   Removed unwanted  characters from the UI in .
+-   **Unified Admin/User Login:** Implemented and tested. A single endpoint  now handles both roles, redirecting admins correctly.
+-   **TikTok/Reels UI Redesign:** The  component was completely rewritten to provide a modern, full-screen vertical video feed.
+-   **Advanced Admin Dashboard:** The dashboard was significantly enhanced with live user statistics (total, online, offline), ad analytics, and new tabs for  and .
+-   **Real-time Viewer Counts:** Implemented a system using a heartbeat API to display live viewer counts on ads.
+-   **Push Notification System:** A full-featured notification system was added, including backend logic (Firebase), database models, API endpoints, and UI on both web and mobile.
+-   **Future Task Implementation:** Proactively implemented backend routes and frontend pages for Invoicing and Analytics.
+-   **UI Refinements:** Numerous small UI tweaks were made based on user feedback, including removing cluttered buttons from the ad viewer and controlling the display of welcome messages.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1: Frontend-Backend Communication Failure (CORS/Proxy)**
-    -   **Debug checklist:** See All Pending/In progress Issue list for a detailed checklist.
-    -   **Why to solve this issue and what will be achieved with this?** This is the main blocker. Solving it will make the application functional.
-    -   **Should Test frontend/backend/both after fix:** both
-    -   **Is recurring issue?** Y
+-   None.
 
 **Known issue recurrence from previous fork**
--   None. This is the first fork.
+-   None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend:** React, Tailwind CSS, shadcn/ui components, Axios
--   **Backend:** FastAPI, Python
--   **Database:** MongoDB (with Motor for async access)
--   **Authentication:** JWT (planned, not fully working)
--   **Mobile:** React Native (scaffolded, not implemented)
+-   **Frontend:** React, Tailwind CSS, shadcn/ui, Axios, React Router, Sonner (for toasts)
+-   **Backend:** FastAPI, Motor (async MongoDB), Pydantic, Firebase Admin SDK (for push notifications)
+-   **Database:** MongoDB
+-   **Authentication:** JWT, Google OAuth
+-   **Real-time:** A heartbeat API endpoint is used to track online users and live ad viewers.
+-   **Mobile:** React Native (Expo)
 
 **key DB schema**
--   **users:** 
--   **ads:** 
--   **withdrawals:** 
--   **advertisers:** 
--   **admins:** 
+-   **users:**  (for online status)
+-   **devices:**  (for push notifications)
+-   **notifications:** 
+-   **invoices:** 
+-   **active_viewers:** (Implicitly managed) Tracks user_id per ad_id with a timestamp to determine live viewers.
 
 **changes in tech stack**
--   The user requested a pivot from a React web application to a React Native mobile application. The agent created a skeleton project in  but did not perform the migration.
+-   Added  to the backend for push notifications.
 
 **All files of reference**
--   : Main application component, handles routing and state management. Heavily modified.
--   : Main FastAPI application file, includes all routers.
--   : Created for the advertiser feature, currently contains hardcoded data.
--   : Handles user login UI and guest mode.
--   : Directory containing the scaffolded but incomplete React Native project.
--   : Directory containing all API endpoint logic.
--   : Directory containing all Pydantic/MongoDB data models.
+-   : Contains the new unified  logic.
+-   : The new TikTok-style component.
+-   : The enhanced admin panel with multiple tabs and stats.
+-   : API for tracking user presence and real-time stats.
+-   : API for managing push notifications.
+-   : Updated to show all new payment options.
+-   : Consistently updated to reflect the latest state of the project.
 
 **Areas that need refactoring**:
--   ** State Management:** The logic in  for handling , , and  is complex and prone to errors. It should be refactored to use  for navigation and a React Context for authentication state.
--   **Hardcoded Data:**  uses hardcoded data as a workaround for the network issue. This needs to be removed and replaced with a proper API call.
--   **API Error Handling:** The frontend lacks robust error handling for failed API calls. It often fails silently or gets stuck in loading states.
+-   The component  is now obsolete and should be removed from the project to avoid confusion.
+-   The payment logic in  is growing. Consider creating a dedicated  component to encapsulate the logic for handling different payment providers.
 
 **key api endpoints**
--   , 
--   
--   , 
--   
--   
--   , 
+-   : Unified login for users and admins.
+-   : Used by the client to signal it is active.
+-   : Provides admin stats (total/online/offline users).
+-   : Provides the live viewer count for a specific ad.
+-   : Registers a device for push notifications.
+-   : Fetches notifications for the current user.
 
 **Critical Info for New Agent**
--   **CRITICAL BLOCKER:** The most significant issue is the network problem (CORS/Proxy) preventing any communication between the frontend and the backend. **This must be the absolute first priority to investigate and fix.** The application is non-functional without this link. Previous attempts to fix it by tweaking FastAPI middleware were unsuccessful, suggesting a deeper environmental or proxy configuration issue.
--   **User's Mobile App Request:** The user explicitly requested to convert the app to React Native. The previous agent started this by creating a  directory but then abandoned the effort and switched to a different task without user confirmation. You must clarify with the user if they want to prioritize the mobile app, as it requires a full rewrite of the frontend. Presenting the PWA (Progressive Web App) option again might be a good compromise.
--   **Workarounds in Place:** Be aware that the frontend has been patched with hardcoded data (e.g., in ) to make it appear functional during demos. These workarounds must be removed and replaced with proper API calls once the network issue is resolved.
+-   The top priority is to complete the payment gateway integrations. This is currently **blocked** as it requires API keys from the user. You must start by asking the user to provide the keys for **Tabby, Tamara, STC Pay, PayPal, and Tap**.
+-   The user is highly engaged and provides frequent, iterative feedback. Expect to work on small, rapid changes after presenting progress.
+-   Once the payment gateways are addressed, the next major task is building out the UI of the React Native mobile app in .
+-   The  component is redundant and should be deleted.
 
 **documents and test reports created in this job**
 -   
 -   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Asks to remove the image border and make the logo bigger. (Completed)
-2.  **User:** Asks to revert the logo to the previous, smaller size. (Completed)
-3.  **User:** Asks about the app's readiness, how to link it to a business registry, and if the platform supports post-deployment services like servers and app store publishing. (Answered by agent)
-4.  **User:** Requests to revert to the original falcon emoji logo and to convert the app to React Native for mobile. (Logo reverted; React Native conversion started but abandoned)
-5.  **User:** Selects Option 3 (Hire a React Native developer - interpreted by the agent as a request to start the conversion). (Acknowledged)
-6.  **User:** Asks how they can withdraw money from ad earnings. (Answered by agent with a business model explanation)
-7.  **User:** Agrees to the agent's proposal to add an admin dashboard, payment integration, and invoicing system. (Task started)
-8.  **User:** Asks if the app is ready, what services are missing, and how to connect it to their commercial registration and get it verified. (This is a repeat of message 3, answered by the agent by consulting the support team).
-9.  **User:** Requests to go back to the original falcon emoji logo and convert the app to React Native. (This is a repeat of message 4).
-10. **User:** Selects the option to hire a React Native developer, which the agent interprets as a command to start the conversion. (This is a repeat of message 5).
+1.  **User:** Requests adding Tabby, Tamara, STC Pay, and PayPal as payment options, with placeholder keys for now. (Agent scaffolded this).
+2.  **User:** Asks for the app link. (Agent provided).
+3.  **User:** Requests a major UI/UX overhaul: make the ad viewer like TikTok, and add advanced user stats (online, offline, etc.) to the admin dashboard. (Agent implemented).
+4.  **User:** Refines the new ad viewer design: remove the like and comment buttons. (Agent implemented).
+5.  **User:** Further refines the UI: hide the carousel dots on the side, and make the welcome message appear only once after the first login. (Agent implemented).
+6.  **User:** Another refinement: add three faint dots on the side for visual balance, and ensure all viewer counts (live and in the admin panel) are based on real data from the backend. (Agent implemented).
+7.  **User:** Final UI tweak: replace the Follow button with the Watching Now icon on the side of the ad. (Agent implemented).
+8.  **User:** Asks for the app link again. (Agent provided).
+9.  **User:** Asks how to save the application code. (Agent explained the Save to GitHub feature).
+10. **User:** Asks for the app link a third time. (Agent provided).
 
 **Project Health Check:**
 -   **Broken:**
-    -   Frontend-Backend communication (All API calls fail).
-    -   User Authentication (Login/Register).
-    -   Advertiser ad submission and payment flow.
-    -   User points tracking and withdrawal requests (as they depend on the backend).
+    -   None.
 -   **Mocked:**
-    -    has hardcoded data to display the page content.
-    -   Initial user data and ads are mocked in , though a backend seeding script also exists.
+    -   Payment logic for Tap, Tabby, Tamara, STC Pay, and PayPal is mocked/non-existent.
+-   **Incomplete/Scaffolded:**
+    -   The React Native Mobile App () requires a full UI build-out for most screens.
+    -   Apple OAuth login.
+    -   The final step of processing withdrawals (e.g., calling PayPal's Payouts API).
 
 **3rd Party Integrations**
--   **Google/Apple OAuth:** Planned, UI exists, but no integration code has been written.
--   **Stripe / Tap Payments:** Discussed as a future step for advertiser payments, but not implemented.
+-   **Emergent-managed Google Auth:** Working.
+-   **Stripe (Payments):** Working.
+-   **Firebase Admin SDK (Push Notifications):** Integrated.
+-   **Tap Payments:** Planned, requires User API Key.
+-   **Tabby:** Planned, requires User API Key.
+-   **Tamara:** Planned, requires User API Key.
+-   **STC Pay:** Planned, requires User API Key.
+-   **PayPal:** Planned, requires User API Key.
+-   **Apple OAuth:** Planned, not started.
 
 **Testing status**
--   Testing agent used after significant changes: NO
+-   Testing agent used after significant changes: YES, for the unified auth feature.
 -   Troubleshoot agent used after agent stuck in loop: NO
--   Test files created: []
--   Known regressions: The application is currently less functional than in its initial frontend-only mocked state, as the broken attempts at backend integration have disabled features like login.
+-   Test files created:
+    -   
+-   Known regressions: None.
 
 **Credentials to test flow:**
--   No user credentials exist.
--   The script to create an admin user () was created but never run.
+-   **Admin User:**
+    -   Email: 
+    -   Password: 
+-   **Regular User:** Can be created via the registration form.
 
 **What agent forgot to execute**
--   **Fix the core network/CORS issue:** The agent identified the problem multiple times but never solved it, opting for workarounds.
--   **Complete the React Native conversion:** This was a major user request that was started and immediately abandoned for another task.
--   **Run the  script:** The agent created a script to add an admin user to the database but never executed it.
--   **Implement functional authentication:** The OAuth and JWT logic is either placeholder or non-existent.
--   **Implement the payment gateway:** This was discussed but never started.</analysis>
+-   The agent did not delete the obsolete  file and its associated route in  after implementing the unified login, leaving technical debt.
+-   The agent did not ask the user for the necessary API keys to complete the  (payment gateway integrations), leaving it in a blocked state for the next agent.</analysis>
