@@ -256,6 +256,20 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
           </div>
         </div>
 
+        {/* Three Dots Menu - Semi-transparent */}
+        <button 
+          onClick={(e) => e.stopPropagation()}
+          className="flex flex-col items-center opacity-40 hover:opacity-70 transition-opacity"
+        >
+          <div className="w-10 h-10 rounded-full flex items-center justify-center">
+            <div className="flex flex-col gap-1">
+              <div className="w-1 h-1 bg-white rounded-full"></div>
+              <div className="w-1 h-1 bg-white rounded-full"></div>
+              <div className="w-1 h-1 bg-white rounded-full"></div>
+            </div>
+          </div>
+        </button>
+
         {/* Mute Toggle */}
         <button 
           onClick={(e) => { 
