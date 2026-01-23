@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { toast } from '../hooks/use-toast';
 
-const AdViewer = ({ ads, onAdWatched, watchedAds }) => {
+const AdViewer = ({ ads, onAdWatched, user }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -16,26 +16,34 @@ const AdViewer = ({ ads, onAdWatched, watchedAds }) => {
   const touchStartRef = useRef(0);
 
   const currentAd = ads[currentIndex];
-  const isWatched = watchedAds.includes(currentAd.id);
+  
+  // Check if ad was watched based on user data from backend
+  const isWatched = user?.watched_ads?.some(w => w.ad_id === currentAd?.id) || false;
 
   useEffect(() => {
-    if (isPlaying && !isWatched) {
+    if (isPlaying && !isWatched && currentAd) {
       watchTimerRef.current = setInterval(() => {
         setWatchTime((prev) => {
           const newTime = prev + 1;
           const progress = (newTime / currentAd.duration) * 100;
           setWatchProgress(progress);
 
-          // Award point every 60 seconds (1 minute)
-          if (newTime > 0 && newTime % 60 === 0) {
-            onAdWatched(currentAd.id, 1);
-            toast({
-              title: '✨ حصلت على نقطة!',
-              description: `لقد شاهدت ${newTime / 60} دقيقة من الإعلان`,
-            });
+          // Award points every 60 seconds (1 minute) and at the end
+          if (newTime > 0 && newTime % 60 === 0 && newTime <= currentAd.duration) {
+            // Call backend to award points
+            onAdWatched(currentAd.id, newTime)
+              .then((response) => {
+                toast({
+                  title: '✨ حصلت على نقاط!',
+                  description: `${response.points_earned} نقطة جديدة! الرصيد: ${response.total_points}`,
+                });
+              })
+              .catch((error) => {
+                console.error('Failed to award points:', error);
+              });
           }
 
-          // Mark as fully watched
+          // Stop at duration
           if (newTime >= currentAd.duration) {
             clearInterval(watchTimerRef.current);
             return currentAd.duration;
