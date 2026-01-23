@@ -219,6 +219,29 @@ async def reject_withdrawal(
         data={'withdrawal_id': withdrawal_id, 'reason': reason}
     )
     
+    # Send email notification
+    import asyncio
+    async def send_rejection_email():
+        try:
+            from services.email_service import send_withdrawal_notification, get_email_settings
+            settings = await get_email_settings()
+            if settings and settings.get('email_enabled') and settings.get('send_withdrawal_notifications'):
+                user = await db.users.find_one({'$or': [{'id': withdrawal['user_id']}, {'user_id': withdrawal['user_id']}]}, {'_id': 0})
+                if user:
+                    await send_withdrawal_notification(
+                        user['email'],
+                        user.get('name', 'مستخدم'),
+                        withdrawal.get('amount', 0),
+                        withdrawal.get('method', 'PayPal'),
+                        'rejected',
+                        reason,
+                        'ar'
+                    )
+        except Exception as e:
+            print(f"Failed to send rejection email: {e}")
+    
+    asyncio.create_task(send_rejection_email())
+    
     return {'success': True, 'message': 'تم رفض طلب السحب وإرجاع النقاط'}
 
 @router.get('/ads/pending')
