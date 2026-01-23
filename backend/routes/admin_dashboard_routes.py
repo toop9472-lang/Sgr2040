@@ -244,13 +244,14 @@ async def approve_ad(
         }}
     )
     
-    # Add to main ads collection
+    # Add to main ads collection with website_url
     main_ad = {
         'id': ad_id,
         'title': ad['title'],
         'description': ad['description'],
         'video_url': ad['video_url'],
         'thumbnail_url': ad.get('thumbnail_url', ''),
+        'website_url': ad.get('website_url', ''),
         'advertiser': ad['advertiser_name'],
         'duration': ad['duration'],
         'points_per_minute': 1,
@@ -259,6 +260,16 @@ async def approve_ad(
     }
     
     await db.ads.insert_one(main_ad)
+    
+    # Send notification to all users about new ad
+    from routes.notification_routes import send_notification_to_all_users
+    await send_notification_to_all_users(
+        db=db,
+        title='🎬 إعلان جديد متاح!',
+        body=f'شاهد "{ad["title"]}" الآن واكسب النقاط!',
+        notification_type='new_ad',
+        data={'ad_id': ad_id, 'title': ad['title']}
+    )
     
     return {'success': True, 'message': 'تمت الموافقة على الإعلان وتفعيله'}
 
