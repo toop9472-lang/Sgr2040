@@ -18,6 +18,7 @@ TAMARA_API_KEY=
 STCPAY_API_KEY=
 PAYPAL_CLIENT_ID=
 PAYPAL_SECRET=
+APPLEPAY_MERCHANT_ID=
 ```
 
 ### Frontend (`/app/frontend/.env`)
