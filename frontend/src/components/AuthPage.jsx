@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
-const AuthPage = ({ onLogin }) => {
+const AuthPage = ({ onLogin, onGuestMode }) => {
   const handleGoogleLogin = () => {
     // Mock login - will be replaced with actual Google Auth
     const mockUser = {
@@ -25,6 +25,19 @@ const AuthPage = ({ onLogin }) => {
       provider: 'apple'
     };
     onLogin(mockUser);
+  };
+
+  const handleGuestMode = () => {
+    // Guest mode
+    const guestUser = {
+      id: 'guest_' + Date.now(),
+      name: 'زائر',
+      email: 'guest@saqr.app',
+      avatar: 'https://ui-avatars.com/api/?name=Guest&background=94A3B8&color=fff',
+      provider: 'guest',
+      isGuest: true
+    };
+    onGuestMode(guestUser);
   };
 
   return (
