@@ -84,6 +84,20 @@ const AdminSettings = () => {
     emergency_message: '',
     show_emergency_banner: false
   });
+  
+  // Email Settings
+  const [emailSettings, setEmailSettings] = useState({
+    email_enabled: false,
+    resend_api_key: '',
+    sender_email: 'onboarding@resend.dev',
+    sender_name: 'صقر Saqr',
+    send_welcome_email: true,
+    send_withdrawal_notifications: true,
+    send_ad_notifications: true
+  });
+  
+  const [testEmail, setTestEmail] = useState('');
+  const [isSendingTest, setIsSendingTest] = useState(false);
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('admin_token');
