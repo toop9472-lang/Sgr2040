@@ -390,6 +390,164 @@ const AdminSettings = () => {
                     )}
                   </div>
                 ))}
+
+        {/* Email Settings Tab */}
+        <TabsContent value="email">
+          <div className="space-y-4">
+            <Card className={emailSettings.email_enabled ? 'border-2 border-green-200' : ''}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="w-5 h-5" /> خدمة البريد الإلكتروني
+                  </CardTitle>
+                  <Switch
+                    checked={emailSettings.email_enabled}
+                    onCheckedChange={(checked) => setEmailSettings(prev => ({ ...prev, email_enabled: checked }))}
+                  />
+                </div>
+                <CardDescription>
+                  إرسال إشعارات البريد الإلكتروني للمستخدمين. 
+                  <a href="https://resend.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline mr-1">احصل على مفتاح API من Resend</a>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* API Key */}
+                <div>
+                  <Label>مفتاح Resend API</Label>
+                  <div className="relative">
+                    <Input
+                      type={showKeys['resend'] ? 'text' : 'password'}
+                      value={emailSettings.resend_api_key}
+                      onChange={(e) => setEmailSettings(prev => ({ ...prev, resend_api_key: e.target.value }))}
+                      placeholder="re_xxxxxxxx..."
+                      dir="ltr"
+                      className="pl-10"
+                    />
+                    <button onClick={() => toggleShowKey('resend')} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      {showKeys['resend'] ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Sender Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>اسم المرسل</Label>
+                    <Input
+                      value={emailSettings.sender_name}
+                      onChange={(e) => setEmailSettings(prev => ({ ...prev, sender_name: e.target.value }))}
+                      placeholder="صقر Saqr"
+                    />
+                  </div>
+                  <div>
+                    <Label>بريد المرسل</Label>
+                    <Input
+                      type="email"
+                      value={emailSettings.sender_email}
+                      onChange={(e) => setEmailSettings(prev => ({ ...prev, sender_email: e.target.value }))}
+                      placeholder="noreply@yourdomain.com"
+                      dir="ltr"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">استخدم onboarding@resend.dev للاختبار</p>
+                  </div>
+                </div>
+                
+                {/* Email Types */}
+                <div className="space-y-3 pt-4 border-t">
+                  <Label className="text-base font-semibold">أنواع الإشعارات</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className={`flex items-center justify-between p-3 rounded-lg ${emailSettings.send_welcome_email ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}`}>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className={`w-4 h-4 ${emailSettings.send_welcome_email ? 'text-green-600' : 'text-gray-400'}`} />
+                        <span className="text-sm">ترحيب المستخدمين الجدد</span>
+                      </div>
+                      <Switch
+                        checked={emailSettings.send_welcome_email}
+                        onCheckedChange={(checked) => setEmailSettings(prev => ({ ...prev, send_welcome_email: checked }))}
+                      />
+                    </div>
+                    <div className={`flex items-center justify-between p-3 rounded-lg ${emailSettings.send_withdrawal_notifications ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}`}>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className={`w-4 h-4 ${emailSettings.send_withdrawal_notifications ? 'text-green-600' : 'text-gray-400'}`} />
+                        <span className="text-sm">إشعارات السحب</span>
+                      </div>
+                      <Switch
+                        checked={emailSettings.send_withdrawal_notifications}
+                        onCheckedChange={(checked) => setEmailSettings(prev => ({ ...prev, send_withdrawal_notifications: checked }))}
+                      />
+                    </div>
+                    <div className={`flex items-center justify-between p-3 rounded-lg ${emailSettings.send_ad_notifications ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}`}>
+                      <div className="flex items-center gap-2">
+                        <Activity className={`w-4 h-4 ${emailSettings.send_ad_notifications ? 'text-green-600' : 'text-gray-400'}`} />
+                        <span className="text-sm">إشعارات الإعلانات</span>
+                      </div>
+                      <Switch
+                        checked={emailSettings.send_ad_notifications}
+                        onCheckedChange={(checked) => setEmailSettings(prev => ({ ...prev, send_ad_notifications: checked }))}
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <Button onClick={() => saveSettings('email', emailSettings, 'email/settings')} disabled={isSaving} className="w-full">
+                  <Save className="w-4 h-4 ml-2" /> حفظ إعدادات البريد
+                </Button>
+              </CardContent>
+            </Card>
+            
+            {/* Test Email */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="w-5 h-5" /> إرسال بريد تجريبي
+                </CardTitle>
+                <CardDescription>اختبر إعدادات البريد الإلكتروني بإرسال رسالة تجريبية</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-3">
+                  <Input
+                    type="email"
+                    value={testEmail}
+                    onChange={(e) => setTestEmail(e.target.value)}
+                    placeholder="أدخل بريدك الإلكتروني..."
+                    dir="ltr"
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={sendTestEmail} 
+                    disabled={isSendingTest || !emailSettings.email_enabled}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    {isSendingTest ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 ml-2" /> إرسال
+                      </>
+                    )}
+                  </Button>
+                </div>
+                {!emailSettings.email_enabled && (
+                  <p className="text-xs text-orange-600 mt-2">⚠️ يجب تفعيل خدمة البريد الإلكتروني أولاً</p>
+                )}
+              </CardContent>
+            </Card>
+            
+            {/* Setup Guide */}
+            <Card className="border-blue-200 bg-blue-50">
+              <CardContent className="pt-4">
+                <h4 className="font-semibold text-blue-800 mb-2">💡 كيفية إعداد Resend:</h4>
+                <ol className="list-decimal list-inside text-sm text-blue-700 space-y-1">
+                  <li>أنشئ حساب مجاني على <a href="https://resend.com" target="_blank" rel="noopener noreferrer" className="underline">resend.com</a></li>
+                  <li>اذهب إلى API Keys واضغط على "Create API Key"</li>
+                  <li>انسخ المفتاح (يبدأ بـ re_) والصقه هنا</li>
+                  <li>للإنتاج: أضف نطاقك واستخدم بريد مخصص</li>
+                </ol>
+                <p className="text-xs text-blue-600 mt-2">✨ المستوى المجاني: 3000 رسالة/شهر</p>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
                 
                 {/* PayPal Special */}
                 <div className={`p-4 rounded-lg border-2 ${paymentSettings.paypal_enabled ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'}`}>
