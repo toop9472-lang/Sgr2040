@@ -81,6 +81,136 @@ async def login(user_data: UserCreate):
             detail=f'Login failed: {str(e)}'
         )
 
+@router.post('/login/email', response_model=dict)
+async def login_email(credentials: EmailLogin):
+    """
+    Unified email login - checks both admins and users
+    If admin credentials, returns admin role for redirect
+    """
+    db = get_db()
+    
+    # First, check if this is an admin
+    admin = await db.admins.find_one({'email': credentials.email}, {'_id': 0})
+    
+    if admin:
+        # Verify admin password
+        if bcrypt.verify(credentials.password, admin['password_hash']):
+            admin_id = admin.get('id', admin['email'])
+            
+            # Update last login
+            await db.admins.update_one(
+                {'email': credentials.email},
+                {'$set': {'last_login': datetime.utcnow()}}
+            )
+            
+            # Create token
+            token = create_access_token(admin_id)
+            
+            return {
+                'token': token,
+                'role': 'admin',
+                'user': {
+                    'id': admin_id,
+                    'email': admin['email'],
+                    'name': admin.get('name', 'Admin'),
+                    'role': admin.get('role', 'admin')
+                }
+            }
+    
+    # Not admin, check regular users
+    user = await db.users.find_one({'email': credentials.email}, {'_id': 0})
+    
+    if user:
+        # Check password
+        if user.get('password_hash') and bcrypt.verify(credentials.password, user['password_hash']):
+            token = create_access_token(user['id'])
+            
+            return {
+                'token': token,
+                'role': 'user',
+                'user': {
+                    'id': user['id'],
+                    'email': user['email'],
+                    'name': user['name'],
+                    'avatar': user.get('avatar'),
+                    'points': user.get('points', 0),
+                    'total_earned': user.get('total_earned', 0),
+                    'joined_date': user.get('created_at', datetime.utcnow()).isoformat() if isinstance(user.get('created_at'), datetime) else str(user.get('created_at', ''))
+                }
+            }
+    
+    # No user found or wrong password
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail='البريد الإلكتروني أو كلمة المرور غير صحيحة'
+    )
+
+
+@router.post('/register', response_model=dict)
+async def register_email(data: EmailRegister):
+    """
+    Register new user with email/password
+    """
+    db = get_db()
+    
+    # Check if email already exists
+    existing = await db.users.find_one({'email': data.email})
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='البريد الإلكتروني مسجل بالفعل'
+        )
+    
+    # Check if admin with this email exists
+    admin_exists = await db.admins.find_one({'email': data.email})
+    if admin_exists:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='البريد الإلكتروني مسجل بالفعل'
+        )
+    
+    # Hash password
+    password_hash = bcrypt.hash(data.password)
+    
+    # Create user
+    import uuid
+    user_id = str(uuid.uuid4())
+    
+    user_doc = {
+        'id': user_id,
+        'email': data.email,
+        'name': data.name,
+        'password_hash': password_hash,
+        'provider': 'email',
+        'provider_id': data.email,
+        'avatar': f"https://ui-avatars.com/api/?name={data.name}&background=6366f1&color=fff",
+        'points': 0,
+        'total_earned': 0,
+        'watched_ads': [],
+        'created_at': datetime.utcnow(),
+        'updated_at': datetime.utcnow()
+    }
+    
+    await db.users.insert_one(user_doc)
+    
+    # Create token
+    token = create_access_token(user_id)
+    
+    return {
+        'token': token,
+        'role': 'user',
+        'user': {
+            'id': user_id,
+            'email': data.email,
+            'name': data.name,
+            'avatar': user_doc['avatar'],
+            'points': 0,
+            'total_earned': 0,
+            'joined_date': user_doc['created_at'].isoformat()
+        }
+    }
+
+
 @router.get('/me', response_model=dict)
 async def get_current_user(user_id: str = Depends(get_current_user_id)):
     """
@@ -107,3 +237,11 @@ async def get_current_user(user_id: str = Depends(get_current_user_id)):
             'joined_date': user['created_at'].isoformat()
         }
     }
+
+
+@router.post('/logout')
+async def logout():
+    """
+    Logout user (client should clear token)
+    """
+    return {'message': 'تم تسجيل الخروج بنجاح'}
