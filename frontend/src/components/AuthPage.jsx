@@ -76,6 +76,26 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
         throw new Error(data.detail || 'Authentication failed');
       }
 
+      // Check if this is an admin login
+      if (data.role === 'admin') {
+        // Store admin data
+        localStorage.setItem('admin_token', data.token);
+        localStorage.setItem('admin_data', JSON.stringify(data.user));
+        
+        toast({
+          title: '✅ ' + (isRTL ? 'مرحباً بك' : 'Welcome'),
+          description: `${isRTL ? 'مرحباً' : 'Hello'} ${data.user.name}!`,
+        });
+
+        // Call admin login handler and redirect to admin dashboard
+        if (onAdminLogin) {
+          onAdminLogin(data.user);
+        }
+        navigate('/admin/dashboard');
+        return;
+      }
+
+      // Regular user login
       toast({
         title: isRegister ? '✅ ' + t('success') : '✅ ' + t('login'),
         description: `${t('welcome')} ${data.user.name}!`,
