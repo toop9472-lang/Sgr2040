@@ -145,6 +145,11 @@
 - `GET /api/withdrawal-methods/rates` - معدلات التحويل
 - `GET /api/withdrawal-methods/history` - سجل السحوبات
 
+### البريد الإلكتروني
+- `GET /api/email/settings` - جلب إعدادات البريد (للمدير)
+- `PUT /api/email/settings` - تحديث إعدادات البريد (للمدير)
+- `POST /api/email/test` - إرسال بريد تجريبي (للمدير)
+
 ---
 
 ## معدلات السحب
