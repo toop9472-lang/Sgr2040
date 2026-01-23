@@ -342,7 +342,11 @@ function MainApp() {
             }} />
           ) : !isAuthenticated ? (
             <>
-              <AuthPage onLogin={handleLogin} onGuestMode={handleLogin} />
+              <AuthPage 
+                onLogin={handleLogin} 
+                onGuestMode={handleLogin} 
+                onAdminLogin={handleAdminLogin}
+              />
               <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
                 <button
                   onClick={() => setCurrentPage('advertiser-preview')}
