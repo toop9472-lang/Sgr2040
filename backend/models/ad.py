@@ -10,6 +10,7 @@ class Ad(BaseModel):
     video_url: str
     thumbnail_url: str
     advertiser: str
+    website_url: Optional[str] = None  # رابط موقع المعلن
     duration: int  # seconds
     points_per_minute: int = 1
     is_active: bool = True
@@ -26,6 +27,7 @@ class AdCreate(BaseModel):
     video_url: str
     thumbnail_url: str
     advertiser: str
+    website_url: Optional[str] = None
     duration: int
     points_per_minute: int = 1
 
@@ -36,6 +38,7 @@ class AdResponse(BaseModel):
     video_url: str
     thumbnail_url: str
     advertiser: str
+    website_url: Optional[str] = None
     duration: int
     points: int
 
