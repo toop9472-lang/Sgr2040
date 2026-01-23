@@ -83,12 +83,13 @@ async def get_pending_withdrawals(admin = Depends(verify_admin)):
     db = get_db()
     
     withdrawals = await db.withdrawals.find(
-        {'status': 'pending'}
+        {'status': 'pending'},
+        {'_id': 0}  # Exclude MongoDB _id
     ).sort('created_at', -1).to_list(100)
     
     # Get user info for each withdrawal
     for withdrawal in withdrawals:
-        user = await db.users.find_one({'id': withdrawal['user_id']})
+        user = await db.users.find_one({'id': withdrawal['user_id']}, {'_id': 0})
         if user:
             withdrawal['user_name'] = user['name']
             withdrawal['user_email'] = user['email']
