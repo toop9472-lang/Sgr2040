@@ -27,6 +27,7 @@ from routes.analytics_routes import router as analytics_router
 from routes.withdrawal_methods_routes import router as withdrawal_methods_router
 from routes.activity_routes import router as activity_router
 from routes.payment_gateways_routes import router as payment_gateways_router
+from routes.settings_routes import router as settings_router
 
 
 ROOT_DIR = Path(__file__).parent
@@ -110,6 +111,7 @@ api_router.include_router(analytics_router)
 api_router.include_router(withdrawal_methods_router)
 api_router.include_router(activity_router)
 api_router.include_router(payment_gateways_router)
+api_router.include_router(settings_router)
 
 # Include the router in the main app
 app.include_router(api_router)
