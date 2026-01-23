@@ -72,13 +72,14 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
 
         {/* Points Card */}
         {!isGuest && (
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2">
-              <Award className="text-yellow-500" size={24} />
-              رصيد النقاط
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+          <Card className="shadow-lg border-0">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Award className="text-yellow-500" size={24} />
+                رصيد النقاط
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
             <div className="text-center mb-4">
               <div className="text-5xl font-bold text-indigo-600 mb-2">
                 {user.points}
