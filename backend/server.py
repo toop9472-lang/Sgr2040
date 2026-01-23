@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime, timezone
 
 # Import routes
-from routes.auth_routes import router as auth_router
+from routes.oauth_routes import router as oauth_router
 from routes.ad_routes import router as ad_router
 from routes.withdrawal_routes import router as withdrawal_router
 from routes.user_routes import router as user_router
