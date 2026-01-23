@@ -1,118 +1,237 @@
-# صقر - تطبيق الموبايل (React Native)
+# 📱 دليل تطبيق صقر للموبايل
 
 ## نظرة عامة
-تطبيق صقر للموبايل - شاهد الإعلانات واكسب النقاط!
+تطبيق صقر للموبايل مبني باستخدام React Native و Expo SDK 51.
 
-## المتطلبات
-- Node.js 18+
-- Expo CLI
-- iOS Simulator أو Android Emulator (أو جهاز فعلي)
+---
 
-## التثبيت
+## 🧪 اختبار التطبيق على جهازك
+
+### الطريقة 1: استخدام Expo Go (الأسرع)
+
+1. **حمّل تطبيق Expo Go** على جهازك:
+   - 📱 iPhone: [App Store](https://apps.apple.com/app/expo-go/id982107779)
+   - 🤖 Android: [Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)
+
+2. **شغّل التطبيق محلياً:**
+   ```bash
+   cd /app/mobile
+   npx expo start
+   ```
+
+3. **امسح QR Code** الظاهر في Terminal بتطبيق Expo Go
+
+### الطريقة 2: بناء APK للاختبار (Android)
 
 ```bash
-# انتقل لمجلد التطبيق
-cd mobile
+cd /app/mobile
 
-# ثبّت المكتبات
-yarn install
+# تثبيت EAS CLI
+npm install -g eas-cli
 
-# شغّل التطبيق
-yarn start
+# تسجيل الدخول
+eas login
+
+# بناء APK للاختبار
+eas build -p android --profile preview
 ```
 
-## التشغيل
+---
 
-### على iOS Simulator
+## 🚀 النشر على المتاجر
+
+### متطلبات النشر
+
+#### Apple App Store:
+- حساب Apple Developer ($99/سنة)
+- شهادات التوقيع (Certificates)
+- ملف Provisioning Profile
+- Mac لرفع التطبيق (أو استخدام EAS Submit)
+
+#### Google Play Store:
+- حساب Google Play Developer ($25 مرة واحدة)
+- ملف Service Account JSON
+- أيقونات ولقطات شاشة
+
+### خطوات النشر
+
+#### 1. إعداد الحسابات
+
+**Apple:**
 ```bash
-yarn ios
+# سجّل في https://developer.apple.com
+# أنشئ App ID في Apple Developer Portal
+# أنشئ Provisioning Profile
 ```
 
-### على Android Emulator
+**Google:**
 ```bash
-yarn android
+# سجّل في https://play.google.com/console
+# أنشئ تطبيق جديد
+# أنشئ Service Account وحمّل JSON key
 ```
 
-### على جهاز فعلي
-1. حمّل تطبيق **Expo Go** من App Store أو Google Play
-2. شغّل `yarn start`
-3. امسح QR Code بتطبيق Expo Go
+#### 2. تحديث إعدادات التطبيق
 
-## الميزات
-
-### ✅ مُنجز
-- تسجيل الدخول بـ Google
-- تسجيل الدخول بالبريد الإلكتروني
-- وضع الزائر
-- عرض الإعلانات (Instagram Reels style)
-- عداد وقت المشاهدة
-- نظام النقاط (1 نقطة/دقيقة)
-- صفحة الملف الشخصي
-- صفحة سحب الرصيد
-
-### 🔲 قيد التطوير
-- تسجيل الدخول بـ Apple
-- Push Notifications
-- Dark Mode
-
-## هيكل المشروع
-
-```
-mobile/
-├── App.js                 # نقطة الدخول الرئيسية
-├── app.json              # إعدادات Expo
-├── package.json          # المكتبات
-├── src/
-│   ├── context/
-│   │   └── AuthContext.js    # إدارة حالة المصادقة
-│   ├── navigation/
-│   │   └── AppNavigator.js   # التنقل
-│   ├── screens/
-│   │   ├── AuthScreen.js     # صفحة تسجيل الدخول
-│   │   ├── HomeScreen.js     # صفحة الإعلانات
-│   │   ├── ProfileScreen.js  # صفحة الملف الشخصي
-│   │   └── WithdrawScreen.js # صفحة السحب
-│   └── services/
-│       └── api.js            # خدمات الـ API
-└── assets/
-    ├── icon.png
-    └── splash.png
-```
-
-## الـ API
-التطبيق يتصل بـ Backend على:
-```
-https://reelcoin.preview.emergentagent.com/api
-```
-
-## النشر
-
-### iOS (App Store)
-```bash
-expo build:ios
-```
-
-### Android (Google Play)
-```bash
-expo build:android
-```
-
-## ملاحظات للمطورين
-
-### تغيير الـ Backend URL
-عدّل الملف `app.json`:
+عدّل `app.json`:
 ```json
 {
   "expo": {
+    "ios": {
+      "bundleIdentifier": "com.yourcompany.saqr"
+    },
+    "android": {
+      "package": "com.yourcompany.saqr"
+    },
     "extra": {
-      "apiUrl": "https://your-api-url.com"
+      "eas": {
+        "projectId": "your-actual-project-id"
+      }
     }
   }
 }
 ```
 
-### إضافة Assets
-ضع الملفات في مجلد `assets/`:
-- `icon.png` - أيقونة التطبيق (1024x1024)
-- `splash.png` - شاشة البداية (1242x2688)
-- `adaptive-icon.png` - أيقونة Android (1024x1024)
+عدّل `eas.json`:
+```json
+{
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "your-real-apple-id@example.com",
+        "ascAppId": "your-app-store-connect-id"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./path-to-your-service-account.json"
+      }
+    }
+  }
+}
+```
+
+#### 3. بناء نسخة الإنتاج
+
+```bash
+# iOS
+eas build -p ios --profile production
+
+# Android
+eas build -p android --profile production
+```
+
+#### 4. رفع للمتاجر
+
+```bash
+# iOS - رفع لـ App Store Connect
+eas submit -p ios
+
+# Android - رفع لـ Google Play Console
+eas submit -p android
+```
+
+---
+
+## 📁 هيكل المشروع
+
+```
+/app/mobile/
+├── App.js                 # نقطة الدخول
+├── app.json               # إعدادات Expo
+├── eas.json               # إعدادات EAS Build
+├── package.json           # المكتبات
+├── assets/                # الأيقونات والصور
+│   ├── icon.png          # أيقونة التطبيق (1024x1024)
+│   ├── splash.png        # شاشة البداية (1242x2688)
+│   └── adaptive-icon.png # أيقونة Android (1024x1024)
+└── src/
+    ├── components/        # المكونات المشتركة
+    ├── context/
+    │   └── AuthContext.js # إدارة حالة المصادقة
+    ├── hooks/             # Custom Hooks
+    ├── navigation/
+    │   └── AppNavigator.js # التنقل
+    ├── screens/
+    │   ├── AuthScreen.js           # تسجيل الدخول
+    │   ├── HomeScreen.js           # عرض الإعلانات
+    │   ├── ProfileScreen.js        # الملف الشخصي
+    │   ├── WithdrawScreen.js       # طلب السحب
+    │   ├── WithdrawalHistoryScreen.js # سجل السحوبات
+    │   ├── NotificationsScreen.js  # الإشعارات
+    │   └── AdvertiserScreen.js     # للمعلنين
+    └── services/
+        └── api.js         # خدمات API
+```
+
+---
+
+## 🎨 إنشاء الأيقونات
+
+### أيقونة التطبيق (icon.png)
+- الحجم: 1024x1024 بكسل
+- بدون شفافية
+- PNG format
+
+### شاشة البداية (splash.png)
+- الحجم: 1242x2688 بكسل (iPhone) أو 1920x1080 (Android)
+- PNG format
+
+### أداة مفيدة:
+استخدم [Expo Icon Builder](https://buildicon.netlify.app/) لإنشاء جميع الأحجام المطلوبة.
+
+---
+
+## ⚙️ إعدادات Google و Apple OAuth
+
+### Google OAuth:
+1. اذهب إلى [Google Cloud Console](https://console.cloud.google.com)
+2. أنشئ OAuth 2.0 Client ID
+3. أضف Bundle ID لـ iOS و Package Name لـ Android
+4. أضف Client ID في لوحة إعدادات صقر
+
+### Apple Sign In:
+1. اذهب إلى [Apple Developer Portal](https://developer.apple.com)
+2. فعّل Sign In with Apple في App ID
+3. أنشئ Service ID إذا لزم الأمر
+4. أضف الإعدادات في لوحة صقر
+
+---
+
+## 🔔 إعداد Push Notifications
+
+التطبيق يدعم Expo Push Notifications. للتفعيل:
+
+1. احصل على Expo Push Token من الجهاز
+2. سجّل Token في الـ Backend
+3. استخدم Firebase Cloud Messaging (FCM) لـ Android
+4. استخدم APNs لـ iOS
+
+---
+
+## 📞 الدعم والمساعدة
+
+- **الموقع:** https://reelcoin.preview.emergentagent.com
+- **API Docs:** https://reelcoin.preview.emergentagent.com/docs
+
+---
+
+## 🔄 التحديثات (OTA Updates)
+
+بعد النشر، يمكنك إرسال تحديثات بدون إعادة رفع التطبيق:
+
+```bash
+# نشر تحديث OTA
+eas update --branch production --message "إصلاح مشكلة..."
+```
+
+---
+
+## ✅ قائمة التحقق قبل النشر
+
+- [ ] تحديث رقم الإصدار في app.json
+- [ ] اختبار جميع الشاشات
+- [ ] التأكد من عمل API
+- [ ] إنشاء أيقونات بالأحجام الصحيحة
+- [ ] كتابة وصف التطبيق للمتاجر
+- [ ] تجهيز لقطات شاشة (Screenshots)
+- [ ] مراجعة سياسة الخصوصية
+- [ ] التأكد من إعدادات OAuth
