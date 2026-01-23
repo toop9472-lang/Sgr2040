@@ -399,12 +399,14 @@ function MainApp() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="App">
-        <AppRouter />
-        <Toaster />
-      </div>
-    </BrowserRouter>
+    <LanguageProvider>
+      <BrowserRouter>
+        <div className="App">
+          <AppRouter />
+          <Toaster />
+        </div>
+      </BrowserRouter>
+    </LanguageProvider>
   );
 }
 
