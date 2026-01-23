@@ -44,7 +44,7 @@ const AuthPage = ({ onLogin, onGuestMode }) => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
       <Card className="w-full max-w-md shadow-xl border-0">
         <CardHeader className="text-center pb-8 pt-10">
-          <div className="mx-auto mb-6 w-32 h-32 rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+          <div className="mx-auto mb-6 w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
             <img 
               src="https://customer-assets.emergentagent.com/job_adreward-app-5/artifacts/8im25ksz_IMG_3313.jpeg" 
               alt="صقر"
