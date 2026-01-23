@@ -1,11 +1,14 @@
 import React from 'react';
-import { Home, User, PlusCircle } from 'lucide-react';
+import { Home, User, PlusCircle, Globe } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 const BottomNav = ({ currentPage, onNavigate }) => {
+  const { t, language, toggleLanguage, isRTL } = useLanguage();
+
   const navItems = [
-    { id: 'home', label: 'الرئيسية', icon: Home },
-    { id: 'advertiser', label: 'أضف إعلانك', icon: PlusCircle },
-    { id: 'profile', label: 'الملف', icon: User },
+    { id: 'home', label: t('home'), icon: Home },
+    { id: 'advertiser', label: t('advertiser'), icon: PlusCircle },
+    { id: 'profile', label: t('profile'), icon: User },
   ];
 
   return (
@@ -23,6 +26,7 @@ const BottomNav = ({ currentPage, onNavigate }) => {
                   ? 'text-indigo-600'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
+              data-testid={`nav-${item.id}`}
             >
               <Icon size={item.id === 'advertiser' ? 26 : 24} className={isActive ? 'stroke-[2.5]' : 'stroke-2'} />
               <span className={`text-xs ${ isActive ? 'font-semibold' : 'font-medium'}`}>
@@ -31,6 +35,19 @@ const BottomNav = ({ currentPage, onNavigate }) => {
             </button>
           );
         })}
+        
+        {/* Language Toggle Button */}
+        <button
+          onClick={toggleLanguage}
+          className="flex flex-col items-center gap-1 py-2 px-4 rounded-lg transition-all text-gray-500 hover:text-gray-700"
+          data-testid="nav-language"
+          title={language === 'ar' ? 'Switch to English' : 'التحويل للعربية'}
+        >
+          <Globe size={24} className="stroke-2" />
+          <span className="text-xs font-medium">
+            {language === 'ar' ? 'EN' : 'عربي'}
+          </span>
+        </button>
       </div>
     </div>
   );
