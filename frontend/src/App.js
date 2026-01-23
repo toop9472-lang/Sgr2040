@@ -310,28 +310,10 @@ function MainApp() {
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <>
-        <AuthPage onLogin={handleLogin} onGuestMode={handleLogin} />
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-          <button
-            onClick={() => setCurrentPage('advertiser-preview')}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg font-semibold flex items-center gap-2"
-            data-testid="add-your-ad-btn"
-          >
-            <span>💼</span>
-            <span>أضف إعلانك</span>
-          </button>
-        </div>
-        <Toaster />
-      </>
-    );
-  }
-
+  // Admin routes should be accessible without user authentication
   return (
     <Routes>
-      {/* Admin Routes */}
+      {/* Admin Routes - accessible without user auth */}
       <Route path="/admin/login" element={
         isAdmin ? <Navigate to="/admin/dashboard" /> : <AdminLoginPage onAdminLogin={handleAdminLogin} />
       } />
