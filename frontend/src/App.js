@@ -34,6 +34,7 @@ function AppRouter() {
 
 function MainApp() {
   const location = useLocation();
+  const { t } = useLanguage();
   const [isAuthenticated, setIsAuthenticated] = useState(location.state?.user ? true : null);
   const [user, setUser] = useState(location.state?.user || null);
   const [ads, setAds] = useState([]);
