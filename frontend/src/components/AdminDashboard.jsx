@@ -487,6 +487,11 @@ const AdminDashboard = ({ admin, onLogout }) => {
           <TabsContent value="invoices" className="mt-4">
             <InvoicesContent />
           </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="mt-4">
+            <AdminSettings />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
