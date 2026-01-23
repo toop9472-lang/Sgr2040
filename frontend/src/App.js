@@ -217,6 +217,22 @@ function App() {
     setCurrentPage(page);
   };
 
+  const handleAdminLogin = (admin) => {
+    setIsAdmin(true);
+    setAdminData(admin);
+  };
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_data');
+    setIsAdmin(false);
+    setAdminData(null);
+    toast({
+      title: 'تم تسجيل الخروج',
+      description: 'نراك قريباً!',
+    });
+  };
+
   // Show advertiser page for non-authenticated users
   if (currentPage === 'advertiser-preview') {
     return (
