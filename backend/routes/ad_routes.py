@@ -21,7 +21,7 @@ async def get_ads():
     Get all active ads (public - no auth required)
     """
     db = get_db()
-    ads = await db.ads.find({'is_active': True}).to_list(100)
+    ads = await db.ads.find({'is_active': True}, {'_id': 0}).to_list(100)
     
     return [
         AdResponse(
@@ -31,6 +31,7 @@ async def get_ads():
             video_url=ad['video_url'],
             thumbnail_url=ad['thumbnail_url'],
             advertiser=ad['advertiser'],
+            website_url=ad.get('website_url'),
             duration=ad['duration'],
             points=ad['points_per_minute']
         )
