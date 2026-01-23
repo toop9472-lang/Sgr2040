@@ -317,6 +317,27 @@ async def approve_ad(
         data={'ad_id': ad_id, 'title': ad['title']}
     )
     
+    # Send email to advertiser
+    import asyncio
+    async def send_ad_approval_email():
+        try:
+            from services.email_service import send_ad_notification, get_email_settings
+            settings = await get_email_settings()
+            if settings and settings.get('email_enabled') and settings.get('send_ad_notifications'):
+                await send_ad_notification(
+                    ad.get('advertiser_email', ''),
+                    ad.get('advertiser_name', 'معلن'),
+                    ad.get('title', ''),
+                    'approved',
+                    '',
+                    'ar'
+                )
+        except Exception as e:
+            print(f"Failed to send ad approval email: {e}")
+    
+    if ad.get('advertiser_email'):
+        asyncio.create_task(send_ad_approval_email())
+    
     return {'success': True, 'message': 'تمت الموافقة على الإعلان وتفعيله'}
 
 @router.put('/ads/{ad_id}/reject')
@@ -338,5 +359,27 @@ async def reject_ad(
             'payment_status': 'refund_pending'
         }}
     )
+    
+    # Send email to advertiser
+    ad = await db.advertiser_ads.find_one({'id': ad_id}, {'_id': 0})
+    if ad and ad.get('advertiser_email'):
+        import asyncio
+        async def send_ad_rejection_email():
+            try:
+                from services.email_service import send_ad_notification, get_email_settings
+                settings = await get_email_settings()
+                if settings and settings.get('email_enabled') and settings.get('send_ad_notifications'):
+                    await send_ad_notification(
+                        ad.get('advertiser_email', ''),
+                        ad.get('advertiser_name', 'معلن'),
+                        ad.get('title', ''),
+                        'rejected',
+                        data.get('reason', ''),
+                        'ar'
+                    )
+            except Exception as e:
+                print(f"Failed to send ad rejection email: {e}")
+        
+        asyncio.create_task(send_ad_rejection_email())
     
     return {'success': True, 'message': 'تم رفض الإعلان'}
