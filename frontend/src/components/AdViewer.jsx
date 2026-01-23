@@ -218,15 +218,13 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
       {/* Bottom Gradient */}
       <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
 
-      {/* Total Views Badge - Top Right */}
-      {totalViews > 0 && (
-        <div className="absolute top-4 right-4 z-20">
-          <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full">
-            <Eye className="w-4 h-4 text-white/80" />
-            <span className="text-white/80 text-sm">{totalViews} {isRTL ? 'مشاهدة' : 'views'}</span>
-          </div>
+      {/* Watching Now Badge - Top Right */}
+      <div className="absolute top-4 right-4 z-20">
+        <div className="flex items-center gap-2 bg-red-500/80 backdrop-blur-sm px-3 py-1.5 rounded-full">
+          <Eye className="w-4 h-4 text-white" />
+          <span className="text-white text-sm font-semibold">{viewersCount || 1} {isRTL ? 'يشاهد' : 'watching'}</span>
         </div>
-      )}
+      </div>
 
       {/* Points Badge - Top Left */}
       {!isWatched && (
@@ -248,31 +246,8 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
         </div>
       )}
 
-      {/* Right Side Actions - Minimal */}
+      {/* Right Side Actions - Only Mute Button */}
       <div className="absolute right-3 bottom-32 flex flex-col items-center gap-5 z-20">
-        {/* Watching Now Indicator */}
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 rounded-full bg-red-500/80 backdrop-blur-sm flex items-center justify-center border-2 border-white shadow-lg">
-            <Eye className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-white text-xs mt-1 font-semibold">{viewersCount || 1}</span>
-          <span className="text-white/60 text-[10px]">{isRTL ? 'يشاهد' : 'watching'}</span>
-        </div>
-
-        {/* Three Dots Menu - Semi-transparent */}
-        <button 
-          onClick={(e) => e.stopPropagation()}
-          className="flex flex-col items-center opacity-40 hover:opacity-70 transition-opacity"
-        >
-          <div className="w-10 h-10 rounded-full flex items-center justify-center">
-            <div className="flex flex-col gap-1">
-              <div className="w-1 h-1 bg-white rounded-full"></div>
-              <div className="w-1 h-1 bg-white rounded-full"></div>
-              <div className="w-1 h-1 bg-white rounded-full"></div>
-            </div>
-          </div>
-        </button>
-
         {/* Mute Toggle */}
         <button 
           onClick={(e) => { 
