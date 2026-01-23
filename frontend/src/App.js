@@ -148,6 +148,16 @@ function App() {
   };
 
   const handleAdWatched = async (adId, watchTime) => {
+    // If guest, show message to login
+    if (user?.isGuest) {
+      toast({
+        title: '🔒 سجّل الدخول لكسب النقاط',
+        description: 'قم بتسجيل الدخول للحصول على نقاط عند مشاهدة الإعلانات',
+        variant: 'default'
+      });
+      return;
+    }
+    
     try {
       const response = await adAPI.watchAd(adId, watchTime);
       
