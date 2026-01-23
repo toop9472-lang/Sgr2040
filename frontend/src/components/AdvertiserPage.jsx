@@ -430,6 +430,22 @@ const AdvertiserPage = ({ onNavigate }) => {
                 </div>
 
                 <div>
+                  <Label htmlFor="website_url">رابط موقعك (اختياري)</Label>
+                  <Input
+                    id="website_url"
+                    name="website_url"
+                    type="url"
+                    value={adData.website_url}
+                    onChange={handleInputChange}
+                    placeholder="https://www.yourwebsite.com"
+                    data-testid="website-url-input"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    سيظهر زر "زيارة" للمستخدمين عند مشاهدة إعلانك
+                  </p>
+                </div>
+
+                <div>
                   <Label htmlFor="title">عنوان الإعلان *</Label>
                   <Input
                     id="title"
