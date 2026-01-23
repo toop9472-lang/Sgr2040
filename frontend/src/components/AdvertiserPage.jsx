@@ -571,7 +571,7 @@ const AdvertiserPage = ({ onNavigate }) => {
               </div>
 
               {/* Tap Payment Option - Saudi Local */}
-              {tapAvailable && (
+              {enabledGateways.tap && (
                 <div 
                   className="p-4 rounded-lg border-2 border-green-200 bg-green-50 cursor-pointer hover:border-green-400 transition-all"
                   onClick={handleTapPayment}
