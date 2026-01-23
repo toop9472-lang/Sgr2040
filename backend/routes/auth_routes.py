@@ -32,6 +32,20 @@ async def test_db():
     admin = await db.admins.find_one({'email': 'sky-321@hotmail.com'}, {'_id': 0, 'password_hash': 0})
     return {'admin_found': admin is not None, 'admin': admin}
 
+@router.post('/test-password')
+async def test_password(credentials: EmailLogin):
+    """Test password verification"""
+    db = get_db()
+    admin = await db.admins.find_one({'email': credentials.email}, {'_id': 0})
+    if not admin:
+        return {'error': 'Admin not found'}
+    
+    try:
+        result = bcrypt.verify(credentials.password, admin['password_hash'])
+        return {'password_valid': result, 'hash_used': admin['password_hash'][:20] + '...'}
+    except Exception as e:
+        return {'error': str(e)}
+
 @router.post('/login', response_model=dict)
 async def login(user_data: UserCreate):
     """
