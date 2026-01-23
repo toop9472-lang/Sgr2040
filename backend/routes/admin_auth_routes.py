@@ -21,7 +21,7 @@ async def admin_login(credentials: AdminLogin):
     db = get_db()
     
     # Find admin by email
-    admin = await db.admins.find_one({'email': credentials.email})
+    admin = await db.admins.find_one({'email': credentials.email}, {'_id': 0})
     
     if not admin:
         raise HTTPException(
@@ -36,22 +36,25 @@ async def admin_login(credentials: AdminLogin):
             detail='بيانات الدخول غير صحيحة'
         )
     
+    # Get admin ID (use email as fallback)
+    admin_id = admin.get('id', admin['email'])
+    
     # Update last login
     await db.admins.update_one(
-        {'id': admin['id']},
+        {'email': credentials.email},
         {'$set': {'last_login': datetime.utcnow()}}
     )
     
     # Create token
-    token = create_access_token(admin['id'])
+    token = create_access_token(admin_id)
     
     return {
         'token': token,
         'admin': {
-            'id': admin['id'],
+            'id': admin_id,
             'email': admin['email'],
-            'name': admin['name'],
-            'role': admin['role']
+            'name': admin.get('name', 'Admin'),
+            'role': admin.get('role', 'admin')
         }
     }
 
