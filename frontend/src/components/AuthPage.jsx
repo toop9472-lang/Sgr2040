@@ -250,11 +250,11 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
 
       <Card className="w-full max-w-md shadow-xl border-0">
         <CardHeader className="text-center pb-8 pt-10">
-          <div className="mx-auto mb-6 w-24 h-24 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-indigo-600 to-purple-600 p-1">
+          <div className="mx-auto mb-6 w-28 h-28">
             <img 
               src="/logo_new.png" 
               alt="صقر" 
-              className="w-full h-full object-contain rounded-xl bg-white/10"
+              className="w-full h-full object-contain"
             />
           </div>
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
