@@ -22,10 +22,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 
 // ============ CONFIGURATION ============
-// Use environment variable or fallback to production URL
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL 
-  ? `${process.env.EXPO_PUBLIC_BACKEND_URL}/api`
-  : 'https://rewardviewer-2.preview.emergentagent.com/api';
+// Backend API URL - MUST be set via environment variable in production
+const API_URL = `${process.env.EXPO_PUBLIC_BACKEND_URL || ''}/api`;
 const { width, height } = Dimensions.get('window');
 
 // Security constants
