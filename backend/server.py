@@ -36,6 +36,7 @@ from routes.points_settings_routes import router as points_settings_router
 from routes.reports_routes import router as reports_router
 from routes.claude_ai_routes import router as claude_ai_router
 from routes.dev_requests_routes import router as dev_requests_router
+from routes.security_routes import router as security_router
 
 
 ROOT_DIR = Path(__file__).parent
