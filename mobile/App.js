@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -12,66 +12,102 @@ import {
   Dimensions,
   Animated,
   Modal,
-  Image,
   Platform,
   Vibration,
-  Easing
+  Easing,
+  Switch,
+  AppState
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 
-// API Configuration
+// ============ CONFIGURATION ============
 const API_URL = 'https://rewardviewer-2.preview.emergentagent.com/api';
-
 const { width, height } = Dimensions.get('window');
 
-// ============ CUSTOM COMPONENTS ============
+// Security constants
+const MIN_WATCH_TIME = 25;
+const REQUIRED_WATCH_TIME = 30;
+const POINTS_PER_AD = 5;
+const AD_COOLDOWN = 30; // seconds
 
-// Animated Background Gradient
-const AnimatedGradient = ({ children, colors }) => {
-  const animValue = useRef(new Animated.Value(0)).current;
-  
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(animValue, { toValue: 1, duration: 3000, useNativeDriver: false }),
-        Animated.timing(animValue, { toValue: 0, duration: 3000, useNativeDriver: false }),
-      ])
-    ).start();
-  }, []);
-
-  return (
-    <LinearGradient colors={colors} style={styles.gradientBg}>
-      {children}
-    </LinearGradient>
-  );
+// ============ THEME CONFIGURATION ============
+const themes = {
+  dark: {
+    primary: '#1a1a2e',
+    secondary: '#16213e',
+    tertiary: '#0f3460',
+    accent: '#FFD700',
+    accentSecondary: '#FFA500',
+    success: '#10B981',
+    error: '#EF4444',
+    text: '#FFFFFF',
+    textSecondary: 'rgba(255, 255, 255, 0.7)',
+    textMuted: 'rgba(255, 255, 255, 0.5)',
+    card: 'rgba(255, 255, 255, 0.05)',
+    cardBorder: 'rgba(255, 255, 255, 0.1)',
+    statusBar: 'light'
+  },
+  light: {
+    primary: '#F8FAFC',
+    secondary: '#E2E8F0',
+    tertiary: '#CBD5E1',
+    accent: '#6366F1',
+    accentSecondary: '#8B5CF6',
+    success: '#10B981',
+    error: '#EF4444',
+    text: '#1E293B',
+    textSecondary: 'rgba(30, 41, 59, 0.7)',
+    textMuted: 'rgba(30, 41, 59, 0.5)',
+    card: 'rgba(0, 0, 0, 0.03)',
+    cardBorder: 'rgba(0, 0, 0, 0.1)',
+    statusBar: 'dark'
+  }
 };
 
-// Floating Particles Effect
-const FloatingParticles = () => {
-  const particles = Array(8).fill(0).map((_, i) => {
+// ============ SECURITY UTILITIES ============
+const generateDeviceFingerprint = async () => {
+  try {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(7);
+    return `${Platform.OS}_${Platform.Version}_${timestamp}_${random}`;
+  } catch (e) {
+    return `unknown_${Date.now()}`;
+  }
+};
+
+const validateWatchSession = (startTime, endTime, expectedDuration) => {
+  const actualDuration = (endTime - startTime) / 1000;
+  // Allow small tolerance for timing variations
+  return actualDuration >= expectedDuration * 0.8;
+};
+
+// ============ ANIMATED COMPONENTS ============
+
+// Floating Particles
+const FloatingParticles = ({ theme }) => {
+  const particles = Array(6).fill(0).map((_, i) => {
     const anim = useRef(new Animated.Value(0)).current;
-    const delay = i * 500;
     
     useEffect(() => {
+      const delay = i * 400;
       Animated.loop(
         Animated.sequence([
           Animated.delay(delay),
-          Animated.timing(anim, { toValue: 1, duration: 4000 + Math.random() * 2000, useNativeDriver: true }),
-          Animated.timing(anim, { toValue: 0, duration: 4000 + Math.random() * 2000, useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 1, duration: 5000, useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 0, duration: 5000, useNativeDriver: true }),
         ])
       ).start();
     }, []);
 
     const translateY = anim.interpolate({
       inputRange: [0, 1],
-      outputRange: [height, -100]
+      outputRange: [height + 50, -50]
     });
 
     const opacity = anim.interpolate({
-      inputRange: [0, 0.3, 0.7, 1],
-      outputRange: [0, 0.6, 0.6, 0]
+      inputRange: [0, 0.2, 0.8, 1],
+      outputRange: [0, 0.5, 0.5, 0]
     });
 
     return (
@@ -83,8 +119,9 @@ const FloatingParticles = () => {
             left: Math.random() * width,
             transform: [{ translateY }],
             opacity,
-            width: 4 + Math.random() * 8,
-            height: 4 + Math.random() * 8,
+            width: 4 + Math.random() * 6,
+            height: 4 + Math.random() * 6,
+            backgroundColor: theme.accent + '60',
           }
         ]}
       />
@@ -94,69 +131,42 @@ const FloatingParticles = () => {
   return <View style={styles.particlesContainer}>{particles}</View>;
 };
 
-// Glowing Button
-const GlowButton = ({ onPress, title, colors, icon, disabled, loading }) => {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, { toValue: 1, duration: 1500, useNativeDriver: false }),
-        Animated.timing(glowAnim, { toValue: 0, duration: 1500, useNativeDriver: false }),
-      ])
-    ).start();
-  }, []);
-
-  const handlePressIn = () => {
-    Animated.spring(scaleAnim, { toValue: 0.95, useNativeDriver: true }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true }).start();
-  };
-
-  const shadowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.3, 0.8]
-  });
-
+// Circular Progress
+const CircularProgress = ({ progress, size = 120, strokeWidth = 8, theme }) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const strokeDashoffset = circumference - (progress * circumference);
+  
   return (
-    <TouchableOpacity 
-      onPress={onPress} 
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      disabled={disabled || loading}
-      activeOpacity={0.9}
-    >
-      <Animated.View style={[
-        styles.glowButtonContainer,
-        { transform: [{ scale: scaleAnim }] }
-      ]}>
-        <LinearGradient
-          colors={disabled ? ['#6B7280', '#4B5563'] : colors}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.glowButton}
-        >
-          {loading ? (
-            <ActivityIndicator color="#FFFFFF" size="small" />
-          ) : (
-            <>
-              {icon && <Text style={styles.buttonIcon}>{icon}</Text>}
-              <Text style={styles.glowButtonText}>{title}</Text>
-            </>
-          )}
-        </LinearGradient>
-      </Animated.View>
-    </TouchableOpacity>
+    <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        borderWidth: strokeWidth,
+        borderColor: theme.cardBorder,
+        position: 'absolute'
+      }} />
+      <View style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        borderWidth: strokeWidth,
+        borderColor: theme.success,
+        borderTopColor: 'transparent',
+        borderRightColor: progress > 0.25 ? theme.success : 'transparent',
+        borderBottomColor: progress > 0.5 ? theme.success : 'transparent',
+        borderLeftColor: progress > 0.75 ? theme.success : 'transparent',
+        position: 'absolute',
+        transform: [{ rotate: '-90deg' }]
+      }} />
+    </View>
   );
 };
 
 // Stats Card with Animation
-const StatsCard = ({ value, label, icon, color, delay = 0 }) => {
+const StatsCard = ({ value, label, icon, color, theme, delay = 0 }) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
-  const countAnim = useRef(new Animated.Value(0)).current;
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
@@ -165,63 +175,255 @@ const StatsCard = ({ value, label, icon, color, delay = 0 }) => {
       Animated.spring(scaleAnim, { toValue: 1, tension: 50, friction: 7, useNativeDriver: true })
     ]).start();
 
-    Animated.timing(countAnim, {
-      toValue: typeof value === 'number' ? value : 0,
-      duration: 1500,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: false
-    }).start();
+    // Animate counter
+    const numericValue = typeof value === 'number' ? value : parseFloat(value) || 0;
+    const duration = 1000;
+    const steps = 30;
+    const increment = numericValue / steps;
+    let current = 0;
+    
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= numericValue) {
+        setDisplayValue(typeof value === 'number' ? numericValue : value);
+        clearInterval(timer);
+      } else {
+        setDisplayValue(Math.floor(current));
+      }
+    }, duration / steps);
 
-    countAnim.addListener(({ value: v }) => {
-      setDisplayValue(Math.floor(v));
-    });
-
-    return () => countAnim.removeAllListeners();
+    return () => clearInterval(timer);
   }, [value]);
 
   return (
     <Animated.View style={[
       styles.statsCard,
-      { transform: [{ scale: scaleAnim }] }
+      { 
+        backgroundColor: theme.card,
+        borderColor: theme.cardBorder,
+        transform: [{ scale: scaleAnim }] 
+      }
     ]}>
-      <LinearGradient
-        colors={[color + '20', color + '10']}
-        style={styles.statsCardGradient}
-      >
-        <Text style={styles.statsIcon}>{icon}</Text>
-        <Text style={[styles.statsValue, { color }]}>
-          {typeof value === 'number' ? displayValue : value}
-        </Text>
-        <Text style={styles.statsLabel}>{label}</Text>
-      </LinearGradient>
+      <Text style={styles.statsIcon}>{icon}</Text>
+      <Text style={[styles.statsValue, { color }]}>
+        {typeof value === 'number' ? displayValue : value}
+      </Text>
+      <Text style={[styles.statsLabel, { color: theme.textMuted }]}>{label}</Text>
     </Animated.View>
   );
 };
 
 // Achievement Badge
-const AchievementBadge = ({ title, description, icon, unlocked, progress }) => {
+const AchievementBadge = ({ title, description, icon, unlocked, progress, theme }) => (
+  <View style={[
+    styles.achievementBadge, 
+    { backgroundColor: theme.card, borderColor: theme.cardBorder },
+    !unlocked && { opacity: 0.6 }
+  ]}>
+    <View style={[
+      styles.achievementIcon, 
+      { backgroundColor: unlocked ? theme.accent + '30' : theme.card }
+    ]}>
+      <Text style={{ fontSize: 24 }}>{icon}</Text>
+    </View>
+    <View style={styles.achievementInfo}>
+      <Text style={[styles.achievementTitle, { color: theme.text }]}>{title}</Text>
+      <Text style={[styles.achievementDesc, { color: theme.textMuted }]}>{description}</Text>
+      {!unlocked && progress !== undefined && (
+        <View style={[styles.achievementProgress, { backgroundColor: theme.cardBorder }]}>
+          <View style={[styles.achievementProgressFill, { width: `${progress}%`, backgroundColor: theme.accent }]} />
+        </View>
+      )}
+    </View>
+    {unlocked && <Text style={[styles.achievementCheck, { color: theme.success }]}>✓</Text>}
+  </View>
+);
+
+// ============ AD VIEWER COMPONENT ============
+const AdViewer = ({ 
+  isWatching, 
+  watchTime, 
+  onStart, 
+  onSkip, 
+  completed, 
+  theme,
+  cooldownRemaining,
+  dailyRemaining 
+}) => {
+  const progressAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  
+  useEffect(() => {
+    if (isWatching) {
+      Animated.timing(progressAnim, {
+        toValue: watchTime / REQUIRED_WATCH_TIME,
+        duration: 900,
+        useNativeDriver: false
+      }).start();
+    }
+  }, [watchTime]);
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1.05, duration: 1000, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
+      ])
+    ).start();
+  }, []);
+
+  const progressWidth = progressAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%']
+  });
+
+  const remainingTime = REQUIRED_WATCH_TIME - watchTime;
+  const canWatch = dailyRemaining > 0 && cooldownRemaining <= 0;
+
   return (
-    <View style={[styles.achievementBadge, !unlocked && styles.achievementLocked]}>
-      <View style={[styles.achievementIcon, unlocked && styles.achievementIconUnlocked]}>
-        <Text style={{ fontSize: 24 }}>{icon}</Text>
-      </View>
-      <View style={styles.achievementInfo}>
-        <Text style={styles.achievementTitle}>{title}</Text>
-        <Text style={styles.achievementDesc}>{description}</Text>
-        {!unlocked && progress !== undefined && (
-          <View style={styles.achievementProgress}>
-            <View style={[styles.achievementProgressFill, { width: `${progress}%` }]} />
+    <View style={[styles.adContainer, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+      {isWatching ? (
+        // Watching State
+        <>
+          <View style={[styles.adVideoContainer, { backgroundColor: theme.primary }]}>
+            {/* Video placeholder - will show real ads when AdMob is verified */}
+            <LinearGradient
+              colors={[theme.primary, theme.secondary]}
+              style={styles.adVideoGradient}
+            >
+              <Text style={styles.adPlayingIcon}>📺</Text>
+              <Text style={[styles.adPlayingText, { color: theme.textSecondary }]}>
+                جاري عرض الإعلان...
+              </Text>
+              
+              {/* Circular Timer */}
+              <View style={styles.timerWrapper}>
+                <CircularProgress 
+                  progress={watchTime / REQUIRED_WATCH_TIME} 
+                  size={100} 
+                  theme={theme}
+                />
+                <View style={styles.timerContent}>
+                  <Text style={[styles.timerNumber, { color: theme.success }]}>
+                    {remainingTime}
+                  </Text>
+                  <Text style={[styles.timerLabel, { color: theme.textMuted }]}>ثانية</Text>
+                </View>
+              </View>
+              
+              {/* Ad Duration Info */}
+              <View style={[styles.durationBadge, { backgroundColor: theme.success + '20' }]}>
+                <Text style={[styles.durationText, { color: theme.success }]}>
+                  ⏱️ مدة الإعلان: {REQUIRED_WATCH_TIME} ثانية
+                </Text>
+              </View>
+            </LinearGradient>
           </View>
-        )}
-      </View>
-      {unlocked && <Text style={styles.achievementCheck}>✓</Text>}
+          
+          {/* Progress Bar */}
+          <View style={[styles.progressOuter, { backgroundColor: theme.cardBorder }]}>
+            <Animated.View style={[styles.progressInner, { width: progressWidth }]}>
+              <LinearGradient
+                colors={[theme.success, '#059669']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.progressGradient}
+              />
+            </Animated.View>
+          </View>
+          
+          <Text style={[styles.watchingHint, { color: theme.textSecondary }]}>
+            🎁 استمر بالمشاهدة للحصول على {POINTS_PER_AD} نقاط
+          </Text>
+          
+          {/* Progress Details */}
+          <View style={styles.progressDetails}>
+            <Text style={[styles.progressText, { color: theme.textMuted }]}>
+              {watchTime}/{REQUIRED_WATCH_TIME} ثانية
+            </Text>
+            <Text style={[styles.progressPercent, { color: theme.accent }]}>
+              {Math.floor((watchTime / REQUIRED_WATCH_TIME) * 100)}%
+            </Text>
+          </View>
+          
+          <TouchableOpacity style={styles.skipButton} onPress={onSkip}>
+            <Text style={[styles.skipButtonText, { color: theme.textMuted }]}>تخطي ❌</Text>
+          </TouchableOpacity>
+        </>
+      ) : completed ? (
+        // Completed State
+        <View style={styles.completedContainer}>
+          <Text style={styles.completedIcon}>🎉</Text>
+          <Text style={[styles.completedText, { color: theme.text }]}>مبروك!</Text>
+          <Text style={[styles.completedPoints, { color: theme.success }]}>
+            +{POINTS_PER_AD} نقاط
+          </Text>
+          <Text style={[styles.completedSubtext, { color: theme.textMuted }]}>
+            يمكنك مشاهدة إعلان آخر بعد {AD_COOLDOWN} ثانية
+          </Text>
+        </View>
+      ) : (
+        // Ready State
+        <>
+          <View style={styles.adReadyContainer}>
+            <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+              <Text style={styles.adReadyIcon}>🎬</Text>
+            </Animated.View>
+            <Text style={[styles.adReadyTitle, { color: theme.text }]}>إعلان جاهز للمشاهدة</Text>
+            <Text style={[styles.adReadySubtitle, { color: theme.textMuted }]}>
+              شاهد {REQUIRED_WATCH_TIME} ثانية واكسب {POINTS_PER_AD} نقاط
+            </Text>
+            
+            {/* Ad Info */}
+            <View style={[styles.adInfoBox, { backgroundColor: theme.cardBorder }]}>
+              <View style={styles.adInfoRow}>
+                <Text style={[styles.adInfoLabel, { color: theme.textMuted }]}>المدة:</Text>
+                <Text style={[styles.adInfoValue, { color: theme.text }]}>{REQUIRED_WATCH_TIME} ثانية</Text>
+              </View>
+              <View style={styles.adInfoRow}>
+                <Text style={[styles.adInfoLabel, { color: theme.textMuted }]}>المكافأة:</Text>
+                <Text style={[styles.adInfoValue, { color: theme.success }]}>{POINTS_PER_AD} نقاط ⭐</Text>
+              </View>
+              <View style={styles.adInfoRow}>
+                <Text style={[styles.adInfoLabel, { color: theme.textMuted }]}>المتبقي اليوم:</Text>
+                <Text style={[styles.adInfoValue, { color: theme.accent }]}>{dailyRemaining} إعلان</Text>
+              </View>
+            </View>
+          </View>
+          
+          {cooldownRemaining > 0 ? (
+            <View style={[styles.cooldownContainer, { backgroundColor: theme.error + '20' }]}>
+              <Text style={[styles.cooldownText, { color: theme.error }]}>
+                ⏳ انتظر {cooldownRemaining} ثانية
+              </Text>
+            </View>
+          ) : dailyRemaining <= 0 ? (
+            <View style={[styles.limitContainer, { backgroundColor: theme.error + '20' }]}>
+              <Text style={[styles.limitText, { color: theme.error }]}>
+                ⏰ وصلت للحد اليومي - عد غداً
+              </Text>
+            </View>
+          ) : (
+            <TouchableOpacity 
+              style={[styles.watchButton, { backgroundColor: theme.success }]}
+              onPress={onStart}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.watchButtonText}>▶️ شاهد الآن</Text>
+            </TouchableOpacity>
+          )}
+        </>
+      )}
     </View>
   );
 };
 
 // ============ MAIN APP ============
-
 export default function App() {
+  // Theme state
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const theme = isDarkMode ? themes.dark : themes.light;
+  
   // Screen state
   const [screen, setScreen] = useState('loading');
   const [activeTab, setActiveTab] = useState('home');
@@ -234,7 +436,9 @@ export default function App() {
   const [watchTime, setWatchTime] = useState(0);
   const [isWatching, setIsWatching] = useState(false);
   const [adCompleted, setAdCompleted] = useState(false);
-  const [currentAd, setCurrentAd] = useState(null);
+  const [watchStartTime, setWatchStartTime] = useState(null);
+  const [viewToken, setViewToken] = useState(null);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
   
   // Stats
   const [todayStats, setTodayStats] = useState({ views: 0, remaining: 50, points: 0 });
@@ -253,17 +457,30 @@ export default function App() {
   const [isRegister, setIsRegister] = useState(false);
   
   // Animations
-  const progressAnim = useRef(new Animated.Value(0)).current;
   const rewardAnim = useRef(new Animated.Value(0)).current;
-  const logoAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  
+  // App state tracking (for security)
+  const appState = useRef(AppState.currentState);
 
   // ============ EFFECTS ============
 
   useEffect(() => {
     initializeApp();
+    
+    // Monitor app state changes (security measure)
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (isWatching && appState.current === 'active' && nextAppState !== 'active') {
+        // User left the app while watching - cancel the view
+        handleAppBackground();
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => subscription?.remove();
   }, []);
 
+  // Watch timer with security validation
   useEffect(() => {
     let timer;
     if (isWatching && !adCompleted) {
@@ -271,20 +488,14 @@ export default function App() {
         setWatchTime(prev => {
           const newTime = prev + 1;
           
-          Animated.timing(progressAnim, {
-            toValue: newTime / 30,
-            duration: 800,
-            useNativeDriver: false
-          }).start();
-          
           // Vibrate every 10 seconds
-          if (newTime % 10 === 0 && newTime < 30) {
+          if (newTime % 10 === 0 && newTime < REQUIRED_WATCH_TIME) {
             Vibration.vibrate(50);
           }
           
-          if (newTime >= 30) {
+          if (newTime >= REQUIRED_WATCH_TIME) {
             completeAdWatch();
-            return 30;
+            return REQUIRED_WATCH_TIME;
           }
           return newTime;
         });
@@ -293,16 +504,27 @@ export default function App() {
     return () => clearInterval(timer);
   }, [isWatching, adCompleted]);
 
+  // Cooldown timer
+  useEffect(() => {
+    let timer;
+    if (cooldownRemaining > 0) {
+      timer = setInterval(() => {
+        setCooldownRemaining(prev => Math.max(0, prev - 1));
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [cooldownRemaining]);
+
   // ============ INITIALIZATION ============
 
   const initializeApp = async () => {
-    // Animate logo
-    Animated.sequence([
-      Animated.timing(logoAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
-      Animated.delay(500),
-    ]).start();
-
     try {
+      // Load theme preference
+      const savedTheme = await AsyncStorage.getItem('saqr_theme');
+      if (savedTheme !== null) {
+        setIsDarkMode(savedTheme === 'dark');
+      }
+      
       const savedToken = await AsyncStorage.getItem('saqr_token');
       const savedUser = await AsyncStorage.getItem('saqr_user');
       
@@ -339,7 +561,6 @@ export default function App() {
         setLeaderboard(data.leaderboard || []);
       }
 
-      // Generate achievements based on user data
       generateAchievements();
     } catch (e) {
       console.log('Fetch error:', e);
@@ -351,47 +572,24 @@ export default function App() {
     const totalViews = todayStats.views || 0;
     
     setAchievements([
-      {
-        id: 1,
-        title: 'البداية',
-        description: 'شاهد أول إعلان',
-        icon: '🎬',
-        unlocked: totalViews >= 1,
-        progress: Math.min(100, totalViews * 100)
-      },
-      {
-        id: 2,
-        title: 'مشاهد نشط',
-        description: 'شاهد 10 إعلانات',
-        icon: '👀',
-        unlocked: totalViews >= 10,
-        progress: Math.min(100, totalViews * 10)
-      },
-      {
-        id: 3,
-        title: 'جامع النقاط',
-        description: 'اجمع 100 نقطة',
-        icon: '⭐',
-        unlocked: points >= 100,
-        progress: Math.min(100, points)
-      },
-      {
-        id: 4,
-        title: 'الثري',
-        description: 'اجمع 500 نقطة',
-        icon: '💰',
-        unlocked: points >= 500,
-        progress: Math.min(100, points / 5)
-      },
-      {
-        id: 5,
-        title: 'المليونير',
-        description: 'اجمع 1000 نقطة',
-        icon: '👑',
-        unlocked: points >= 1000,
-        progress: Math.min(100, points / 10)
-      },
+      { id: 1, title: 'البداية', description: 'شاهد أول إعلان', icon: '🎬', unlocked: totalViews >= 1, progress: Math.min(100, totalViews * 100) },
+      { id: 2, title: 'مشاهد نشط', description: 'شاهد 10 إعلانات', icon: '👀', unlocked: totalViews >= 10, progress: Math.min(100, totalViews * 10) },
+      { id: 3, title: 'جامع النقاط', description: 'اجمع 100 نقطة', icon: '⭐', unlocked: points >= 100, progress: Math.min(100, points) },
+      { id: 4, title: 'الثري', description: 'اجمع 500 نقطة', icon: '💰', unlocked: points >= 500, progress: Math.min(100, points / 5) },
+      { id: 5, title: 'المليونير', description: 'اجمع 1000 نقطة', icon: '👑', unlocked: points >= 1000, progress: Math.min(100, points / 10) },
     ]);
+  };
+
+  // ============ SECURITY HANDLERS ============
+
+  const handleAppBackground = () => {
+    // Cancel current ad view if user leaves app
+    if (isWatching) {
+      setIsWatching(false);
+      setWatchTime(0);
+      setViewToken(null);
+      Alert.alert('تم إلغاء المشاهدة', 'يجب البقاء في التطبيق أثناء مشاهدة الإعلان');
+    }
   };
 
   // ============ AUTH HANDLERS ============
@@ -504,7 +702,7 @@ export default function App() {
     );
   };
 
-  // ============ AD HANDLERS ============
+  // ============ AD HANDLERS WITH SECURITY ============
 
   const startWatching = async () => {
     if (todayStats.remaining <= 0 && !user?.isGuest) {
@@ -512,26 +710,59 @@ export default function App() {
       return;
     }
 
-    // Simulate fetching ad
-    setCurrentAd({
-      id: 'ad_' + Date.now(),
-      title: 'إعلان مميز',
-      advertiser: 'المعلن',
-      type: 'video'
-    });
+    if (cooldownRemaining > 0) {
+      Alert.alert('انتظر', `يرجى الانتظار ${cooldownRemaining} ثانية`);
+      return;
+    }
 
+    // For registered users, validate with server
+    if (!user?.isGuest && token) {
+      try {
+        const response = await fetch(`${API_URL}/security/validate-ad-view`, {
+          method: 'POST',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const data = await response.json();
+        
+        if (!data.allowed) {
+          Alert.alert('تنبيه', data.message || 'غير مسموح بالمشاهدة حالياً');
+          return;
+        }
+        
+        setViewToken(data.view_token);
+      } catch (e) {
+        console.log('Validation error:', e);
+        // Continue for offline support
+      }
+    }
+
+    setWatchStartTime(Date.now());
     setIsWatching(true);
     setAdCompleted(false);
     setWatchTime(0);
-    progressAnim.setValue(0);
     Vibration.vibrate(50);
   };
 
   const completeAdWatch = async () => {
+    const endTime = Date.now();
+    
+    // Validate watch session
+    if (!validateWatchSession(watchStartTime, endTime, MIN_WATCH_TIME)) {
+      Alert.alert('خطأ', 'مدة المشاهدة غير صالحة');
+      setIsWatching(false);
+      setWatchTime(0);
+      return;
+    }
+
     setAdCompleted(true);
     setIsWatching(false);
+    setCooldownRemaining(AD_COOLDOWN);
     
-    const pointsEarned = 5;
+    const pointsEarned = POINTS_PER_AD;
     setEarnedPoints(pointsEarned);
     
     // Show reward animation
@@ -550,19 +781,17 @@ export default function App() {
       const updatedUser = { ...user, points: newPoints };
       setUser(updatedUser);
       await AsyncStorage.setItem('saqr_user', JSON.stringify(updatedUser));
-    } else {
+    } else if (token) {
       try {
-        const response = await fetch(`${API_URL}/rewarded-ads/complete`, {
+        const response = await fetch(`${API_URL}/security/complete-ad-view`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
-            ad_type: 'personal',
-            ad_id: currentAd?.id,
-            completed: true,
-            watch_duration: 30
+            view_token: viewToken,
+            watch_duration: REQUIRED_WATCH_TIME
           })
         });
         
@@ -583,15 +812,12 @@ export default function App() {
       }
     }
 
-    // Update achievements
     generateAchievements();
     
-    // Reset for next ad
     setTimeout(() => {
-      setCurrentAd(null);
       setWatchTime(0);
-      progressAnim.setValue(0);
       setAdCompleted(false);
+      setViewToken(null);
     }, 3000);
   };
 
@@ -606,82 +832,77 @@ export default function App() {
           style: 'destructive',
           onPress: () => {
             setIsWatching(false);
-            setCurrentAd(null);
             setWatchTime(0);
-            progressAnim.setValue(0);
+            setViewToken(null);
           }
         }
       ]
     );
   };
 
-  // ============ RENDER SCREENS ============
+  // Theme toggle
+  const toggleTheme = async () => {
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme);
+    await AsyncStorage.setItem('saqr_theme', newTheme ? 'dark' : 'light');
+    Vibration.vibrate(30);
+  };
+
+  // ============ RENDER ============
 
   // Loading Screen
   if (screen === 'loading') {
     return (
-      <AnimatedGradient colors={['#1a1a2e', '#16213e', '#0f3460']}>
-        <StatusBar style="light" />
-        <FloatingParticles />
-        <View style={styles.loadingContainer}>
-          <Animated.View style={[
-            styles.logoContainer,
-            {
-              opacity: logoAnim,
-              transform: [{ 
-                scale: logoAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0.5, 1]
-                })
-              }]
-            }
-          ]}>
-            <Text style={styles.loadingLogo}>صقر</Text>
-            <Text style={styles.loadingTagline}>شاهد • اكسب • اسحب</Text>
-          </Animated.View>
-          <ActivityIndicator size="large" color="#FFD700" style={{ marginTop: 30 }} />
-        </View>
-      </AnimatedGradient>
+      <View style={[styles.loadingContainer, { backgroundColor: theme.primary }]}>
+        <StatusBar style={theme.statusBar} />
+        <FloatingParticles theme={theme} />
+        <Text style={[styles.loadingLogo, { color: theme.accent }]}>صقر</Text>
+        <Text style={[styles.loadingTagline, { color: theme.textSecondary }]}>شاهد • اكسب • اسحب</Text>
+        <ActivityIndicator size="large" color={theme.accent} style={{ marginTop: 30 }} />
+      </View>
     );
   }
 
   // Login Screen
   if (screen === 'login') {
     return (
-      <AnimatedGradient colors={['#1a1a2e', '#16213e', '#0f3460']}>
-        <StatusBar style="light" />
-        <FloatingParticles />
+      <View style={[styles.loginContainer, { backgroundColor: theme.primary }]}>
+        <StatusBar style={theme.statusBar} />
+        <FloatingParticles theme={theme} />
+        
         <ScrollView 
           contentContainerStyle={styles.loginScrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
           <Animated.View style={[styles.loginContent, { opacity: fadeAnim }]}>
+            {/* Theme Toggle */}
+            <TouchableOpacity style={styles.themeToggle} onPress={toggleTheme}>
+              <Text style={{ fontSize: 24 }}>{isDarkMode ? '☀️' : '🌙'}</Text>
+            </TouchableOpacity>
+
             {/* Logo */}
             <View style={styles.loginLogoContainer}>
-              <LinearGradient
-                colors={['#FFD700', '#FFA500']}
-                style={styles.logoGradient}
-              >
-                <Text style={styles.loginLogoText}>صقر</Text>
-              </LinearGradient>
-              <Text style={styles.loginSubtitle}>منصة مشاهدة الإعلانات</Text>
-              <Text style={styles.loginTagline}>شاهد • اكسب • اسحب</Text>
+              <View style={[styles.logoGradient, { backgroundColor: theme.accent }]}>
+                <Text style={[styles.loginLogoText, { color: theme.primary }]}>صقر</Text>
+              </View>
+              <Text style={[styles.loginSubtitle, { color: theme.text }]}>منصة مشاهدة الإعلانات</Text>
+              <Text style={[styles.loginTagline, { color: theme.textMuted }]}>شاهد • اكسب • اسحب</Text>
             </View>
 
             {/* Form */}
-            <View style={styles.formCard}>
-              <Text style={styles.formTitle}>
+            <View style={[styles.formCard, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+              <Text style={[styles.formTitle, { color: theme.text }]}>
                 {isRegister ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
               </Text>
 
               {isRegister && (
-                <View style={styles.inputContainer}>
+                <View style={[styles.inputContainer, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
                   <Text style={styles.inputIcon}>👤</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { color: theme.text }]}
                     placeholder="الاسم الكامل"
-                    placeholderTextColor="#6B7280"
+                    placeholderTextColor={theme.textMuted}
                     value={name}
                     onChangeText={setName}
                     textAlign="right"
@@ -689,12 +910,12 @@ export default function App() {
                 </View>
               )}
 
-              <View style={styles.inputContainer}>
+              <View style={[styles.inputContainer, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
                 <Text style={styles.inputIcon}>📧</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: theme.text }]}
                   placeholder="البريد الإلكتروني"
-                  placeholderTextColor="#6B7280"
+                  placeholderTextColor={theme.textMuted}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -703,12 +924,12 @@ export default function App() {
                 />
               </View>
 
-              <View style={styles.inputContainer}>
+              <View style={[styles.inputContainer, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
                 <Text style={styles.inputIcon}>🔒</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: theme.text }]}
                   placeholder="كلمة المرور"
-                  placeholderTextColor="#6B7280"
+                  placeholderTextColor={theme.textMuted}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
@@ -716,16 +937,22 @@ export default function App() {
                 />
               </View>
 
-              <GlowButton
-                title={isRegister ? 'إنشاء حساب' : 'دخول'}
-                colors={['#FFD700', '#FFA500']}
+              <TouchableOpacity 
+                style={[styles.primaryButton, { backgroundColor: theme.accent }]}
                 onPress={isRegister ? handleRegister : handleEmailLogin}
-                loading={loading}
-                icon={isRegister ? '✨' : '🚀'}
-              />
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color={theme.primary} />
+                ) : (
+                  <Text style={[styles.primaryButtonText, { color: theme.primary }]}>
+                    {isRegister ? '✨ إنشاء حساب' : '🚀 دخول'}
+                  </Text>
+                )}
+              </TouchableOpacity>
 
               <TouchableOpacity onPress={() => setIsRegister(!isRegister)}>
-                <Text style={styles.switchText}>
+                <Text style={[styles.switchText, { color: theme.accent }]}>
                   {isRegister ? 'لديك حساب؟ سجل دخول' : 'جديد؟ أنشئ حساب'}
                 </Text>
               </TouchableOpacity>
@@ -733,69 +960,67 @@ export default function App() {
 
             {/* Divider */}
             <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>أو</Text>
-              <View style={styles.dividerLine} />
+              <View style={[styles.dividerLine, { backgroundColor: theme.cardBorder }]} />
+              <Text style={[styles.dividerText, { color: theme.textMuted }]}>أو</Text>
+              <View style={[styles.dividerLine, { backgroundColor: theme.cardBorder }]} />
             </View>
 
             {/* Guest Login */}
-            <TouchableOpacity style={styles.guestButton} onPress={guestLogin}>
-              <Text style={styles.guestButtonText}>👋 دخول كزائر</Text>
+            <TouchableOpacity 
+              style={[styles.guestButton, { borderColor: theme.cardBorder }]}
+              onPress={guestLogin}
+            >
+              <Text style={[styles.guestButtonText, { color: theme.text }]}>👋 دخول كزائر</Text>
             </TouchableOpacity>
 
             {/* Info */}
             <View style={styles.infoBox}>
-              <Text style={styles.infoBoxText}>💰 500 نقطة = 1 دولار</Text>
-              <Text style={styles.infoBoxText}>⚡ اكسب حتى 250 نقطة يومياً</Text>
+              <Text style={[styles.infoBoxText, { color: theme.textMuted }]}>💰 {POINTS_PER_AD * 100} نقطة = 1 دولار</Text>
+              <Text style={[styles.infoBoxText, { color: theme.textMuted }]}>⚡ اكسب حتى {POINTS_PER_AD * 50} نقطة يومياً</Text>
             </View>
           </Animated.View>
         </ScrollView>
-      </AnimatedGradient>
+      </View>
     );
   }
 
   // Main App Screen
-  const progressWidth = progressAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0%', '100%']
-  });
-
   return (
-    <View style={styles.mainContainer}>
-      <StatusBar style="light" />
+    <View style={[styles.mainContainer, { backgroundColor: theme.primary }]}>
+      <StatusBar style={theme.statusBar} />
       
       {/* Header */}
-      <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.header}>
+      <View style={[styles.header, { backgroundColor: theme.secondary }]}>
         <View style={styles.headerTop}>
-          <TouchableOpacity onPress={logout} style={styles.logoutBtn}>
-            <Text style={styles.logoutIcon}>⬅️</Text>
+          <TouchableOpacity onPress={logout} style={styles.headerBtn}>
+            <Text style={{ fontSize: 20 }}>⬅️</Text>
           </TouchableOpacity>
           
           <View style={styles.headerCenter}>
-            <Text style={styles.headerLogo}>صقر</Text>
+            <Text style={[styles.headerLogo, { color: theme.accent }]}>صقر</Text>
           </View>
           
-          <View style={styles.pointsContainer}>
-            <LinearGradient
-              colors={['#FFD700', '#FFA500']}
-              style={styles.pointsBadge}
-            >
-              <Text style={styles.pointsValue}>{user?.points || 0}</Text>
-              <Text style={styles.pointsLabel}>نقطة</Text>
-            </LinearGradient>
+          <View style={styles.headerRight}>
+            <TouchableOpacity onPress={toggleTheme} style={styles.themeBtn}>
+              <Text style={{ fontSize: 18 }}>{isDarkMode ? '☀️' : '🌙'}</Text>
+            </TouchableOpacity>
+            <View style={[styles.pointsBadge, { backgroundColor: theme.accent }]}>
+              <Text style={[styles.pointsValue, { color: theme.primary }]}>{user?.points || 0}</Text>
+              <Text style={[styles.pointsLabel, { color: theme.primary }]}>نقطة</Text>
+            </View>
           </View>
         </View>
         
         {/* User greeting */}
         <View style={styles.greetingContainer}>
-          <Text style={styles.greetingText}>مرحباً {user?.name || 'زائر'} 👋</Text>
+          <Text style={[styles.greetingText, { color: theme.text }]}>مرحباً {user?.name || 'زائر'} 👋</Text>
           {user?.isGuest && (
             <TouchableOpacity onPress={() => setScreen('login')}>
-              <Text style={styles.registerPrompt}>سجل للحفاظ على نقاطك ➡️</Text>
+              <Text style={[styles.registerPrompt, { color: theme.accent }]}>سجل للحفاظ على نقاطك ➡️</Text>
             </TouchableOpacity>
           )}
         </View>
-      </LinearGradient>
+      </View>
 
       {/* Main Content */}
       <ScrollView 
@@ -804,164 +1029,100 @@ export default function App() {
         contentContainerStyle={{ paddingBottom: 100 }}
       >
         {activeTab === 'home' && (
-          <Animated.View style={[styles.tabContent, { opacity: fadeAnim }]}>
-            {/* Ad Card */}
-            <View style={styles.adContainer}>
-              <LinearGradient
-                colors={['#1a1a2e', '#0f3460']}
-                style={styles.adCard}
-              >
-                {isWatching ? (
-                  // Watching State
-                  <>
-                    <View style={styles.adVideoContainer}>
-                      <LinearGradient
-                        colors={['#000000', '#1a1a2e']}
-                        style={styles.adVideo}
-                      >
-                        <Text style={styles.adPlayingIcon}>📺</Text>
-                        <Text style={styles.adPlayingText}>جاري العرض...</Text>
-                        <View style={styles.timerCircle}>
-                          <Text style={styles.timerText}>{30 - watchTime}</Text>
-                          <Text style={styles.timerLabel}>ثانية</Text>
-                        </View>
-                      </LinearGradient>
-                    </View>
-                    
-                    {/* Progress Bar */}
-                    <View style={styles.progressOuter}>
-                      <Animated.View style={[styles.progressInner, { width: progressWidth }]}>
-                        <LinearGradient
-                          colors={['#10B981', '#059669']}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 0 }}
-                          style={styles.progressGradient}
-                        />
-                      </Animated.View>
-                    </View>
-                    
-                    <Text style={styles.watchingHint}>
-                      🎁 استمر بالمشاهدة لتحصل على 5 نقاط
-                    </Text>
-                    
-                    <TouchableOpacity style={styles.skipButton} onPress={skipAd}>
-                      <Text style={styles.skipButtonText}>تخطي ❌</Text>
-                    </TouchableOpacity>
-                  </>
-                ) : adCompleted ? (
-                  // Completed State
-                  <View style={styles.completedContainer}>
-                    <Text style={styles.completedIcon}>🎉</Text>
-                    <Text style={styles.completedText}>مبروك!</Text>
-                    <Text style={styles.completedPoints}>+5 نقاط</Text>
-                  </View>
-                ) : (
-                  // Ready State
-                  <>
-                    <View style={styles.adReadyContainer}>
-                      <Text style={styles.adReadyIcon}>🎬</Text>
-                      <Text style={styles.adReadyTitle}>إعلان جاهز</Text>
-                      <Text style={styles.adReadySubtitle}>شاهد 30 ثانية واكسب 5 نقاط</Text>
-                    </View>
-                    
-                    <GlowButton
-                      title="شاهد الآن"
-                      colors={['#10B981', '#059669']}
-                      onPress={startWatching}
-                      icon="▶️"
-                      disabled={todayStats.remaining <= 0 && !user?.isGuest}
-                    />
-                    
-                    {todayStats.remaining <= 0 && !user?.isGuest && (
-                      <Text style={styles.limitReached}>
-                        ⏰ وصلت للحد اليومي - عد غداً
-                      </Text>
-                    )}
-                  </>
-                )}
-              </LinearGradient>
-            </View>
+          <View style={styles.tabContent}>
+            {/* Ad Viewer */}
+            <AdViewer
+              isWatching={isWatching}
+              watchTime={watchTime}
+              onStart={startWatching}
+              onSkip={skipAd}
+              completed={adCompleted}
+              theme={theme}
+              cooldownRemaining={cooldownRemaining}
+              dailyRemaining={user?.isGuest ? 999 : todayStats.remaining}
+            />
 
             {/* Daily Stats */}
             {!user?.isGuest && (
-              <View style={styles.dailyStatsContainer}>
-                <Text style={styles.sectionTitle}>📊 إحصائيات اليوم</Text>
+              <View style={[styles.dailyStatsContainer, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+                <Text style={[styles.sectionTitle, { color: theme.text }]}>📊 إحصائيات اليوم</Text>
                 <View style={styles.dailyStatsRow}>
                   <View style={styles.dailyStat}>
-                    <Text style={styles.dailyStatValue}>{todayStats.views}</Text>
-                    <Text style={styles.dailyStatLabel}>مشاهدة</Text>
+                    <Text style={[styles.dailyStatValue, { color: theme.accent }]}>{todayStats.views}</Text>
+                    <Text style={[styles.dailyStatLabel, { color: theme.textMuted }]}>مشاهدة</Text>
                   </View>
-                  <View style={styles.dailyStatDivider} />
+                  <View style={[styles.dailyStatDivider, { backgroundColor: theme.cardBorder }]} />
                   <View style={styles.dailyStat}>
-                    <Text style={styles.dailyStatValue}>{todayStats.points || todayStats.views * 5}</Text>
-                    <Text style={styles.dailyStatLabel}>نقطة اليوم</Text>
+                    <Text style={[styles.dailyStatValue, { color: theme.accent }]}>{todayStats.points || todayStats.views * POINTS_PER_AD}</Text>
+                    <Text style={[styles.dailyStatLabel, { color: theme.textMuted }]}>نقطة اليوم</Text>
                   </View>
-                  <View style={styles.dailyStatDivider} />
+                  <View style={[styles.dailyStatDivider, { backgroundColor: theme.cardBorder }]} />
                   <View style={styles.dailyStat}>
-                    <Text style={[styles.dailyStatValue, { color: '#10B981' }]}>{todayStats.remaining}</Text>
-                    <Text style={styles.dailyStatLabel}>متبقي</Text>
+                    <Text style={[styles.dailyStatValue, { color: theme.success }]}>{todayStats.remaining}</Text>
+                    <Text style={[styles.dailyStatLabel, { color: theme.textMuted }]}>متبقي</Text>
                   </View>
                 </View>
               </View>
             )}
 
             {/* Stats Cards */}
-            <Text style={styles.sectionTitle}>💎 إحصائياتك</Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>💎 إحصائياتك</Text>
             <View style={styles.statsGrid}>
               <StatsCard 
                 value={user?.points || 0} 
                 label="إجمالي النقاط" 
                 icon="⭐" 
-                color="#FFD700"
+                color={theme.accent}
+                theme={theme}
                 delay={0}
               />
               <StatsCard 
                 value={`$${((user?.points || 0) / 500).toFixed(2)}`} 
                 label="رصيدك بالدولار" 
                 icon="💵" 
-                color="#10B981"
+                color={theme.success}
+                theme={theme}
                 delay={100}
               />
             </View>
 
-            {/* Quick Actions */}
+            {/* Withdraw Button */}
             {(user?.points || 0) >= 500 && !user?.isGuest && (
-              <View style={styles.quickActions}>
-                <GlowButton
-                  title="اسحب أرباحك"
-                  colors={['#8B5CF6', '#7C3AED']}
-                  icon="💰"
-                  onPress={() => Alert.alert('قريباً', 'خاصية السحب ستكون متاحة قريباً')}
-                />
-              </View>
+              <TouchableOpacity 
+                style={[styles.withdrawButton, { backgroundColor: theme.accentSecondary }]}
+                onPress={() => Alert.alert('قريباً', 'خاصية السحب ستكون متاحة قريباً')}
+              >
+                <Text style={styles.withdrawButtonText}>💰 اسحب أرباحك</Text>
+              </TouchableOpacity>
             )}
-          </Animated.View>
+          </View>
         )}
 
         {activeTab === 'leaderboard' && (
           <View style={styles.tabContent}>
-            <Text style={styles.sectionTitle}>🏆 المتصدرين هذا الأسبوع</Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>🏆 المتصدرين هذا الأسبوع</Text>
             {leaderboard.length > 0 ? (
               <View style={styles.leaderboardContainer}>
                 {leaderboard.map((item, index) => (
                   <View key={index} style={[
                     styles.leaderboardItem,
-                    index === 0 && styles.leaderboardFirst,
-                    index === 1 && styles.leaderboardSecond,
-                    index === 2 && styles.leaderboardThird,
+                    { backgroundColor: theme.card, borderColor: theme.cardBorder },
+                    index === 0 && { borderColor: '#FFD700' },
+                    index === 1 && { borderColor: '#C0C0C0' },
+                    index === 2 && { borderColor: '#CD7F32' },
                   ]}>
                     <Text style={styles.leaderboardRank}>
                       {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                     </Text>
-                    <Text style={styles.leaderboardName}>{item.name}</Text>
-                    <Text style={styles.leaderboardPoints}>{item.points} ⭐</Text>
+                    <Text style={[styles.leaderboardName, { color: theme.text }]}>{item.name}</Text>
+                    <Text style={[styles.leaderboardPoints, { color: theme.accent }]}>{item.points} ⭐</Text>
                   </View>
                 ))}
               </View>
             ) : (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyIcon}>🏆</Text>
-                <Text style={styles.emptyText}>كن أول المتصدرين!</Text>
+                <Text style={[styles.emptyText, { color: theme.textMuted }]}>كن أول المتصدرين!</Text>
               </View>
             )}
           </View>
@@ -969,7 +1130,7 @@ export default function App() {
 
         {activeTab === 'achievements' && (
           <View style={styles.tabContent}>
-            <Text style={styles.sectionTitle}>🎖️ الإنجازات</Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>🎖️ الإنجازات</Text>
             <View style={styles.achievementsContainer}>
               {achievements.map((achievement) => (
                 <AchievementBadge
@@ -979,6 +1140,7 @@ export default function App() {
                   icon={achievement.icon}
                   unlocked={achievement.unlocked}
                   progress={achievement.progress}
+                  theme={theme}
                 />
               ))}
             </View>
@@ -987,78 +1149,87 @@ export default function App() {
 
         {activeTab === 'profile' && (
           <View style={styles.tabContent}>
-            <Text style={styles.sectionTitle}>👤 الملف الشخصي</Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>👤 الملف الشخصي</Text>
             
-            <View style={styles.profileCard}>
-              <View style={styles.profileAvatar}>
-                <Text style={styles.profileAvatarText}>
+            <View style={[styles.profileCard, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+              <View style={[styles.profileAvatar, { backgroundColor: theme.accent }]}>
+                <Text style={[styles.profileAvatarText, { color: theme.primary }]}>
                   {(user?.name || 'ز')[0]}
                 </Text>
               </View>
-              <Text style={styles.profileName}>{user?.name || 'زائر'}</Text>
-              <Text style={styles.profileEmail}>{user?.email || 'حساب زائر'}</Text>
+              <Text style={[styles.profileName, { color: theme.text }]}>{user?.name || 'زائر'}</Text>
+              <Text style={[styles.profileEmail, { color: theme.textMuted }]}>{user?.email || 'حساب زائر'}</Text>
+              
+              {/* Theme Toggle in Profile */}
+              <View style={styles.profileThemeRow}>
+                <Text style={[styles.profileThemeLabel, { color: theme.text }]}>الوضع الليلي</Text>
+                <Switch
+                  value={isDarkMode}
+                  onValueChange={toggleTheme}
+                  trackColor={{ false: theme.cardBorder, true: theme.accent }}
+                  thumbColor={isDarkMode ? theme.primary : theme.card}
+                />
+              </View>
               
               {user?.isGuest && (
-                <GlowButton
-                  title="إنشاء حساب"
-                  colors={['#FFD700', '#FFA500']}
-                  icon="✨"
+                <TouchableOpacity 
+                  style={[styles.registerButton, { backgroundColor: theme.accent }]}
                   onPress={() => setScreen('login')}
-                />
+                >
+                  <Text style={[styles.registerButtonText, { color: theme.primary }]}>✨ إنشاء حساب</Text>
+                </TouchableOpacity>
               )}
             </View>
 
-            <View style={styles.profileStats}>
+            <View style={[styles.profileStats, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
               <View style={styles.profileStatItem}>
-                <Text style={styles.profileStatValue}>{user?.points || 0}</Text>
-                <Text style={styles.profileStatLabel}>النقاط</Text>
+                <Text style={[styles.profileStatValue, { color: theme.accent }]}>{user?.points || 0}</Text>
+                <Text style={[styles.profileStatLabel, { color: theme.textMuted }]}>النقاط</Text>
               </View>
               <View style={styles.profileStatItem}>
-                <Text style={styles.profileStatValue}>${((user?.points || 0) / 500).toFixed(2)}</Text>
-                <Text style={styles.profileStatLabel}>الرصيد</Text>
+                <Text style={[styles.profileStatValue, { color: theme.accent }]}>${((user?.points || 0) / 500).toFixed(2)}</Text>
+                <Text style={[styles.profileStatLabel, { color: theme.textMuted }]}>الرصيد</Text>
               </View>
               <View style={styles.profileStatItem}>
-                <Text style={styles.profileStatValue}>{achievements.filter(a => a.unlocked).length}</Text>
-                <Text style={styles.profileStatLabel}>الإنجازات</Text>
+                <Text style={[styles.profileStatValue, { color: theme.accent }]}>{achievements.filter(a => a.unlocked).length}</Text>
+                <Text style={[styles.profileStatLabel, { color: theme.textMuted }]}>الإنجازات</Text>
               </View>
             </View>
 
-            <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-              <Text style={styles.logoutButtonText}>تسجيل الخروج</Text>
+            <TouchableOpacity 
+              style={[styles.logoutButton, { backgroundColor: theme.error + '20', borderColor: theme.error }]}
+              onPress={logout}
+            >
+              <Text style={[styles.logoutButtonText, { color: theme.error }]}>تسجيل الخروج</Text>
             </TouchableOpacity>
           </View>
         )}
       </ScrollView>
 
       {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <LinearGradient
-          colors={['#1a1a2e', '#16213e']}
-          style={styles.bottomNavGradient}
-        >
-          {[
-            { id: 'home', icon: '🏠', label: 'الرئيسية' },
-            { id: 'leaderboard', icon: '🏆', label: 'المتصدرين' },
-            { id: 'achievements', icon: '🎖️', label: 'الإنجازات' },
-            { id: 'profile', icon: '👤', label: 'حسابي' },
-          ].map((tab) => (
-            <TouchableOpacity
-              key={tab.id}
-              style={[styles.navItem, activeTab === tab.id && styles.navItemActive]}
-              onPress={() => {
-                setActiveTab(tab.id);
-                Vibration.vibrate(30);
-              }}
-            >
-              <Text style={styles.navIcon}>{tab.icon}</Text>
-              <Text style={[
-                styles.navLabel,
-                activeTab === tab.id && styles.navLabelActive
-              ]}>{tab.label}</Text>
-              {activeTab === tab.id && <View style={styles.navIndicator} />}
-            </TouchableOpacity>
-          ))}
-        </LinearGradient>
+      <View style={[styles.bottomNav, { backgroundColor: theme.secondary, borderTopColor: theme.cardBorder }]}>
+        {[
+          { id: 'home', icon: '🏠', label: 'الرئيسية' },
+          { id: 'leaderboard', icon: '🏆', label: 'المتصدرين' },
+          { id: 'achievements', icon: '🎖️', label: 'الإنجازات' },
+          { id: 'profile', icon: '👤', label: 'حسابي' },
+        ].map((tab) => (
+          <TouchableOpacity
+            key={tab.id}
+            style={styles.navItem}
+            onPress={() => {
+              setActiveTab(tab.id);
+              Vibration.vibrate(30);
+            }}
+          >
+            <Text style={styles.navIcon}>{tab.icon}</Text>
+            <Text style={[
+              styles.navLabel,
+              { color: activeTab === tab.id ? theme.accent : theme.textMuted }
+            ]}>{tab.label}</Text>
+            {activeTab === tab.id && <View style={[styles.navIndicator, { backgroundColor: theme.accent }]} />}
+          </TouchableOpacity>
+        ))}
       </View>
 
       {/* Reward Modal */}
@@ -1076,15 +1247,12 @@ export default function App() {
               }]
             }
           ]}>
-            <LinearGradient
-              colors={['#1a1a2e', '#16213e']}
-              style={styles.rewardModalContent}
-            >
+            <View style={[styles.rewardModalContent, { backgroundColor: theme.secondary, borderColor: theme.accent }]}>
               <Text style={styles.rewardEmoji}>🎉</Text>
-              <Text style={styles.rewardTitle}>مبروك!</Text>
-              <Text style={styles.rewardPoints}>+{earnedPoints} نقاط</Text>
-              <Text style={styles.rewardSubtitle}>أحسنت! استمر بالمشاهدة</Text>
-            </LinearGradient>
+              <Text style={[styles.rewardTitle, { color: theme.text }]}>مبروك!</Text>
+              <Text style={[styles.rewardPoints, { color: theme.success }]}>+{earnedPoints} نقاط</Text>
+              <Text style={[styles.rewardSubtitle, { color: theme.textMuted }]}>أحسنت! استمر بالمشاهدة</Text>
+            </View>
           </Animated.View>
         </View>
       </Modal>
@@ -1093,13 +1261,7 @@ export default function App() {
 }
 
 // ============ STYLES ============
-
 const styles = StyleSheet.create({
-  // Gradient Background
-  gradientBg: {
-    flex: 1,
-  },
-  
   // Particles
   particlesContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -1107,7 +1269,6 @@ const styles = StyleSheet.create({
   },
   particle: {
     position: 'absolute',
-    backgroundColor: 'rgba(255, 215, 0, 0.4)',
     borderRadius: 50,
   },
 
@@ -1117,33 +1278,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logoContainer: {
-    alignItems: 'center',
-  },
   loadingLogo: {
-    fontSize: 80,
+    fontSize: 70,
     fontWeight: 'bold',
-    color: '#FFD700',
-    textShadowColor: 'rgba(255, 215, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
   },
   loadingTagline: {
-    fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 16,
     marginTop: 10,
     letterSpacing: 2,
   },
 
   // Login Screen
+  loginContainer: {
+    flex: 1,
+  },
   loginScrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
-    paddingBottom: 40,
+    paddingTop: 60,
   },
   loginContent: {
     alignItems: 'center',
+  },
+  themeToggle: {
+    position: 'absolute',
+    top: -40,
+    right: 0,
+    padding: 10,
   },
   loginLogoContainer: {
     alignItems: 'center',
@@ -1155,19 +1317,16 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   loginLogoText: {
-    fontSize: 60,
+    fontSize: 50,
     fontWeight: 'bold',
-    color: '#1a1a2e',
   },
   loginSubtitle: {
     fontSize: 18,
-    color: '#FFFFFF',
     marginTop: 15,
     fontWeight: '600',
   },
   loginTagline: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.6)',
     marginTop: 5,
     letterSpacing: 3,
   },
@@ -1175,27 +1334,22 @@ const styles = StyleSheet.create({
   // Form
   formCard: {
     width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 24,
     padding: 24,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   formTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#FFFFFF',
     textAlign: 'center',
     marginBottom: 24,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   inputIcon: {
     fontSize: 20,
@@ -1206,35 +1360,21 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingRight: 16,
     fontSize: 16,
-    color: '#FFFFFF',
   },
-  switchText: {
-    color: '#FFD700',
-    textAlign: 'center',
-    marginTop: 16,
-    fontSize: 14,
-  },
-
-  // Glow Button
-  glowButtonContainer: {
-    marginVertical: 8,
-  },
-  glowButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+  primaryButton: {
     borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 16,
   },
-  buttonIcon: {
-    fontSize: 20,
-    marginRight: 8,
-  },
-  glowButtonText: {
-    color: '#1a1a2e',
+  primaryButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  switchText: {
+    textAlign: 'center',
+    fontSize: 14,
   },
 
   // Divider
@@ -1247,25 +1387,20 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   dividerText: {
-    color: 'rgba(255, 255, 255, 0.5)',
     marginHorizontal: 16,
     fontSize: 14,
   },
 
   // Guest Button
   guestButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     paddingVertical: 16,
     paddingHorizontal: 40,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   guestButtonText: {
-    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1276,7 +1411,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   infoBoxText: {
-    color: 'rgba(255, 255, 255, 0.6)',
     fontSize: 14,
     marginBottom: 8,
   },
@@ -1284,65 +1418,61 @@ const styles = StyleSheet.create({
   // Main Container
   mainContainer: {
     flex: 1,
-    backgroundColor: '#0a0a14',
   },
 
   // Header
   header: {
     paddingTop: 50,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
+    paddingBottom: 15,
+    paddingHorizontal: 16,
   },
   headerTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  logoutBtn: {
+  headerBtn: {
     padding: 8,
-  },
-  logoutIcon: {
-    fontSize: 24,
   },
   headerCenter: {
     alignItems: 'center',
   },
   headerLogo: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#FFD700',
   },
-  pointsContainer: {
-    alignItems: 'flex-end',
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  themeBtn: {
+    padding: 8,
   },
   pointsBadge: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
     borderRadius: 20,
     alignItems: 'center',
   },
   pointsValue: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#1a1a2e',
   },
   pointsLabel: {
     fontSize: 10,
-    color: '#1a1a2e',
     fontWeight: '600',
   },
   greetingContainer: {
-    marginTop: 16,
+    marginTop: 12,
     alignItems: 'center',
   },
   greetingText: {
     fontSize: 18,
-    color: '#FFFFFF',
     fontWeight: '600',
   },
   registerPrompt: {
     fontSize: 12,
-    color: '#FFD700',
     marginTop: 4,
   },
 
@@ -1354,66 +1484,67 @@ const styles = StyleSheet.create({
   tabContent: {
     paddingTop: 16,
   },
-
-  // Section Title
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FFFFFF',
     marginBottom: 16,
     textAlign: 'right',
   },
 
   // Ad Container
   adContainer: {
-    marginBottom: 20,
-  },
-  adCard: {
     borderRadius: 24,
     padding: 20,
+    marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 215, 0, 0.2)',
   },
   adVideoContainer: {
+    borderRadius: 16,
+    overflow: 'hidden',
     marginBottom: 16,
   },
-  adVideo: {
-    height: 200,
-    borderRadius: 16,
+  adVideoGradient: {
+    height: 220,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   adPlayingIcon: {
     fontSize: 40,
-    marginBottom: 10,
   },
   adPlayingText: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.7)',
+    marginTop: 8,
   },
-  timerCircle: {
-    marginTop: 20,
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+  timerWrapper: {
+    marginTop: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
-    borderColor: '#10B981',
   },
-  timerText: {
-    fontSize: 32,
+  timerContent: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  timerNumber: {
+    fontSize: 36,
     fontWeight: 'bold',
-    color: '#10B981',
   },
   timerLabel: {
-    fontSize: 10,
-    color: '#10B981',
+    fontSize: 12,
+  },
+  durationBadge: {
+    marginTop: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  durationText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   progressOuter: {
     height: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 4,
     overflow: 'hidden',
     marginBottom: 12,
@@ -1428,23 +1559,33 @@ const styles = StyleSheet.create({
   },
   watchingHint: {
     textAlign: 'center',
-    color: 'rgba(255, 255, 255, 0.6)',
     fontSize: 14,
-    marginBottom: 16,
+    marginBottom: 8,
+  },
+  progressDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  progressText: {
+    fontSize: 12,
+  },
+  progressPercent: {
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   skipButton: {
     alignSelf: 'center',
     padding: 10,
   },
   skipButtonText: {
-    color: 'rgba(255, 255, 255, 0.4)',
     fontSize: 14,
   },
 
   // Ad Ready State
   adReadyContainer: {
     alignItems: 'center',
-    paddingVertical: 30,
+    paddingVertical: 20,
   },
   adReadyIcon: {
     fontSize: 60,
@@ -1453,19 +1594,58 @@ const styles = StyleSheet.create({
   adReadyTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
     marginBottom: 8,
   },
   adReadySubtitle: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.6)',
-    marginBottom: 24,
+    marginBottom: 20,
   },
-  limitReached: {
-    textAlign: 'center',
-    color: '#EF4444',
+  adInfoBox: {
+    width: '100%',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+  },
+  adInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  adInfoLabel: {
     fontSize: 14,
-    marginTop: 16,
+  },
+  adInfoValue: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  watchButton: {
+    borderRadius: 16,
+    padding: 18,
+    alignItems: 'center',
+    width: '100%',
+  },
+  watchButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  cooldownContainer: {
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+  },
+  cooldownText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  limitContainer: {
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+  },
+  limitText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 
   // Completed State
@@ -1480,28 +1660,29 @@ const styles = StyleSheet.create({
   completedText: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FFFFFF',
     marginBottom: 8,
   },
   completedPoints: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#10B981',
+  },
+  completedSubtext: {
+    fontSize: 14,
+    marginTop: 12,
   },
 
   // Daily Stats
   dailyStatsContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 20,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   dailyStatsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
+    marginTop: 12,
   },
   dailyStat: {
     alignItems: 'center',
@@ -1509,17 +1690,14 @@ const styles = StyleSheet.create({
   dailyStatValue: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FFD700',
   },
   dailyStatLabel: {
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.6)',
     marginTop: 4,
   },
   dailyStatDivider: {
     width: 1,
     height: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
 
   // Stats Grid
@@ -1530,13 +1708,10 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     flex: 1,
-  },
-  statsCardGradient: {
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   statsIcon: {
     fontSize: 30,
@@ -1548,14 +1723,20 @@ const styles = StyleSheet.create({
   },
   statsLabel: {
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.6)',
     marginTop: 4,
   },
 
-  // Quick Actions
-  quickActions: {
-    marginTop: 10,
+  // Withdraw Button
+  withdrawButton: {
+    borderRadius: 16,
+    padding: 18,
+    alignItems: 'center',
     marginBottom: 20,
+  },
+  withdrawButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 
   // Leaderboard
@@ -1565,23 +1746,9 @@ const styles = StyleSheet.create({
   leaderboardItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  leaderboardFirst: {
-    borderColor: '#FFD700',
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
-  },
-  leaderboardSecond: {
-    borderColor: '#C0C0C0',
-    backgroundColor: 'rgba(192, 192, 192, 0.1)',
-  },
-  leaderboardThird: {
-    borderColor: '#CD7F32',
-    backgroundColor: 'rgba(205, 127, 50, 0.1)',
   },
   leaderboardRank: {
     fontSize: 24,
@@ -1591,12 +1758,10 @@ const styles = StyleSheet.create({
   leaderboardName: {
     flex: 1,
     fontSize: 16,
-    color: '#FFFFFF',
     fontWeight: '600',
   },
   leaderboardPoints: {
     fontSize: 16,
-    color: '#FFD700',
     fontWeight: 'bold',
   },
 
@@ -1611,7 +1776,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.6)',
   },
 
   // Achievements
@@ -1621,26 +1785,17 @@ const styles = StyleSheet.create({
   achievementBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  achievementLocked: {
-    opacity: 0.6,
   },
   achievementIcon: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
-  },
-  achievementIconUnlocked: {
-    backgroundColor: 'rgba(255, 215, 0, 0.2)',
   },
   achievementInfo: {
     flex: 1,
@@ -1648,48 +1803,40 @@ const styles = StyleSheet.create({
   achievementTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FFFFFF',
     textAlign: 'right',
   },
   achievementDesc: {
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.6)',
     marginTop: 4,
     textAlign: 'right',
   },
   achievementProgress: {
     height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 2,
     marginTop: 8,
     overflow: 'hidden',
   },
   achievementProgressFill: {
     height: '100%',
-    backgroundColor: '#FFD700',
     borderRadius: 2,
   },
   achievementCheck: {
     fontSize: 20,
-    color: '#10B981',
     marginLeft: 12,
   },
 
   // Profile
   profileCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 24,
     padding: 30,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
     marginBottom: 20,
   },
   profileAvatar: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#FFD700',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
@@ -1697,27 +1844,44 @@ const styles = StyleSheet.create({
   profileAvatarText: {
     fontSize: 40,
     fontWeight: 'bold',
-    color: '#1a1a2e',
   },
   profileName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
     marginBottom: 4,
   },
   profileEmail: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.6)',
     marginBottom: 20,
+  },
+  profileThemeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+    marginBottom: 16,
+  },
+  profileThemeLabel: {
+    fontSize: 16,
+  },
+  registerButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 16,
+  },
+  registerButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   profileStats: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 20,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   profileStatItem: {
     flex: 1,
@@ -1726,23 +1890,18 @@ const styles = StyleSheet.create({
   profileStatValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFD700',
   },
   profileStatLabel: {
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.6)',
     marginTop: 4,
   },
   logoutButton: {
-    backgroundColor: 'rgba(239, 68, 68, 0.2)',
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.3)',
   },
   logoutButtonText: {
-    color: '#EF4444',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1753,22 +1912,16 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-  },
-  bottomNavGradient: {
     flexDirection: 'row',
     paddingBottom: Platform.OS === 'ios' ? 30 : 16,
     paddingTop: 12,
     paddingHorizontal: 10,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
   navItem: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: 8,
-  },
-  navItemActive: {
-    // Active state handled by indicator
   },
   navIcon: {
     fontSize: 24,
@@ -1776,18 +1929,12 @@ const styles = StyleSheet.create({
   },
   navLabel: {
     fontSize: 10,
-    color: 'rgba(255, 255, 255, 0.5)',
-  },
-  navLabelActive: {
-    color: '#FFD700',
-    fontWeight: '600',
   },
   navIndicator: {
     position: 'absolute',
     top: 0,
     width: 30,
     height: 3,
-    backgroundColor: '#FFD700',
     borderRadius: 2,
   },
 
@@ -1806,7 +1953,6 @@ const styles = StyleSheet.create({
     padding: 40,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#FFD700',
   },
   rewardEmoji: {
     fontSize: 80,
@@ -1815,17 +1961,14 @@ const styles = StyleSheet.create({
   rewardTitle: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#FFFFFF',
     marginBottom: 8,
   },
   rewardPoints: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#10B981',
     marginBottom: 8,
   },
   rewardSubtitle: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.7)',
   },
 });
