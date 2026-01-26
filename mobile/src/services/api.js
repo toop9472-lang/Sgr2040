@@ -1,12 +1,21 @@
 /**
  * API Service for Saqr Mobile App
  * Handles all backend communication
+ * 
+ * NOTE: For production deployment, update the apiUrl in app.json
+ * or set EXPO_PUBLIC_API_URL environment variable
  */
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://adviewer-6.preview.emergentagent.com';
+// API URL priority: 
+// 1. Environment variable (EXPO_PUBLIC_API_URL)
+// 2. app.json extra.apiUrl
+// 3. Fallback for development
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 
+                Constants.expoConfig?.extra?.apiUrl || 
+                'https://adviewer-6.preview.emergentagent.com';
 const API_BASE = `${API_URL}/api`;
 
 // Create axios instance
