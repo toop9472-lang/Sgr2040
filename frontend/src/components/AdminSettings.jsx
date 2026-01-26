@@ -15,6 +15,7 @@ import {
 import axios from 'axios';
 import AdminWallet from './AdminWallet';
 import RewardedAdsSettings from './RewardedAdsSettings';
+import PointsSystemSettings from './PointsSystemSettings';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
