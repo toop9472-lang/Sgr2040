@@ -1,12 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>صقر</Text>
-      <Text style={styles.subtitle}>شاهد واكسب النقاط</Text>
-      <StatusBar style="auto" />
+      <Text style={styles.emoji}>🦅</Text>
+      <Text style={styles.title}>Saqr</Text>
+      <Text style={styles.subtitle}>Watch and Earn</Text>
+      <StatusBar style="light" />
     </View>
   );
 }
@@ -17,6 +19,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#4F46E5',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  emoji: {
+    fontSize: 80,
+    marginBottom: 20,
   },
   title: {
     fontSize: 48,
