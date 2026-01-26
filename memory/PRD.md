@@ -315,5 +315,5 @@
 
 | الخدمة | الرابط |
 |--------|--------|
-| الموقع | https://adviewer-6.preview.emergentagent.com |
-| API Docs | https://adviewer-6.preview.emergentagent.com/docs |
+| الموقع | https://saqr-ads.preview.emergentagent.com |
+| API Docs | https://saqr-ads.preview.emergentagent.com/docs |
