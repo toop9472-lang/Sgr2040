@@ -154,8 +154,12 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
             >
               {isRTL ? '←' : '→'}
             </button>
-            <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg">
-              <span className="text-3xl">🦅</span>
+            <div className="mx-auto mb-4 w-16 h-16 rounded-xl overflow-hidden shadow-lg bg-gradient-to-br from-indigo-600 to-purple-600 p-0.5">
+              <img 
+                src="/logo_new.png" 
+                alt="صقر" 
+                className="w-full h-full object-contain rounded-lg bg-white/10"
+              />
             </div>
             <CardTitle className="text-2xl font-bold text-gray-800">
               {isRegister ? t('register') : t('login')}
@@ -246,8 +250,12 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
 
       <Card className="w-full max-w-md shadow-xl border-0">
         <CardHeader className="text-center pb-8 pt-10">
-          <div className="mx-auto mb-6 w-20 h-20 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg">
-            <span className="text-4xl">🦅</span>
+          <div className="mx-auto mb-6 w-24 h-24 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-indigo-600 to-purple-600 p-1">
+            <img 
+              src="/logo_new.png" 
+              alt="صقر" 
+              className="w-full h-full object-contain rounded-xl bg-white/10"
+            />
           </div>
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
             {t('appName')}
