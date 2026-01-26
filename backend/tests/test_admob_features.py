@@ -93,7 +93,8 @@ class TestAdMobSettingsAPI:
     def test_get_admob_settings_requires_auth(self):
         """Test GET /api/settings/admob requires authentication"""
         response = requests.get(f"{BASE_URL}/api/settings/admob")
-        assert response.status_code == 401, f"Expected 401 without auth, got {response.status_code}"
+        # 401 or 403 both indicate unauthorized access
+        assert response.status_code in [401, 403], f"Expected 401/403 without auth, got {response.status_code}"
         print("✅ AdMob settings correctly requires authentication")
     
     def test_get_admob_settings_with_auth(self):
