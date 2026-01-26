@@ -208,6 +208,9 @@ function MainApp() {
       console.error('Logout error:', error);
     }
     
+    // Clear user token from localStorage
+    localStorage.removeItem('user_token');
+    
     setIsAuthenticated(false);
     setUser(null);
     setAds([]);
