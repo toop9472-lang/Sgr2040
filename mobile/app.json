@@ -54,7 +54,10 @@
     ],
     "owner": "ziyad333",
     "extra": {
-      "apiUrl": "https://adviewer-6.preview.emergentagent.com"
+      "apiUrl": "https://adviewer-6.preview.emergentagent.com",
+      "eas": {
+        "projectId": "2a08ac90-1772-4377-bf99-af5d2357db30"
+      }
     }
   }
 }
