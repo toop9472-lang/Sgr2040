@@ -3,122 +3,115 @@ The user wants to create an application named صقر (Saqr), which is an adverti
 
 **PRODUCT REQUIREMENTS:**
 -   **Core Functionality:** Users scroll through a vertical, full-screen feed of video ads.
--   **Points System:** Users earn 1 point for every full minute of ad-watching, redeemable at 500 points for .
--   **Anti-cheat:** Prevent users from gaining points by watching the same ad multiple times.
+-   **Points System:** Users earn points for watching ads, redeemable for cash. The conversion rate and earning rules must be configurable by the admin.
+-   **AI Features:** The user requested AI-powered features for the admin (e.g., improvements, error analysis) and a user-facing AI component. This was recently integrated using the Claude Sonnet 4 model.
+-   **UI/UX Enhancements:** The user requested a more professional UI for the ad viewer, where controls hide during playback and a notification appears when a point is earned.
 -   **Authentication:** User registration via Google, Apple, and email/password. A unified login page redirects admins to their dashboard.
--   **Guest Mode:** Allow browsing ads without logging in.
--   **Withdrawals:** Admin approval is required for all withdrawal requests (PayPal, STC Pay, local banks).
--   **Advertiser Features:** A section for advertisers to post ads for a fee (500 SAR/month) with a Visit Website button. Payment gateways include Stripe, Tap, Tabby, Tamara, STC Pay, and PayPal.
--   **Admin Panel:** A comprehensive dashboard to manage withdrawals, ads, view financial/user statistics, manage invoices, and control the application's core settings.
--   **Mobile App:** A React Native mobile application with the same functionality.
--   **Localization:** Support for both Arabic and English.
--   **Push Notifications:** For key user events.
+-   **Admin Panel:** A comprehensive dashboard to manage withdrawals, ads, users, finances, and control all core application settings dynamically without code changes.
+-   **Mobile App:** A React Native mobile application. The user has specifically requested a downloadable APK file.
+-   **Advertiser Features:** A section for advertisers to post ads for a fee.
+-   **Withdrawals:** Admin approval is required for all withdrawal requests.
+-   **Notifications:** Email and Push notifications for key events.
 
 **User's preferred language**: Arabic
 
 **what currently exists?**
-The web application is feature-rich, with a functional FastAPI backend and React frontend.
--   **Advanced Admin Dashboard:** A fully integrated admin panel has been built. It allows the admin to manage the entire application without code changes.
--   **Dynamic Settings Management:**
-    -   **Payment Gateways:** Admins can manually add/update API keys for Stripe, Tap, Tabby, etc., and enable/disable them.
-    -   **OAuth Configuration:** Admins can enable/disable Google & Apple sign-in and input their own s and s.
-    -   **Application Control:** Features like maintenance mode, emergency lockdowns (disabling logins, payments), and core settings (points value, registration status) can be controlled from the dashboard.
--   **App Wallet System:** A complete wallet system for the admin to fund the application. It supports real deposits via Stripe, tracks balance, and logs all transactions. The initial fake/manual deposit feature has been removed.
--   **Real-Time User Stats:** The dashboard now displays live, accurate data for total users, online users, and offline users, powered by a heartbeat API.
--   **User Management:** Admins can view a paginated list of all users (excluding the admin account for security), search, and ban/unban or delete them directly from the UI.
--   **UI & Bug Fixes:** Several user-requested UI tweaks and bug fixes have been implemented, including translation issues and component layouts.
--   The obsolete  has been removed.
+The project is a full-stack application with a FastAPI backend, a React frontend, and a React Native mobile app.
+-   **Web App:** Features a comprehensive admin dashboard allowing dynamic management of payment gateways, OAuth providers, email services (Resend), rewarded ad networks, the core points system, PDF report generation, push notifications (via Firebase), and a newly added AI (Claude) integration.
+-   **Backend:** Supports all admin panel functionality. It includes foundational services for payout processing, PDF reports, and push notifications. A full-fledged AI service using Claude Sonnet 4 is integrated and functional.
+-   **Mobile App:** The basic structure is in place, and the code was recently updated from a user-provided zip file. Key screens exist, but the UI needs the professional polish requested by the user. The build process for an APK is currently blocked.
+-   **Integrations:**
+    -   **Resend:** Fully integrated for emails.
+    -   **Anthropic (Claude Sonnet 4):** Fully integrated for AI features, using a user-provided API key.
+    -   **Firebase Admin SDK:** Integrated for push notifications, with an admin UI to configure credentials.
+    -   **Stripe:** Partially integrated (admin can deposit funds).
 
 **Last working item**:
--   Last item agent was working: The agent addressed a user report that deleting users was not working and that the admin's own account was dangerously exposed in the user list. The agent redesigned the user management UI into a secure, clean table, protected the admin account from being listed, and fixed the delete functionality.
--   Status: USER VERIFICATION PENDING
--   Agent Testing Done: Y
--   Which testing method agent to use? manual testing by curl
+-   Last item agent was working: The agent was starting to implement a major user request for comprehensive UI/UX improvements and new AI-powered features. The first step taken was to overwrite the main  component to add a more professional design where UI elements hide during video playback. The next planned step was to install  for a point earned visual effect.
+-   Status: IN PROGRESS
+-   Agent Testing Done: N
+-   Which testing method agent to use? frontend testing agent
 -   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   Issue 1: (P0) Deleting users from the admin panel does not work.
--   Issue 2: (P1) The admin's own account is visible and editable in the user management list.
--   Issue 3: (P2) Real Stripe deposits are not confirmed to be working.
--   Issue 4: (P3) The application wallet has a fake deposit option.
--   Issue 5: (P4) User statistics on the admin dashboard are showing mock data.
+-   Issue 1: (P1) Backend logic for most payment gateways is missing (Tap, Tabby, Tamara, STC Pay, PayPal, Apple Pay). The admin UI exists, but transactions will fail.
+-   Issue 2: (P1) The mobile app APK build is blocked. The agent was unable to complete the build process using EAS CLI due to the non-interactive environment, specifically around project initialization and keystore management.
+-   Issue 3: (P2) Backend logic for Google & Apple OAuth is not implemented.
+-   Issue 4: (P2) The deployment agent reported a potential N+1 query issue in the admin dashboard in a previous session, which could cause performance problems. This has not been investigated.
 
 Issues Detail:
--   **Issue 1: Deleting users from the admin panel does not work.**
-    -   **Attempted fixes:** The backend delete API was confirmed to work via . The issue was traced to the frontend sending the wrong user identifier. The user management UI was completely redesigned into a table, and the  handler for the delete button was corrected to use the correct .
-    -   **Next debug checklist:** The user needs to test the delete button in the new UI to confirm the fix.
-    -   **Why fix this issue and what will be achieved with the fix?** This is a critical admin function for managing the user base.
-    -   **Status:** RESOLVED
+-   **Issue 1: Backend logic for payment gateways is missing.**
+    -   **Attempted fixes:** UI and database storage for API keys are complete.
+    -   **Next debug checklist:** For each gateway, implement the backend route to initiate a payment session using the stored API key. The  is a placeholder and needs to be implemented for withdrawals.
+    -   **Why fix this issue and what will be achieved with the fix?** Critical for the business model (advertiser payments and user withdrawals).
+    -   **Status:** NOT STARTED
     -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** none
+    -   **Should Test frontend/backend/both after fix?** backend
     -   **Blocked on other issue:** None.
-
--   **Issue 2: The admin's own account is visible and editable in the user management list.**
-    -   **Attempted fixes:** The backend API endpoint  was modified to explicitly filter out the admin's email address from the query results, ensuring it never reaches the frontend.
-    -   **Next debug checklist:** The user needs to verify that their admin account is no longer present in the Manage Users tab.
-    -   **Why fix this issue and what will be achieved with the fix?** Prevents the admin from accidentally banning or deleting their own account, which would lock them out of the application.
-    -   **Status:** RESOLVED
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** none
-    -   **Blocked on other issue:** None.
-
--   **Issue 3: Real Stripe deposits are not confirmed to be working.**
-    -   **Attempted fixes:** The UI and backend logic for initiating a Stripe checkout session are in place.
-    -   **Next debug checklist:** The admin needs to enter their real Stripe API keys into the new settings panel and attempt a deposit to confirm the end-to-end flow.
-    -   **Why fix this issue and what will be achieved with the fix?** Enables the admin to fund the application wallet to pay for user withdrawals.
+-   **Issue 2: The mobile app APK build is blocked.**
+    -   **Attempted fixes:** The agent tried multiple  commands, logged into the user's Expo account via token, updated  and , generated a local keystore, and attempted to use local credentials. All attempts failed due to the non-interactive nature of the agent's shell environment.
+    -   **Next debug checklist:** The agent cannot resolve this alone. The next step is to explain the environmental limitation to the user and provide them with the complete, updated  folder contents and clear, step-by-step instructions to run the  command on their own local machine.
+    -   **Why fix this issue and what will be achieved with the fix?** This directly fulfills the user's request for a downloadable APK file.
     -   **Status:** BLOCKED
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** both
-    -   **Blocked on other issue:** Awaiting user to input real Stripe keys.
-
--   **Issue 4: The application wallet has a fake deposit option.**
-    -   **Attempted fixes:** The agent removed the manual deposit option from the backend and frontend, ensuring only real payment gateways (like Stripe) can be used to add funds. The wallet was also reset to remove any test data.
-    -   **Why fix this issue and what will be achieved with the fix?** Ensures all financial data in the wallet is from real, traceable transactions.
-    -   **Status:** RESOLVED
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** none
-    -   **Blocked on other issue:** None.
-
--   **Issue 5: User statistics on the admin dashboard are showing mock data.**
-    -   **Attempted fixes:** The agent implemented a  function in  that periodically pings the backend, allowing for accurate tracking of active users. The backend routes were confirmed to be querying the database directly.
-    -   **Why fix this issue and what will be achieved with the fix?** Provides the admin with real, actionable insights into user activity.
-    -   **Status:** RESOLVED
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** none
-    -   **Blocked on other issue:** None.
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** frontend
+    -   **Blocked on other issue:** This is a platform/environment limitation.
 
 **In progress Task List**:
--   **Task 1: Build Out React Native Mobile App** (P1)
-    -   **Where to resume:** The project is structured in . The auth flow is updated. The next step is to build the UI for the main screens (, , ) and connect them to the backend APIs.
-    -   **What will be achieved with this?** A functional cross-platform mobile application.
+-   **Task 1: Comprehensive UI/UX & AI Feature Enhancement** (P0)
+    -   **Where to resume:** The  has been overwritten. The next steps are:
+        1.  Run yarn add v1.22.22
+[1/4] Resolving packages...
+[2/4] Fetching packages...
+[3/4] Linking dependencies...
+[4/4] Building fresh packages...
+success Saved lockfile.
+success Saved 3 new dependencies.
+info Direct dependencies
+├─ react-confetti@6.4.0
+└─ react-icons@5.5.0
+info All dependencies
+├─ react-confetti@6.4.0
+├─ react-icons@5.5.0
+└─ tween-functions@1.2.0
+Done in 4.39s..
+        2.  Finalize the implementation in  to ensure the confetti effect triggers correctly after one minute and the UI elements hide/show on touch.
+        3.  Add a user-facing AI icon/button that opens a chat or interaction modal.
+        4.  Implement valuable AI-powered features for the admin dashboard (e.g., an AI Assistant tab with options for performance analysis, suggestions for ad campaigns, or automated content moderation ideas).
+    -   **What will be achieved with this?** A more professional, engaging, and intelligent application that meets the user's latest creative requirements.
     -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** frontend
+    -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   (P0) **Implement Payment Gateways:** Implement the backend logic for Tap, Tabby, Tamara, STC Pay, and PayPal, now that the admin can provide API keys.
-    -   (P1) **Implement Apple & Google OAuth:** Implement the actual backend OAuth flows using the keys the admin provides in the settings.
-    -   (P2) **Implement Withdrawal Processing:** Implement the logic to trigger payments to users via PayPal, STC Pay, or bank transfers.
+    -   (P0) **Implement Withdrawal Processing:** Implement the backend logic in  to handle admin approval of withdrawal requests and trigger payouts.
+    -   (P1) **Integrate Rewarded Ad SDKs:** Connect the  component to the actual SDKs (e.g., Google AdMob).
 -   **Future Tasks:**
-    -   Deploy the web and backend applications.
-    -   Publish the mobile app to app stores.
-    -   Add advanced PDF reporting for financial analytics.
-    -   Integrate an email service like SendGrid for transactional emails.
+    -   Deploy the web and backend applications to a production environment.
+    -   Publish the mobile app to the Apple App Store and Google Play Store.
+    -   Add advanced PDF reporting for financial analytics in the admin dashboard (the foundation is built but can be expanded).
 
 **Completed work in this session**
--   **Comprehensive Admin Panel:** Created a multi-tabbed settings page () for full application control.
--   **Dynamic API Key Management:** Admins can now add and manage API keys for all payment gateways (Stripe, Tap, etc.) directly from the UI.
--   **Dynamic OAuth Management:** Admins can enable/disable and configure credentials for Google & Apple OAuth.
--   **Application Controls:** Implemented Maintenance Mode and Emergency Controls (e.g., stop payments, stop logins) toggles for the admin.
--   **App Wallet System:** Created a secure wallet for the admin with real deposits via Stripe, balance tracking, and transaction history. Removed all mock/manual deposit functionality.
--   **Live User Statistics:** Implemented a heartbeat API to ensure the admin dashboard shows real-time data for online/offline users.
--   **Full User Management:** Added a secure Manage Users tab where admins can search, view, ban/unban, and delete users. The admin's own account is now protected from being listed.
--   **Bug Fixes & UI Refinements:** Fixed user ban/delete functionality, resolved multiple translation issues, and redesigned several UI components based on direct user feedback for better clarity and usability.
--   **Code Cleanup:** Removed the obsolete  and its related routes.
+-   **Apple Pay Clarification:** Investigated Apple Pay, confirmed it works via Stripe, and updated the admin UI to make this clear with an explanatory text and status check.
+-   **New Features Foundation:**
+    -   Created foundational (but empty) services for  and .
+    -   Implemented a working PDF generation service () and corresponding API endpoints ().
+    -   Created a new  component in the admin panel to house these features.
+-   **Firebase FCM Integration:** Implemented a full UI and backend configuration flow for admins to securely add their Firebase Service Account credentials for push notifications.
+-   **Deployment Readiness:** Performed multiple readiness checks, fixed a hardcoded URL in the mobile config, and resolved a minor frontend linting error.
+-   **AI Integration (Claude Sonnet 4):**
+    -   Successfully integrated AI files from a user-provided zip file.
+    -   Created a new AI Settings tab in the admin panel ().
+    -   Refactored the AI service () to use the user's provided API key and the  model.
+    -   Verified all AI endpoints () are working correctly.
 
 **Earlier issues found/mentioned but not fixed**
--   None.
+-   **Issue 1: N+1 Query Problem:** The deployment agent reported a potential N+1 query issue in the admin dashboard, which can lead to performance degradation. This was not investigated or fixed.
+    -   **Debug checklist:** Analyze the backend code for fetching dashboard statistics or user lists to identify loops that make database calls. Use database aggregation pipelines to fetch data in a single query.
+    -   **Why to solve this issue and what will be achieved with this?** Prevents the admin dashboard from becoming slow or unresponsive with a large user base.
+    -   **Should Test frontend/backend/both after fix:** backend
+    -   **Is recurring issue?** Y
 
 **Known issue recurrence from previous fork**
 -   None.
@@ -127,98 +120,99 @@ Issues Detail:
 
 
 **Key Technical Concepts**
--   **Frontend:** React, Tailwind CSS, shadcn/ui, Axios, React Router, Sonner
+-   **Frontend:** React, Tailwind CSS, shadcn/ui
 -   **Backend:** FastAPI, Motor (async MongoDB), Pydantic
+-   **Mobile:** React Native, Expo (EAS Build)
 -   **Database:** MongoDB
--   **Authentication:** JWT, Google/Apple OAuth (now configurable)
--   **Real-time Stats:** Heartbeat API endpoint () for tracking online users.
--   **Dynamic Configuration:** A  collection in MongoDB acts as a single source of truth for API keys, feature flags, and app settings, all manageable from the admin UI.
+-   **AI:** Anthropic Claude Sonnet 4 via direct  API calls.
+-   **PDF Generation:**  library.
 
 **key DB schema**
--   **users:**  (updated)
--   **settings:** , ,  (new)
--   **wallet_transactions:**  (new)
+-   **settings:** New documents added for:
+    -   
+    -   
 
 **changes in tech stack**
--   None.
+-   **Backend:** Added , . The AI implementation was switched from  to .
+-   **Mobile:**  was installed for build attempts. The agent was about to add  and .
 
 **All files of reference**
--   : The new, all-in-one control panel for the admin.
--   : Contains the new user management interface.
--   : The backend for all dynamic configuration.
--   : The backend for the application funding wallet.
--   : The backend for banning/deleting users.
--   : Contains the new heartbeat implementation for live user tracking.
--   : Updated to reflect the new admin capabilities.
+-   
+-   
+-   
+-   
+-   
+-   
+-   
 
 **Areas that need refactoring**:
--   The  and  components are very large and handle a lot of state and logic. They should be broken down into smaller, single-responsibility components (e.g., , , ) to improve maintainability.
+-   The  component is now extremely large and manages state for Dashboard, Payments, OAuth, Email, Ads, Points, Reports, and AI. It urgently needs to be broken down, with each tab's content fully encapsulated in its own component.
 
 **key api endpoints**
--   : Manage payment API keys.
--   : Manage OAuth credentials and status.
--   : Manage global app settings like maintenance mode.
--   : Get wallet balance and transactions.
--   : Create a Stripe session for funding the wallet.
--   : Clear the wallet (for testing).
--   : Get a paginated list of users (admin excluded).
--   : Ban a user.
--   : Unban a user.
--   : Delete a user.
+-   
+-   
+-   
+-   
+-   
+-   All  endpoints (generate-response, summarize, chat, etc.)
 
 **Critical Info for New Agent**
--   The user wants a fully-functional, real application with no mock data. The central point of control is now the Admin Dashboard and its Settings tab.
--   The highest priority is to confirm with the user that the user management fixes (delete, ban, admin protection) are working as expected.
--   The next logical step is to guide the user to input their real API keys (Stripe, Google, Apple, etc.) into the new settings panel to unblock the remaining integration tasks.
--   The agent should not proceed with building out the mobile app until the core web functionalities, especially payments and auth, are fully implemented and verified.
+-   The highest priority is to continue the **UI/UX & AI Feature Enhancement** task. The user has a creative vision for a more polished app.
+-   The second most critical issue is the **blocked APK build**. You cannot solve this directly. You must explain the technical limitation of the non-interactive environment and provide the user with the code and clear instructions to build the APK on their own machine. This will unblock them and manage their expectations.
+-   The AI integration is live and uses a key provided by the user. Be mindful of this when testing.
+-   The foundational code for payouts, reports, and push notifications exists but is not functional. These are the next big features to tackle after the current UI/UX task.
 
 **documents and test reports created in this job**
--    (updated extensively)
+-    (updated)
+-    (new)
+-    (new)
+-   and other related AI documentation.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Requests to remove fake deposits and fix the real money deposit functionality in the admin wallet. (Agent implemented)
-2.  **User:** Asks to ensure all user statistics (online/offline) in the admin panel are real and not mocked, and to add any other important missing features. (Agent implemented heartbeat and added user management)
-3.  **User:** Reports that banning and deleting users is not working. (Agent investigated)
-4.  **User:** Reports that deleting users is not working and requests that the admin's own ID be secured and not shown in the user list. (Agent fixed both issues and redesigned the user list)
-5.  **User:** Asks to redesign the crowded admin dashboard tabs and fix a lingering translation issue on the login page. (Agent implemented)
-6.  **User:** Asks to move the watching now count to the top right of the ad viewer and remove some other icons. (Agent implemented)
-7.  **User:** Asks what is missing and if the app is ready. (Agent provided a status report)
-8.  **User:** Requests a major expansion of the admin dashboard to include a full data panel, maintenance mode, emergency controls, and the ability to configure all optional features from the UI. (Agent implemented)
-9.  **User:** Requests an option in the admin panel to add funds to the application to pay for user withdrawals, using a real bank account or other financial method. (Agent implemented the App Wallet system)
-10. **User:** Clarifies that the Google/Apple login options should be configurable from the admin panel, where they can input API keys after registering with those services. Also states that the wallet should use real money. (Agent implemented configurable OAuth settings)
+1.  **User:** Activate the AI.
+2.  **User:** Provided a curl command with an Anthropic API key to test.
+3.  **User:** A comprehensive request to add AI features for the admin, add an AI icon for the user, and redesign the ad viewer to be more professional (hide UI, add point-earned notification), and generally improve the app.
+4.  **User:** Provided an Expo account username () and asked to verify the points system.
+5.  **User:** Provided an Expo token.
+6.  **User:** Asked about a missing preview profile in .
+7.  **User:** Uploaded a zip file () with updated code and asked to make it the primary source.
+8.  **User:** Asked if the new code contains AI files.
+9.  **User:** Said they will send an updated file and to wait.
+10. **Pending User Message:** The user has not sent the new file mentioned in the previous message. The agent proceeded based on the Activate the AI message.
 
 **Project Health Check:**
 -   **Broken:**
-    -   None.
+    -   Mobile App APK Build process.
 -   **Mocked:**
-    -   Backend payment logic for Tap, Tabby, Tamara, STC Pay, and PayPal (UI and key storage exist).
-    -   Backend logic for Apple & Google OAuth (UI and key storage exist).
+    -   Backend payment logic for most gateways (Tap, PayPal, etc.).
+    -   Backend logic for Apple & Google OAuth.
+    -   Payout processing logic.
 -   **Incomplete/Scaffolded:**
-    -   The React Native Mobile App () UI is not built.
-    -   The final withdrawal processing logic (paying out to users).
+    -   React Native Mobile App UI needs a major overhaul as per the user's latest request.
+    -   Push notification service logic is a placeholder.
 
 **3rd Party Integrations**
--   **Emergent-managed Google Auth:** Integrated, now configurable from admin panel.
--   **Stripe (Payments):** Integrated for admin deposits, now configurable from admin panel.
--   **Firebase Admin SDK (Push Notifications):** Integrated.
--   **Tap Payments:** Planned, requires User API Key (configurable in admin panel).
--   **Tabby:** Planned, requires User API Key (configurable in admin panel).
--   **Tamara:** Planned, requires User API Key (configurable in admin panel).
--   **STC Pay:** Planned, requires User API Key (configurable in admin panel).
--   **PayPal:** Planned, requires User API Key (configurable in admin panel).
--   **Apple OAuth:** Planned, requires User Keys/Secrets (configurable in admin panel).
+-   **Anthropic Claude Sonnet 4:** (Text Generation) Fully integrated. Requires User API key (already provided and configured).
+-   **Stripe (Payments):** Partially integrated.
+-   **Firebase Admin SDK (Push Notifications):** Integrated, requires user to provide service account JSON.
+-   **Resend (Email):** Fully integrated.
+-   **Emergent-managed Google Auth:** Configurable, backend logic pending.
+-   **Other Payment/Ad Gateways:** UI exists for configuration, but backend logic is missing.
 
 **Testing status**
 -   Testing agent used after significant changes: NO
 -   Troubleshoot agent used after agent stuck in loop: NO
--   Test files created: []
+-   Test files created:
+    -   
 -   Known regressions: None.
 
 **Credentials to test flow:**
 -   **Admin User:**
     -   Email: 
     -   Password: 
--   **Regular User:** Can be created via the registration form.
+-   **Expo Account:**
+    -   Username:  (Token was provided but is session-specific).
 
 **What agent forgot to execute**
--   The agent successfully implemented all user requests. However, the newly created large components like  and  were not broken down into smaller sub-components, which could create technical debt and make future modifications more difficult.</analysis>
+-   The agent did not refactor the large  component, which is a recurring source of technical debt. Instead of breaking it down, more tabs were added, making the problem worse.
+-   The N+1 query issue identified in a previous fork remains unaddressed.</analysis>
