@@ -151,6 +151,24 @@ api_router.include_router(security_router)
 # Include the router in the main app
 app.include_router(api_router)
 
+# ROOT LEVEL health check endpoint for Kubernetes liveness/readiness probes
+@app.get("/health")
+async def root_health_check():
+    """Root-level health check endpoint for Kubernetes deployment"""
+    try:
+        # Test database connection
+        await db.command("ping")
+        db_status = "connected"
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+    
+    return {
+        "status": "healthy",
+        "database": db_status,
+        "version": "1.0.0",
+        "service": "saqr-api"
+    }
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
