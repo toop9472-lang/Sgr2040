@@ -84,21 +84,47 @@ async def get_dashboard_stats(admin = Depends(verify_admin)):
 @router.get('/withdrawals/pending')
 async def get_pending_withdrawals(admin = Depends(verify_admin)):
     """
-    Get all pending withdrawal requests
+    Get all pending withdrawal requests with user info using aggregation
     """
     db = get_db()
     
-    withdrawals = await db.withdrawals.find(
-        {'status': 'pending'},
-        {'_id': 0}  # Exclude MongoDB _id
-    ).sort('created_at', -1).to_list(100)
+    # Use aggregation with $lookup to avoid N+1 query problem
+    pipeline = [
+        {'$match': {'status': 'pending'}},
+        {'$sort': {'created_at': -1}},
+        {'$limit': 100},
+        {
+            '$lookup': {
+                'from': 'users',
+                'localField': 'user_id',
+                'foreignField': 'id',
+                'as': 'user_info'
+            }
+        },
+        {
+            '$unwind': {
+                'path': '$user_info',
+                'preserveNullAndEmptyArrays': True
+            }
+        },
+        {
+            '$project': {
+                '_id': 0,
+                'id': 1,
+                'user_id': 1,
+                'amount': 1,
+                'method': 1,
+                'method_name': 1,
+                'details': 1,
+                'status': 1,
+                'created_at': 1,
+                'user_name': '$user_info.name',
+                'user_email': '$user_info.email'
+            }
+        }
+    ]
     
-    # Get user info for each withdrawal
-    for withdrawal in withdrawals:
-        user = await db.users.find_one({'id': withdrawal['user_id']}, {'_id': 0})
-        if user:
-            withdrawal['user_name'] = user['name']
-            withdrawal['user_email'] = user['email']
+    withdrawals = await db.withdrawals.aggregate(pipeline).to_list(100)
     
     return {'withdrawals': withdrawals}
 
