@@ -73,6 +73,23 @@ class StatusCheckCreate(BaseModel):
 async def root():
     return {"message": "Saqr API - Welcome to the Advertising Platform"}
 
+@api_router.get("/health")
+async def health_check():
+    """Health check endpoint for deployment verification"""
+    try:
+        # Test database connection
+        await db.command("ping")
+        db_status = "connected"
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+    
+    return {
+        "status": "healthy",
+        "database": db_status,
+        "version": "1.0.0",
+        "service": "saqr-api"
+    }
+
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
     status_dict = input.model_dump()
