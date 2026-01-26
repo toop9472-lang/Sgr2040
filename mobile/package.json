@@ -11,7 +11,8 @@
     "build:ios": "eas build -p ios --profile preview",
     "build:production": "eas build --profile production",
     "submit:android": "eas submit -p android",
-    "submit:ios": "eas submit -p ios"
+    "submit:ios": "eas submit -p ios",
+    "export": "npx expo export"
   },
   "dependencies": {
     "expo": "~51.0.0",
