@@ -487,6 +487,192 @@ const ReportsAndNotifications = ({ adminToken }) => {
           </Card>
         </div>
       )}
+
+      {/* Firebase FCM Tab */}
+      {activeTab === 'firebase' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Firebase Settings Form */}
+          <Card className={firebaseSettings.fcm_enabled ? 'border-2 border-orange-200' : ''}>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <img src="https://www.gstatic.com/devrel-devsite/prod/v1bfd8c2f27fc05434f7eb23f2c2cba58b7c52c46231a22b7f8a06cae89d7bf1d/firebase/images/touchicon-180.png" alt="Firebase" className="w-6 h-6" />
+                  Firebase Cloud Messaging
+                </CardTitle>
+                <Switch
+                  checked={firebaseSettings.fcm_enabled}
+                  onCheckedChange={(checked) => setFirebaseSettings(prev => ({ ...prev, fcm_enabled: checked }))}
+                />
+              </div>
+              <CardDescription>
+                إرسال إشعارات Push للأجهزة عبر Firebase FCM
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {firebaseSettings.fcm_enabled && (
+                <>
+                  {/* Project ID */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Project ID</label>
+                    <Input
+                      value={firebaseSettings.firebase_project_id}
+                      onChange={(e) => setFirebaseSettings(prev => ({ ...prev, firebase_project_id: e.target.value }))}
+                      placeholder="your-project-id"
+                      dir="ltr"
+                    />
+                  </div>
+
+                  {/* Client Email */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Client Email (Service Account)</label>
+                    <Input
+                      value={firebaseSettings.firebase_client_email}
+                      onChange={(e) => setFirebaseSettings(prev => ({ ...prev, firebase_client_email: e.target.value }))}
+                      placeholder="firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com"
+                      dir="ltr"
+                    />
+                  </div>
+
+                  {/* Private Key */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Private Key</label>
+                    <div className="relative">
+                      <Textarea
+                        value={firebaseSettings.firebase_private_key}
+                        onChange={(e) => setFirebaseSettings(prev => ({ ...prev, firebase_private_key: e.target.value }))}
+                        placeholder="-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBg..."
+                        rows={4}
+                        dir="ltr"
+                        className={!showKeys['firebase_key'] ? 'font-mono text-xs' : ''}
+                        style={!showKeys['firebase_key'] ? { WebkitTextSecurity: 'disc' } : {}}
+                      />
+                      <button 
+                        onClick={() => toggleShowKey('firebase_key')} 
+                        className="absolute left-3 top-3 text-gray-400 hover:text-gray-600"
+                      >
+                        {showKeys['firebase_key'] ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      انسخ المفتاح الخاص من ملف JSON الذي حملته من Firebase
+                    </p>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={saveFirebaseSettings}
+                      disabled={firebaseLoading}
+                      className="flex-1 gap-2"
+                    >
+                      {firebaseLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                      حفظ الإعدادات
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={testFCMConnection}
+                      disabled={firebaseLoading || !firebaseSettings.firebase_project_id}
+                      className="gap-2"
+                    >
+                      {firebaseLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                      اختبار الاتصال
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {!firebaseSettings.fcm_enabled && (
+                <div className="text-center py-8 text-gray-500">
+                  <Bell className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <p>فعّل FCM لإرسال إشعارات Push</p>
+                  <p className="text-sm">الإشعارات حالياً تستخدم Expo Push فقط</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Instructions Card */}
+          <Card className="bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg text-orange-700">
+                📋 كيفية الحصول على بيانات Firebase
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3 text-sm">
+                <div className="flex gap-2">
+                  <span className="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">1</span>
+                  <div>
+                    <p className="font-medium">اذهب إلى Firebase Console</p>
+                    <a 
+                      href="https://console.firebase.google.com/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-orange-600 hover:underline flex items-center gap-1"
+                    >
+                      console.firebase.google.com <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <span className="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">2</span>
+                  <div>
+                    <p className="font-medium">اختر مشروعك أو أنشئ مشروع جديد</p>
+                    <p className="text-gray-500">أدخل اسم المشروع واتبع الخطوات</p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <span className="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">3</span>
+                  <div>
+                    <p className="font-medium">اذهب إلى Project Settings</p>
+                    <p className="text-gray-500">⚙️ Settings → Project Settings → Service accounts</p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <span className="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">4</span>
+                  <div>
+                    <p className="font-medium">Generate New Private Key</p>
+                    <p className="text-gray-500">سيتم تحميل ملف JSON يحتوي على:</p>
+                    <ul className="text-xs text-gray-400 mt-1 space-y-1 mr-3">
+                      <li>• <code className="bg-gray-100 px-1 rounded">project_id</code></li>
+                      <li>• <code className="bg-gray-100 px-1 rounded">client_email</code></li>
+                      <li>• <code className="bg-gray-100 px-1 rounded">private_key</code></li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <span className="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">5</span>
+                  <div>
+                    <p className="font-medium">انسخ البيانات هنا</p>
+                    <p className="text-gray-500">افتح ملف JSON وانسخ القيم الثلاث</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 p-3 bg-orange-100 rounded-lg">
+                <p className="text-xs text-orange-700 font-medium mb-1">⚠️ ملاحظة مهمة</p>
+                <p className="text-xs text-orange-600">
+                  لا تشارك ملف Service Account مع أي شخص. يحتوي على بيانات حساسة للوصول لمشروعك.
+                </p>
+              </div>
+
+              <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                <p className="text-xs text-green-700 font-medium mb-1">✅ ما الفائدة؟</p>
+                <ul className="text-xs text-green-600 space-y-1">
+                  <li>• إرسال إشعارات لأجهزة Android مباشرة</li>
+                  <li>• دعم إشعارات iOS بشكل كامل</li>
+                  <li>• موثوقية أعلى من Expo Push</li>
+                  <li>• تحليلات متقدمة في Firebase Console</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
