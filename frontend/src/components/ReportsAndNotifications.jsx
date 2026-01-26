@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
+import { Switch } from './ui/switch';
 import { 
   FileText, 
   Download, 
@@ -12,7 +13,14 @@ import {
   Smartphone,
   TrendingUp,
   DollarSign,
-  Loader2
+  Loader2,
+  Settings,
+  CheckCircle,
+  XCircle,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Save
 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
@@ -23,6 +31,16 @@ const ReportsAndNotifications = ({ adminToken }) => {
   const [activeTab, setActiveTab] = useState('reports');
   const [loading, setLoading] = useState(false);
   const [notificationStats, setNotificationStats] = useState(null);
+  const [showKeys, setShowKeys] = useState({});
+  
+  // Firebase settings
+  const [firebaseSettings, setFirebaseSettings] = useState({
+    fcm_enabled: false,
+    firebase_project_id: '',
+    firebase_client_email: '',
+    firebase_private_key: ''
+  });
+  const [firebaseLoading, setFirebaseLoading] = useState(false);
   
   // Notification form
   const [notificationForm, setNotificationForm] = useState({
