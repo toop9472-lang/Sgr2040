@@ -146,6 +146,7 @@ api_router.include_router(points_settings_router)
 api_router.include_router(reports_router)
 api_router.include_router(claude_ai_router)
 api_router.include_router(dev_requests_router)
+api_router.include_router(security_router)
 
 # Include the router in the main app
 app.include_router(api_router)
