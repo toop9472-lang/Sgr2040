@@ -219,6 +219,9 @@ const AdminSettings = () => {
           <TabsTrigger value="rewarded" className="flex items-center gap-1 text-xs">
             <Gift className="w-3 h-3" /> إعلانات المكافآت
           </TabsTrigger>
+          <TabsTrigger value="admob" className="flex items-center gap-1 text-xs">
+            <Tv className="w-3 h-3" /> AdMob
+          </TabsTrigger>
           <TabsTrigger value="ai" className="flex items-center gap-1 text-xs">
             <Bot className="w-3 h-3" /> الذكاء الاصطناعي
           </TabsTrigger>
