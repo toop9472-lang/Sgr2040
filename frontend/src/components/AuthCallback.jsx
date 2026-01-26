@@ -48,6 +48,11 @@ const AuthCallback = () => {
 
         const data = await response.json();
 
+        // Store user token for API calls (if provided)
+        if (data.token) {
+          localStorage.setItem('user_token', data.token);
+        }
+
         // Navigate to home with user data
         navigate('/', { 
           replace: true, 
