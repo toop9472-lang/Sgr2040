@@ -629,6 +629,11 @@ const AdminDashboard = ({ admin, onLogout }) => {
             )}
           </TabsContent>
 
+          {/* AI Assistant Tab */}
+          <TabsContent value="ai-assistant" className="mt-4">
+            <AdminAIAssistant adminToken={localStorage.getItem('admin_token')} />
+          </TabsContent>
+
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="mt-4">
             <AnalyticsContent />
