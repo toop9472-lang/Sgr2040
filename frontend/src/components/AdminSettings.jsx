@@ -11,13 +11,14 @@ import {
   AlertTriangle, Settings, Wrench, Globe, Phone, Mail,
   Users, DollarSign, TrendingUp, Activity, Power, Ban,
   MessageSquare, Link, Clock, Wallet, Send, CheckCircle, XCircle, Gift,
-  FileText, Bell
+  FileText, Bell, Bot
 } from 'lucide-react';
 import axios from 'axios';
 import AdminWallet from './AdminWallet';
 import RewardedAdsSettings from './RewardedAdsSettings';
 import PointsSystemSettings from './PointsSystemSettings';
 import ReportsAndNotifications from './ReportsAndNotifications';
+import AIModelSettings from './AIModelSettings';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
