@@ -496,3 +496,111 @@ def mask_key(key: str) -> str:
     if len(key) <= 8:
         return '****' + key[-2:] if len(key) > 2 else '****'
     return '****' + key[-4:]
+
+
+# === Push Notifications Settings ===
+
+class PushNotificationSettings(BaseModel):
+    fcm_enabled: bool = False
+    firebase_project_id: Optional[str] = None
+    firebase_client_email: Optional[str] = None
+    firebase_private_key: Optional[str] = None
+
+
+@router.get('/push-notifications')
+async def get_push_notification_settings(user_id: str = Depends(get_current_user_id)):
+    """Get push notification settings (admin only)"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    settings = await db.settings.find_one({'type': 'push_notifications'}, {'_id': 0})
+    
+    if not settings:
+        return {
+            'fcm_enabled': False,
+            'firebase_project_id': '',
+            'firebase_client_email': '',
+            'firebase_private_key': ''
+        }
+    
+    return {
+        'fcm_enabled': settings.get('fcm_enabled', False),
+        'firebase_project_id': settings.get('firebase_project_id', ''),
+        'firebase_client_email': settings.get('firebase_client_email', ''),
+        # Return masked private key for security
+        'firebase_private_key': '****KEY_SAVED****' if settings.get('firebase_private_key') else ''
+    }
+
+
+@router.post('/push-notifications')
+async def update_push_notification_settings(
+    settings: PushNotificationSettings,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Update push notification settings (admin only)"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    update_data = {
+        'type': 'push_notifications',
+        'fcm_enabled': settings.fcm_enabled,
+        'firebase_project_id': settings.firebase_project_id,
+        'firebase_client_email': settings.firebase_client_email,
+        'updated_at': datetime.utcnow()
+    }
+    
+    # Only update private key if it's not the masked value
+    if settings.firebase_private_key and settings.firebase_private_key != '****KEY_SAVED****':
+        update_data['firebase_private_key'] = settings.firebase_private_key
+    else:
+        # Keep existing private key
+        existing = await db.settings.find_one({'type': 'push_notifications'}, {'_id': 0})
+        if existing and existing.get('firebase_private_key'):
+            update_data['firebase_private_key'] = existing['firebase_private_key']
+    
+    await db.settings.update_one(
+        {'type': 'push_notifications'},
+        {'$set': update_data},
+        upsert=True
+    )
+    
+    return {'success': True, 'message': 'تم حفظ إعدادات الإشعارات بنجاح'}
+
+
+@router.post('/push-notifications/test')
+async def test_push_notification_connection(user_id: str = Depends(get_current_user_id)):
+    """Test Firebase FCM connection"""
+    from services.push_notification_service import FCMService
+    
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    settings = await db.settings.find_one({'type': 'push_notifications'}, {'_id': 0})
+    
+    if not settings or not settings.get('fcm_enabled'):
+        return {'success': False, 'error': 'FCM غير مفعل'}
+    
+    if not settings.get('firebase_project_id') or not settings.get('firebase_private_key'):
+        return {'success': False, 'error': 'بيانات Firebase غير مكتملة'}
+    
+    # Test FCM connection
+    fcm = FCMService()
+    await fcm.initialize_from_settings(settings)
+    
+    if not fcm.is_configured():
+        return {'success': False, 'error': 'فشل في تهيئة FCM'}
+    
+    # Try to get access token
+    try:
+        token = await fcm.get_access_token()
+        if token:
+            return {
+                'success': True,
+                'message': 'اتصال Firebase يعمل بشكل صحيح',
+                'project_id': settings.get('firebase_project_id')
+            }
+        else:
+            return {'success': False, 'error': 'فشل في الحصول على token من Firebase'}
+    except Exception as e:
+        return {'success': False, 'error': f'خطأ: {str(e)}'}
+
