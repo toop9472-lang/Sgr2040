@@ -4,30 +4,18 @@
     "appVersionSource": "local"
   },
   "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk",
-        "gradleCommand": ":app:assembleDebug"
-      }
-    },
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "credentialsSource": "local"
       }
     },
     "production": {
       "android": {
-        "buildType": "app-bundle"
-      },
-      "ios": {
-        "resourceClass": "m-medium"
+        "buildType": "app-bundle",
+        "credentialsSource": "local"
       }
     }
-  },
-  "submit": {
-    "production": {}
   }
 }
