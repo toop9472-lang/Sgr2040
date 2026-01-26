@@ -11,8 +11,6 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'https://saqr-ads.preview.emergentagent.com';
-
 export default function App() {
   const [screen, setScreen] = useState('loading');
   const [points, setPoints] = useState(0);
@@ -30,7 +28,7 @@ export default function App() {
           const newTime = prev + 1;
           if (newTime >= 60) {
             setPoints(p => p + 1);
-            Alert.alert('🎉 مبروك!', 'حصلت على 1 نقطة!');
+            Alert.alert('مبروك!', 'حصلت على 1 نقطة!');
             return 0;
           }
           return newTime;
@@ -71,7 +69,6 @@ export default function App() {
     setUserName('');
   };
 
-  // Loading Screen
   if (screen === 'loading') {
     return (
       <View style={styles.loadingContainer}>
@@ -82,7 +79,6 @@ export default function App() {
     );
   }
 
-  // Login Screen
   if (screen === 'login') {
     return (
       <View style={styles.loginContainer}>
@@ -100,38 +96,33 @@ export default function App() {
     );
   }
 
-  // Home Screen
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
       
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={logout}>
           <Text style={styles.logoutText}>خروج</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>صقر</Text>
         <View style={styles.pointsBadge}>
-          <Text style={styles.pointsText}>🪙 {points}</Text>
+          <Text style={styles.pointsText}>{points} نقطة</Text>
         </View>
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Welcome */}
         <View style={styles.welcomeCard}>
-          <Text style={styles.welcomeText}>مرحباً {userName}! 👋</Text>
+          <Text style={styles.welcomeText}>مرحبا {userName}!</Text>
         </View>
 
-        {/* Progress Card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>⏱️ وقت المشاهدة</Text>
+          <Text style={styles.cardTitle}>وقت المشاهدة</Text>
           <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: `${(watchTime / 60) * 100}%` }]} />
+            <View style={[styles.progressFill, { width: (watchTime / 60 * 100) + '%' }]} />
           </View>
-          <Text style={styles.progressText}>{watchTime}/60 ثانية للنقطة التالية</Text>
+          <Text style={styles.progressText}>{watchTime}/60 ثانية</Text>
         </View>
 
-        {/* Stats */}
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statNumber}>{points}</Text>
@@ -143,18 +134,15 @@ export default function App() {
           </View>
         </View>
 
-        {/* Info Card */}
         <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>💡 كيف تكسب النقاط؟</Text>
-          <Text style={styles.infoText}>• ابقَ في التطبيق لمدة دقيقة = 1 نقطة</Text>
-          <Text style={styles.infoText}>• 500 نقطة = 1 دولار</Text>
-          <Text style={styles.infoText}>• اسحب عبر PayPal أو STC Pay</Text>
+          <Text style={styles.infoTitle}>كيف تكسب النقاط؟</Text>
+          <Text style={styles.infoText}>ابق في التطبيق دقيقة = 1 نقطة</Text>
+          <Text style={styles.infoText}>500 نقطة = 1 دولار</Text>
         </View>
 
-        {/* Withdraw Button */}
         {points >= 500 && (
           <TouchableOpacity style={styles.withdrawButton}>
-            <Text style={styles.withdrawButtonText}>💰 اسحب أرباحك</Text>
+            <Text style={styles.withdrawButtonText}>اسحب ارباحك</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -265,11 +253,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 16,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   cardTitle: {
     fontSize: 18,
@@ -306,11 +289,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   statNumber: {
     fontSize: 36,
@@ -326,8 +304,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#EEF2FF',
     padding: 20,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#C7D2FE',
     marginBottom: 16,
   },
   infoTitle: {
