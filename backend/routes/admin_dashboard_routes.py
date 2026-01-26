@@ -531,3 +531,230 @@ async def reject_ad(
         asyncio.create_task(send_ad_rejection_email())
     
     return {'success': True, 'message': 'تم رفض الإعلان'}
+
+
+@router.delete('/ads/{ad_id}')
+async def delete_ad(
+    ad_id: str,
+    admin = Depends(verify_admin)
+):
+    """
+    Delete an ad completely (from both collections)
+    """
+    db = get_db()
+    
+    # Delete from advertiser_ads
+    result1 = await db.advertiser_ads.delete_one({'id': ad_id})
+    
+    # Delete from main ads collection
+    result2 = await db.ads.delete_one({'id': ad_id})
+    
+    if result1.deleted_count == 0 and result2.deleted_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='الإعلان غير موجود'
+        )
+    
+    return {'success': True, 'message': 'تم حذف الإعلان نهائياً'}
+
+
+@router.get('/ads/all')
+async def get_all_ads(admin = Depends(verify_admin)):
+    """
+    Get all ads (active, pending, rejected)
+    """
+    db = get_db()
+    
+    # Get from main ads collection
+    main_ads = await db.ads.find({}, {'_id': 0}).sort('created_at', -1).to_list(500)
+    
+    # Get from advertiser_ads
+    advertiser_ads = await db.advertiser_ads.find({}, {'_id': 0}).sort('created_at', -1).to_list(500)
+    
+    return {
+        'main_ads': main_ads,
+        'advertiser_ads': advertiser_ads,
+        'total_main': len(main_ads),
+        'total_advertiser': len(advertiser_ads)
+    }
+
+
+@router.put('/ads/{ad_id}/deactivate')
+async def deactivate_ad(
+    ad_id: str,
+    admin = Depends(verify_admin)
+):
+    """
+    Deactivate an ad without deleting it
+    """
+    db = get_db()
+    
+    # Update in both collections
+    await db.ads.update_one({'id': ad_id}, {'$set': {'is_active': False}})
+    await db.advertiser_ads.update_one({'id': ad_id}, {'$set': {'status': 'inactive', 'is_active': False}})
+    
+    return {'success': True, 'message': 'تم إيقاف الإعلان'}
+
+
+@router.put('/ads/{ad_id}/activate')
+async def activate_ad(
+    ad_id: str,
+    admin = Depends(verify_admin)
+):
+    """
+    Activate a deactivated ad
+    """
+    db = get_db()
+    
+    # Update in both collections
+    await db.ads.update_one({'id': ad_id}, {'$set': {'is_active': True}})
+    await db.advertiser_ads.update_one({'id': ad_id}, {'$set': {'status': 'active', 'is_active': True}})
+    
+    return {'success': True, 'message': 'تم تفعيل الإعلان'}
+
+
+# AI Auto-Approval Settings
+@router.get('/ai-approval/settings')
+async def get_ai_approval_settings(admin = Depends(verify_admin)):
+    """
+    Get AI auto-approval settings
+    """
+    db = get_db()
+    settings = await db.settings.find_one({'type': 'ai_approval'}, {'_id': 0})
+    
+    if not settings:
+        return {
+            'enabled': False,
+            'auto_approve_paid': True,
+            'content_check': True,
+            'require_video': True,
+            'min_duration': 15,
+            'max_duration': 300
+        }
+    
+    return settings
+
+
+@router.put('/ai-approval/settings')
+async def update_ai_approval_settings(
+    data: dict,
+    admin = Depends(verify_admin)
+):
+    """
+    Update AI auto-approval settings
+    """
+    db = get_db()
+    
+    update_data = {
+        'type': 'ai_approval',
+        'enabled': data.get('enabled', False),
+        'auto_approve_paid': data.get('auto_approve_paid', True),
+        'content_check': data.get('content_check', True),
+        'require_video': data.get('require_video', True),
+        'min_duration': data.get('min_duration', 15),
+        'max_duration': data.get('max_duration', 300),
+        'updated_at': datetime.utcnow()
+    }
+    
+    await db.settings.update_one(
+        {'type': 'ai_approval'},
+        {'$set': update_data},
+        upsert=True
+    )
+    
+    return {'success': True, 'message': 'تم تحديث إعدادات الموافقة التلقائية'}
+
+
+@router.post('/ai-approval/process/{ad_id}')
+async def ai_process_ad(
+    ad_id: str,
+    admin = Depends(verify_admin)
+):
+    """
+    Process ad with AI for auto-approval
+    """
+    db = get_db()
+    
+    # Get AI settings
+    settings = await db.settings.find_one({'type': 'ai_approval'}, {'_id': 0})
+    if not settings or not settings.get('enabled'):
+        return {'success': False, 'message': 'الموافقة التلقائية معطلة'}
+    
+    # Get ad
+    ad = await db.advertiser_ads.find_one({'id': ad_id}, {'_id': 0})
+    if not ad:
+        raise HTTPException(status_code=404, detail='الإعلان غير موجود')
+    
+    # Validate ad
+    issues = []
+    
+    # Check video URL
+    if settings.get('require_video') and not ad.get('video_url'):
+        issues.append('الإعلان لا يحتوي على فيديو')
+    
+    # Check duration
+    duration = ad.get('duration', 0)
+    if duration < settings.get('min_duration', 15):
+        issues.append(f'مدة الإعلان قصيرة جداً (الحد الأدنى: {settings.get("min_duration")} ثانية)')
+    if duration > settings.get('max_duration', 300):
+        issues.append(f'مدة الإعلان طويلة جداً (الحد الأقصى: {settings.get("max_duration")} ثانية)')
+    
+    # Check payment if required
+    if settings.get('auto_approve_paid') and ad.get('payment_status') != 'paid':
+        issues.append('لم يتم دفع رسوم الإعلان بعد')
+    
+    # Check basic content
+    if not ad.get('title') or len(ad.get('title', '')) < 3:
+        issues.append('عنوان الإعلان قصير جداً')
+    if not ad.get('description') or len(ad.get('description', '')) < 10:
+        issues.append('وصف الإعلان قصير جداً')
+    
+    # If no issues, auto-approve
+    if not issues:
+        # Calculate expiry date
+        expires_at = datetime.utcnow() + timedelta(days=30 * ad.get('duration_months', 1))
+        
+        # Update ad
+        await db.advertiser_ads.update_one(
+            {'id': ad_id},
+            {'$set': {
+                'status': 'active',
+                'is_active': True,
+                'approved_at': datetime.utcnow(),
+                'expires_at': expires_at,
+                'payment_status': 'paid',
+                'auto_approved': True,
+                'approved_by': 'AI'
+            }}
+        )
+        
+        # Add to main ads collection
+        main_ad = {
+            'id': ad_id,
+            'title': ad['title'],
+            'description': ad['description'],
+            'video_url': ad['video_url'],
+            'thumbnail_url': ad.get('thumbnail_url', ''),
+            'website_url': ad.get('website_url', ''),
+            'advertiser': ad['advertiser_name'],
+            'duration': ad['duration'],
+            'points_per_minute': 1,
+            'is_active': True,
+            'auto_approved': True,
+            'created_at': datetime.utcnow()
+        }
+        
+        await db.ads.insert_one(main_ad)
+        
+        return {
+            'success': True,
+            'approved': True,
+            'message': 'تمت الموافقة على الإعلان تلقائياً بواسطة الذكاء الاصطناعي'
+        }
+    else:
+        return {
+            'success': True,
+            'approved': False,
+            'issues': issues,
+            'message': 'لم يتم الموافقة على الإعلان للأسباب التالية'
+        }
