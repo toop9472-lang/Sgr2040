@@ -376,6 +376,11 @@ const AdminSettings = () => {
           <RewardedAdsSettings />
         </TabsContent>
 
+        {/* AdMob Tab */}
+        <TabsContent value="admob">
+          <AdMobSettings adminToken={localStorage.getItem('admin_token')} />
+        </TabsContent>
+
         {/* Points System Tab */}
         <TabsContent value="points">
           <PointsSystemSettings />
