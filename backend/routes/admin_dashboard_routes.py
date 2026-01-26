@@ -108,7 +108,7 @@ async def approve_withdrawal(
     admin = Depends(verify_admin)
 ):
     """
-    Approve withdrawal request
+    Approve withdrawal request (without processing payout)
     """
     db = get_db()
     
@@ -170,6 +170,154 @@ async def approve_withdrawal(
     asyncio.create_task(send_withdrawal_email())
     
     return {'success': True, 'message': 'تمت الموافقة على طلب السحب'}
+
+
+@router.put('/withdrawals/{withdrawal_id}/process-payout')
+async def process_withdrawal_payout(
+    withdrawal_id: str,
+    admin = Depends(verify_admin)
+):
+    """
+    Process actual payout for approved withdrawal
+    Sends money via PayPal, STC Pay, or generates bank transfer instructions
+    """
+    from services.payout_service import process_withdrawal_payout
+    
+    db = get_db()
+    
+    # Get withdrawal
+    withdrawal = await db.withdrawals.find_one({'id': withdrawal_id})
+    if not withdrawal:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Withdrawal not found'
+        )
+    
+    if withdrawal.get('status') != 'approved':
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='يجب الموافقة على طلب السحب أولاً قبل معالجة الدفع'
+        )
+    
+    if withdrawal.get('payout_status') == 'completed':
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='تم معالجة هذا السحب مسبقاً'
+        )
+    
+    # Get payment gateway settings
+    settings = await db.settings.find_one({'type': 'payment_gateways'}, {'_id': 0})
+    
+    # Process payout
+    result = await process_withdrawal_payout(withdrawal, settings)
+    
+    if result.get('success'):
+        # Update withdrawal with payout info
+        await db.withdrawals.update_one(
+            {'id': withdrawal_id},
+            {'$set': {
+                'payout_status': 'completed',
+                'payout_batch_id': result.get('payout_batch_id'),
+                'payout_processed_at': datetime.utcnow(),
+                'payout_details': result
+            }}
+        )
+        
+        # Send notification to user
+        from routes.notification_routes import send_notification_to_user
+        await send_notification_to_user(
+            db=db,
+            user_id=withdrawal['user_id'],
+            title='💰 تم إرسال أموالك!',
+            body=f'تم تحويل {withdrawal.get("amount", 0):.2f} {withdrawal.get("currency", "USD")} إلى حسابك',
+            notification_type='payout_sent',
+            data={'withdrawal_id': withdrawal_id, 'amount': withdrawal.get('amount', 0)}
+        )
+        
+        return {
+            'success': True,
+            'message': 'تم إرسال الأموال بنجاح',
+            'payout_batch_id': result.get('payout_batch_id'),
+            'details': result
+        }
+    
+    elif result.get('requires_manual'):
+        # Mark as requiring manual processing
+        await db.withdrawals.update_one(
+            {'id': withdrawal_id},
+            {'$set': {
+                'payout_status': 'manual_required',
+                'payout_instructions': result.get('instructions') or result.get('details'),
+                'payout_message': result.get('message')
+            }}
+        )
+        
+        return {
+            'success': False,
+            'requires_manual': True,
+            'message': result.get('message', 'يتطلب معالجة يدوية'),
+            'instructions': result.get('instructions') or result.get('details')
+        }
+    
+    else:
+        # Payout failed
+        await db.withdrawals.update_one(
+            {'id': withdrawal_id},
+            {'$set': {
+                'payout_status': 'failed',
+                'payout_error': result.get('error')
+            }}
+        )
+        
+        return {
+            'success': False,
+            'message': 'فشل في إرسال الدفع',
+            'error': result.get('error')
+        }
+
+
+@router.put('/withdrawals/{withdrawal_id}/mark-paid')
+async def mark_withdrawal_paid(
+    withdrawal_id: str,
+    data: dict,
+    admin = Depends(verify_admin)
+):
+    """
+    Manually mark withdrawal as paid (for manual bank transfers, etc.)
+    """
+    db = get_db()
+    
+    withdrawal = await db.withdrawals.find_one({'id': withdrawal_id})
+    if not withdrawal:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Withdrawal not found'
+        )
+    
+    # Update withdrawal
+    await db.withdrawals.update_one(
+        {'id': withdrawal_id},
+        {'$set': {
+            'payout_status': 'completed',
+            'payout_processed_at': datetime.utcnow(),
+            'payout_reference': data.get('reference', ''),
+            'payout_note': data.get('note', ''),
+            'manually_marked_by': admin['email']
+        }}
+    )
+    
+    # Send notification to user
+    from routes.notification_routes import send_notification_to_user
+    await send_notification_to_user(
+        db=db,
+        user_id=withdrawal['user_id'],
+        title='💰 تم إرسال أموالك!',
+        body=f'تم تحويل {withdrawal.get("amount", 0):.2f} {withdrawal.get("currency", "USD")} إلى حسابك',
+        notification_type='payout_sent',
+        data={'withdrawal_id': withdrawal_id}
+    )
+    
+    return {'success': True, 'message': 'تم تحديث حالة السحب كمدفوع'}
 
 @router.put('/withdrawals/{withdrawal_id}/reject')
 async def reject_withdrawal(
