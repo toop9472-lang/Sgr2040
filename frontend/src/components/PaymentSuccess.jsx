@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Check, Loader2 } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
@@ -13,17 +13,7 @@ const PaymentSuccess = () => {
   const [status, setStatus] = useState('checking'); // checking, success, failed
   const [paymentData, setPaymentData] = useState(null);
 
-  useEffect(() => {
-    const sessionId = searchParams.get('session_id');
-    
-    if (sessionId) {
-      pollPaymentStatus(sessionId);
-    } else {
-      setStatus('failed');
-    }
-  }, [searchParams]);
-
-  const pollPaymentStatus = async (sessionId, attempts = 0) => {
+  const pollPaymentStatus = useCallback(async (sessionId, attempts = 0) => {
     const maxAttempts = 10;
     const pollInterval = 2000;
 
@@ -64,7 +54,17 @@ const PaymentSuccess = () => {
         setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
       }
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const sessionId = searchParams.get('session_id');
+    
+    if (sessionId) {
+      pollPaymentStatus(sessionId);
+    } else {
+      setStatus('failed');
+    }
+  }, [searchParams, pollPaymentStatus]);
 
   if (status === 'checking') {
     return (
