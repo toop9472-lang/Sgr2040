@@ -132,12 +132,72 @@ const ReportsAndNotifications = ({ adminToken }) => {
     if (activeTab === 'notifications') {
       loadNotificationStats();
     }
+    if (activeTab === 'firebase') {
+      loadFirebaseSettings();
+    }
   }, [activeTab]);
+
+  // Load Firebase settings
+  const loadFirebaseSettings = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/settings/push-notifications`, {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+      if (response.data) {
+        setFirebaseSettings({
+          fcm_enabled: response.data.fcm_enabled || false,
+          firebase_project_id: response.data.firebase_project_id || '',
+          firebase_client_email: response.data.firebase_client_email || '',
+          firebase_private_key: response.data.firebase_private_key || ''
+        });
+      }
+    } catch (error) {
+      console.error('Load Firebase settings error:', error);
+    }
+  };
+
+  // Save Firebase settings
+  const saveFirebaseSettings = async () => {
+    setFirebaseLoading(true);
+    try {
+      await axios.post(`${API_URL}/api/settings/push-notifications`, firebaseSettings, {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+      toast.success('تم حفظ إعدادات Firebase بنجاح');
+    } catch (error) {
+      console.error('Save Firebase error:', error);
+      toast.error('فشل في حفظ الإعدادات');
+    } finally {
+      setFirebaseLoading(false);
+    }
+  };
+
+  // Test FCM connection
+  const testFCMConnection = async () => {
+    setFirebaseLoading(true);
+    try {
+      const response = await axios.post(`${API_URL}/api/settings/push-notifications/test`, {}, {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+      if (response.data.success) {
+        toast.success('اتصال Firebase يعمل بشكل صحيح! ✅');
+      } else {
+        toast.error(response.data.error || 'فشل الاتصال');
+      }
+    } catch (error) {
+      console.error('Test FCM error:', error);
+      toast.error(error.response?.data?.detail || 'فشل اختبار الاتصال');
+    } finally {
+      setFirebaseLoading(false);
+    }
+  };
+
+  const toggleShowKey = (key) => setShowKeys(prev => ({ ...prev, [key]: !prev[key] }));
 
   return (
     <div className="space-y-6">
       {/* Tab Buttons */}
-      <div className="flex gap-2 border-b pb-4">
+      <div className="flex gap-2 border-b pb-4 flex-wrap">
         <Button
           variant={activeTab === 'reports' ? 'default' : 'outline'}
           onClick={() => setActiveTab('reports')}
@@ -153,6 +213,14 @@ const ReportsAndNotifications = ({ adminToken }) => {
         >
           <Bell className="w-4 h-4" />
           الإشعارات
+        </Button>
+        <Button
+          variant={activeTab === 'firebase' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('firebase')}
+          className="gap-2"
+        >
+          <Settings className="w-4 h-4" />
+          Firebase FCM
         </Button>
       </div>
 
