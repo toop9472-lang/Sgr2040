@@ -22,7 +22,10 @@
         "NSCameraUsageDescription": "نحتاج إذن الكاميرا لتحميل فيديوهات الإعلانات",
         "NSPhotoLibraryUsageDescription": "نحتاج إذن الصور لتحميل محتوى الإعلانات",
         "CFBundleAllowMixedLocalizations": true,
-        "GADApplicationIdentifier": "ca-app-pub-5132559433385403~XXXXXXXXXX"
+        "GADApplicationIdentifier": "ca-app-pub-5132559433385403~1073385732",
+        "SKAdNetworkItems": [
+          { "SKAdNetworkIdentifier": "cstr6suwn9.skadnetwork" }
+        ]
       },
       "config": {
         "usesNonExemptEncryption": false
@@ -42,7 +45,7 @@
         "com.google.android.gms.permission.AD_ID"
       ],
       "config": {
-        "googleMobileAdsAppId": "ca-app-pub-5132559433385403~XXXXXXXXXX"
+        "googleMobileAdsAppId": "ca-app-pub-5132559433385403~1073385732"
       }
     },
     "web": {
@@ -55,12 +58,21 @@
         {
           "microphonePermission": "السماح لـ صقر باستخدام الميكروفون"
         }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-5132559433385403~1073385732",
+          "iosAppId": "ca-app-pub-5132559433385403~1073385732"
+        }
       ]
     ],
     "owner": "ziyad333",
     "extra": {
       "apiUrl": "https://saqr-ads.preview.emergentagent.com",
       "admobPublisherId": "pub-5132559433385403",
+      "admobAppId": "ca-app-pub-5132559433385403~1073385732",
+      "admobRewardedAdUnitId": "ca-app-pub-5132559433385403/3389052725",
       "eas": {
         "projectId": "2a08ac90-1772-4377-bf99-af5d2357db30"
       }
