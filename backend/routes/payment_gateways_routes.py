@@ -62,12 +62,14 @@ async def get_payment_gateways_status():
     """
     Get configuration status of all payment gateways
     """
+    stripe_configured = bool(os.environ.get('STRIPE_API_KEY'))
+    
     return {
         'gateways': {
             'stripe': {
                 'name': 'Stripe',
                 'name_ar': 'سترايب',
-                'configured': bool(os.environ.get('STRIPE_API_KEY')),
+                'configured': stripe_configured,
                 'supported_currencies': ['USD', 'EUR', 'SAR', 'AED'],
                 'type': 'international',
                 'logo': '💳'
@@ -114,7 +116,58 @@ async def get_payment_gateways_status():
                 'supported_currencies': ['USD', 'EUR', 'GBP', 'SAR'],
                 'type': 'international',
                 'logo': '🅿️'
+            },
+            'applepay': {
+                'name': 'Apple Pay',
+                'name_ar': 'أبل باي',
+                'configured': stripe_configured,  # Apple Pay works through Stripe
+                'supported_currencies': ['USD', 'EUR', 'SAR', 'AED'],
+                'type': 'wallet',
+                'description': 'يعمل تلقائياً عبر Stripe للمستخدمين على أجهزة Apple',
+                'logo': '',
+                'requires': 'stripe',
+                'note': 'Apple Pay is automatically available when Stripe is configured. It appears as a payment option for users on compatible Apple devices.'
             }
+        }
+    }
+
+
+@router.get('/applepay/status')
+async def get_applepay_status():
+    """
+    Get Apple Pay configuration status
+    Apple Pay works through Stripe automatically
+    """
+    stripe_configured = bool(os.environ.get('STRIPE_API_KEY'))
+    
+    db = get_db()
+    settings = await db.settings.find_one({'type': 'payment_gateways'}, {'_id': 0})
+    
+    applepay_enabled = settings.get('applepay_enabled', False) if settings else False
+    applepay_merchant_id = settings.get('applepay_merchant_id', '') if settings else ''
+    
+    return {
+        'apple_pay': {
+            'enabled': applepay_enabled,
+            'functional': stripe_configured and applepay_enabled,
+            'stripe_configured': stripe_configured,
+            'merchant_id': applepay_merchant_id[:4] + '****' if applepay_merchant_id else '',
+            'status': 'active' if (stripe_configured and applepay_enabled) else 'inactive',
+            'message': 'Apple Pay يعمل بشكل صحيح عبر Stripe' if (stripe_configured and applepay_enabled) else 
+                       'يجب تفعيل Stripe لتشغيل Apple Pay' if not stripe_configured else
+                       'Apple Pay معطل في الإعدادات',
+            'how_it_works': [
+                'Apple Pay متاح تلقائياً في Stripe Checkout',
+                'يظهر لمستخدمي iPhone و iPad و Mac فقط',
+                'لا يحتاج إعداد إضافي - Stripe يدير العملية',
+                'تأكد من تفعيل Apple Pay في لوحة تحكم Stripe'
+            ],
+            'setup_steps': [
+                '1. فعّل Stripe وأدخل مفتاح API',
+                '2. اذهب إلى Stripe Dashboard → Settings → Payment Methods',
+                '3. فعّل Apple Pay من القائمة',
+                '4. سيظهر Apple Pay تلقائياً للمستخدمين المؤهلين'
+            ]
         }
     }
 
