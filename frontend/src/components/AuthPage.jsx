@@ -115,7 +115,11 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
         return;
       }
 
-      // Regular user login
+      // Regular user login - store token for API calls
+      if (data.token) {
+        localStorage.setItem('user_token', data.token);
+      }
+      
       toast({
         title: isRegister ? '✅ ' + t('success') : '✅ ' + t('login'),
         description: `${t('welcome')} ${data.user.name}!`,
