@@ -54,6 +54,7 @@ const AIChatModal = ({ isOpen, onClose, user }) => {
       
       // Get the correct token
       const token = localStorage.getItem('user_token') || localStorage.getItem('token') || localStorage.getItem('saqr_token') || '';
+      const isGuest = !token || user?.isGuest;
       
       // Prepare messages for API
       const chatMessages = messages.map(m => ({
@@ -62,12 +63,23 @@ const AIChatModal = ({ isOpen, onClose, user }) => {
       }));
       chatMessages.push({ role: 'user', content: userMessage });
 
-      const response = await fetch(`${API_URL}/api/claude-ai/chat`, {
+      // Use guest endpoint for users without token
+      const endpoint = isGuest 
+        ? `${API_URL}/api/claude-ai/chat/guest`
+        : `${API_URL}/api/claude-ai/chat`;
+      
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Only add Authorization header if we have a token
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers,
         credentials: 'include',
         body: JSON.stringify({
           messages: chatMessages.slice(-10), // Keep last 10 messages for context
