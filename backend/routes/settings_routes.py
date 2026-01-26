@@ -681,3 +681,113 @@ async def get_public_ai_models_settings():
         'available_for_all': settings.get('claude_haiku_enabled_for_all_clients', False) if settings else False
     }
 
+
+
+# === AdMob Settings ===
+
+class AdMobSettings(BaseModel):
+    admob_enabled: bool = False
+    admob_publisher_id: str = ''
+    admob_app_id_android: str = ''
+    admob_app_id_ios: str = ''
+    admob_rewarded_ad_unit_android: str = ''
+    admob_rewarded_ad_unit_ios: str = ''
+    points_per_rewarded_ad: int = 5
+    daily_rewarded_ad_limit: int = 20
+    cooldown_seconds: int = 30
+    verification_pending: bool = True
+
+
+@router.get('/admob')
+async def get_admob_settings(user_id: str = Depends(get_current_user_id)):
+    """Get AdMob settings (admin only)"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    settings = await db.settings.find_one({'type': 'admob'}, {'_id': 0})
+    
+    if not settings:
+        return {
+            'admob_enabled': False,
+            'admob_publisher_id': 'pub-5132559433385403',
+            'admob_app_id_android': '',
+            'admob_app_id_ios': '',
+            'admob_rewarded_ad_unit_android': '',
+            'admob_rewarded_ad_unit_ios': '',
+            'points_per_rewarded_ad': 5,
+            'daily_rewarded_ad_limit': 20,
+            'cooldown_seconds': 30,
+            'verification_pending': True
+        }
+    
+    return {
+        'admob_enabled': settings.get('admob_enabled', False),
+        'admob_publisher_id': settings.get('admob_publisher_id', ''),
+        'admob_app_id_android': settings.get('admob_app_id_android', ''),
+        'admob_app_id_ios': settings.get('admob_app_id_ios', ''),
+        'admob_rewarded_ad_unit_android': settings.get('admob_rewarded_ad_unit_android', ''),
+        'admob_rewarded_ad_unit_ios': settings.get('admob_rewarded_ad_unit_ios', ''),
+        'points_per_rewarded_ad': settings.get('points_per_rewarded_ad', 5),
+        'daily_rewarded_ad_limit': settings.get('daily_rewarded_ad_limit', 20),
+        'cooldown_seconds': settings.get('cooldown_seconds', 30),
+        'verification_pending': settings.get('verification_pending', True)
+    }
+
+
+@router.post('/admob')
+async def update_admob_settings(
+    settings: AdMobSettings,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Update AdMob settings (admin only)"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    update_data = {
+        'type': 'admob',
+        'admob_enabled': settings.admob_enabled,
+        'admob_publisher_id': settings.admob_publisher_id,
+        'admob_app_id_android': settings.admob_app_id_android,
+        'admob_app_id_ios': settings.admob_app_id_ios,
+        'admob_rewarded_ad_unit_android': settings.admob_rewarded_ad_unit_android,
+        'admob_rewarded_ad_unit_ios': settings.admob_rewarded_ad_unit_ios,
+        'points_per_rewarded_ad': settings.points_per_rewarded_ad,
+        'daily_rewarded_ad_limit': settings.daily_rewarded_ad_limit,
+        'cooldown_seconds': settings.cooldown_seconds,
+        'verification_pending': settings.verification_pending,
+        'updated_at': datetime.utcnow()
+    }
+    
+    await db.settings.update_one(
+        {'type': 'admob'},
+        {'$set': update_data},
+        upsert=True
+    )
+    
+    return {'success': True, 'message': 'تم حفظ إعدادات AdMob بنجاح'}
+
+
+@router.get('/public/admob')
+async def get_public_admob_settings():
+    """Get public AdMob settings for mobile app"""
+    db = get_db()
+    settings = await db.settings.find_one({'type': 'admob'}, {'_id': 0})
+    
+    if not settings or not settings.get('admob_enabled'):
+        return {
+            'enabled': False,
+            'points_per_ad': 5,
+            'daily_limit': 20,
+            'cooldown': 30
+        }
+    
+    return {
+        'enabled': True,
+        'app_id_android': settings.get('admob_app_id_android', ''),
+        'app_id_ios': settings.get('admob_app_id_ios', ''),
+        'rewarded_ad_unit_android': settings.get('admob_rewarded_ad_unit_android', ''),
+        'rewarded_ad_unit_ios': settings.get('admob_rewarded_ad_unit_ios', ''),
+        'points_per_ad': settings.get('points_per_rewarded_ad', 5),
+        'daily_limit': settings.get('daily_rewarded_ad_limit', 20),
+        'cooldown': settings.get('cooldown_seconds', 30)
+    }
