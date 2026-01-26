@@ -2,15 +2,23 @@
  * AdMob Service for Saqr Mobile App
  * Handles Google AdMob rewarded video ads integration
  * 
- * Note: This service requires react-native-google-mobile-ads package
- * which should be installed once the app is ready for production
+ * App ID: ca-app-pub-5132559433385403~1073385732
+ * Rewarded Ad Unit ID: ca-app-pub-5132559433385403/3389052725
  */
 
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from './api';
+import Constants from 'expo-constants';
 
-// AdMob Test Ad Unit IDs (for development)
+const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://saqr-ads.preview.emergentagent.com';
+
+// Production Ad Unit IDs
+const PRODUCTION_AD_UNITS = {
+  appId: 'ca-app-pub-5132559433385403~1073385732',
+  rewardedAdUnitId: 'ca-app-pub-5132559433385403/3389052725'
+};
+
+// Test Ad Unit IDs (for development/testing)
 const TEST_AD_UNITS = {
   android: 'ca-app-pub-3940256099942544/5224354917',
   ios: 'ca-app-pub-3940256099942544/1712485313'
@@ -22,6 +30,7 @@ class AdMobService {
     this.isInitialized = false;
     this.dailyAdsWatched = 0;
     this.lastAdTime = null;
+    this.useTestAds = __DEV__; // Use test ads in development
   }
 
   /**
@@ -30,37 +39,53 @@ class AdMobService {
   async initialize() {
     try {
       // Fetch AdMob settings from backend
-      const response = await fetch(`${API_URL}/settings/public/admob`);
+      const response = await fetch(`${API_URL}/api/settings/public/admob`);
       const data = await response.json();
       
       if (data.enabled) {
         this.settings = {
           enabled: true,
-          appId: Platform.OS === 'ios' ? data.app_id_ios : data.app_id_android,
-          rewardedAdUnitId: Platform.OS === 'ios' ? data.rewarded_ad_unit_ios : data.rewarded_ad_unit_android,
+          appId: PRODUCTION_AD_UNITS.appId,
+          rewardedAdUnitId: this.useTestAds 
+            ? TEST_AD_UNITS[Platform.OS] 
+            : PRODUCTION_AD_UNITS.rewardedAdUnitId,
           pointsPerAd: data.points_per_ad || 5,
           dailyLimit: data.daily_limit || 20,
           cooldown: data.cooldown || 30
         };
 
-        // Use test ads if no real ad unit configured
-        if (!this.settings.rewardedAdUnitId) {
-          this.settings.rewardedAdUnitId = TEST_AD_UNITS[Platform.OS];
-          console.log('Using test ad unit');
-        }
-
         // Load daily count from storage
         await this.loadDailyCount();
         
         this.isInitialized = true;
+        console.log('AdMob initialized successfully');
+        console.log('Using', this.useTestAds ? 'TEST' : 'PRODUCTION', 'ads');
         return true;
       }
       
+      console.log('AdMob is disabled in settings');
       return false;
     } catch (error) {
       console.error('Failed to initialize AdMob:', error);
       return false;
     }
+  }
+
+  /**
+   * Get App ID
+   */
+  getAppId() {
+    return PRODUCTION_AD_UNITS.appId;
+  }
+
+  /**
+   * Get Rewarded Ad Unit ID
+   */
+  getRewardedAdUnitId() {
+    if (this.useTestAds) {
+      return TEST_AD_UNITS[Platform.OS];
+    }
+    return this.settings?.rewardedAdUnitId || PRODUCTION_AD_UNITS.rewardedAdUnitId;
   }
 
   /**
@@ -133,7 +158,8 @@ class AdMobService {
       dailyWatched: this.dailyAdsWatched,
       dailyLimit: this.settings?.dailyLimit || 20,
       pointsPerAd: this.settings?.pointsPerAd || 5,
-      cooldown: this.settings?.cooldown || 30
+      cooldown: this.settings?.cooldown || 30,
+      useTestAds: this.useTestAds
     };
   }
 
@@ -152,13 +178,22 @@ class AdMobService {
   }
 
   /**
-   * Get ad unit ID for rewarded ads
+   * Set test mode (for development)
    */
-  getRewardedAdUnitId() {
-    return this.settings?.rewardedAdUnitId || TEST_AD_UNITS[Platform.OS];
+  setTestMode(useTest) {
+    this.useTestAds = useTest;
+    if (this.settings) {
+      this.settings.rewardedAdUnitId = useTest 
+        ? TEST_AD_UNITS[Platform.OS] 
+        : PRODUCTION_AD_UNITS.rewardedAdUnitId;
+    }
   }
 }
 
 // Export singleton instance
 export const adMobService = new AdMobService();
 export default adMobService;
+
+// Export constants for direct use
+export const ADMOB_APP_ID = PRODUCTION_AD_UNITS.appId;
+export const ADMOB_REWARDED_AD_UNIT_ID = PRODUCTION_AD_UNITS.rewardedAdUnitId;
