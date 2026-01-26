@@ -209,6 +209,9 @@ const AdminSettings = () => {
           <TabsTrigger value="wallet" className="flex items-center gap-1 text-xs">
             <Wallet className="w-3 h-3" /> المحفظة
           </TabsTrigger>
+          <TabsTrigger value="rewarded" className="flex items-center gap-1 text-xs">
+            <Gift className="w-3 h-3" /> إعلانات المكافآت
+          </TabsTrigger>
           <TabsTrigger value="maintenance" className="flex items-center gap-1 text-xs">
             <Wrench className="w-3 h-3" /> الصيانة
           </TabsTrigger>
