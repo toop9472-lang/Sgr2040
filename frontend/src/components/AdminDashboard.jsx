@@ -7,7 +7,8 @@ import { Badge } from './ui/badge';
 import { toast } from '../hooks/use-toast';
 import axios from 'axios';
 import AdminSettings from './AdminSettings';
-import { Search, Ban, Trash2, UserCheck, RefreshCw, Eye, Edit2 } from 'lucide-react';
+import AdminAIAssistant from './AdminAIAssistant';
+import { Search, Ban, Trash2, UserCheck, RefreshCw, Eye, Edit2, Bot } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -366,6 +367,9 @@ const AdminDashboard = ({ admin, onLogout }) => {
             </TabsTrigger>
             <TabsTrigger value="ads" className="flex-1 min-w-[100px] text-xs py-2">
               الإعلانات ({pendingAds.length})
+            </TabsTrigger>
+            <TabsTrigger value="ai-assistant" className="flex-1 min-w-[100px] text-xs py-2 flex items-center justify-center gap-1">
+              <Bot className="w-3 h-3" /> مساعد AI
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex-1 min-w-[100px] text-xs py-2">
               التحليلات
