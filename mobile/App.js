@@ -22,7 +22,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 
 // ============ CONFIGURATION ============
-const API_URL = 'https://rewardviewer-2.preview.emergentagent.com/api';
+// Use environment variable or fallback to production URL
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL 
+  ? `${process.env.EXPO_PUBLIC_BACKEND_URL}/api`
+  : 'https://rewardviewer-2.preview.emergentagent.com/api';
 const { width, height } = Dimensions.get('window');
 
 // Security constants
