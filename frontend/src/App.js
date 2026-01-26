@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import AuthPage from "./components/AuthPage";
 import AuthCallback from "./components/AuthCallback";
 import AdViewer from "./components/AdViewer";
+import AIFloatingButton from "./components/AIFloatingButton";
 import ProfilePage from "./components/ProfilePage";
 import WithdrawPage from "./components/WithdrawPage";
 import AdvertiserPage from "./components/AdvertiserPage";
@@ -389,11 +390,14 @@ function MainApp() {
           ) : (
             <>
               {currentPage === 'home' && (
-                <AdViewer 
-                  ads={ads} 
-                  onAdWatched={handleAdWatched}
-                  user={user}
-                />
+                <>
+                  <AdViewer 
+                    ads={ads} 
+                    onAdWatched={handleAdWatched}
+                    user={user}
+                  />
+                  <AIFloatingButton user={user} />
+                </>
               )}
               {currentPage === 'profile' && (
                 <ProfilePage 
