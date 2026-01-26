@@ -31,6 +31,7 @@ from routes.settings_routes import router as settings_router
 from routes.wallet_routes import router as wallet_router
 from routes.admin_users_routes import router as admin_users_router
 from routes.email_routes import router as email_router
+from routes.rewarded_ads_routes import router as rewarded_ads_router
 
 
 ROOT_DIR = Path(__file__).parent
