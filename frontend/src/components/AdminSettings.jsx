@@ -377,6 +377,11 @@ const AdminSettings = () => {
           <PointsSystemSettings />
         </TabsContent>
 
+        {/* AI Models Tab */}
+        <TabsContent value="ai">
+          <AIModelSettings adminToken={localStorage.getItem('admin_token')} />
+        </TabsContent>
+
         {/* Reports and Notifications Tab */}
         <TabsContent value="reports">
           <ReportsAndNotifications adminToken={localStorage.getItem('admin_token')} />
