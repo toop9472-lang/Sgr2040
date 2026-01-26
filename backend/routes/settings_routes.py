@@ -604,3 +604,80 @@ async def test_push_notification_connection(user_id: str = Depends(get_current_u
     except Exception as e:
         return {'success': False, 'error': f'خطأ: {str(e)}'}
 
+
+# === AI Models Settings ===
+
+class AIModelsSettings(BaseModel):
+    claude_haiku_enabled: bool = False
+    claude_haiku_enabled_for_all_clients: bool = False
+    anthropic_api_key: Optional[str] = None
+
+
+@router.get('/ai-models')
+async def get_ai_models_settings(user_id: str = Depends(get_current_user_id)):
+    """Get AI models settings (admin only)"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    settings = await db.settings.find_one({'type': 'ai_models'}, {'_id': 0})
+    
+    if not settings:
+        return {
+            'claude_haiku_enabled': False,
+            'claude_haiku_enabled_for_all_clients': False,
+            'anthropic_api_key': ''
+        }
+    
+    return {
+        'claude_haiku_enabled': settings.get('claude_haiku_enabled', False),
+        'claude_haiku_enabled_for_all_clients': settings.get('claude_haiku_enabled_for_all_clients', False),
+        'anthropic_api_key': '****KEY_SAVED****' if settings.get('anthropic_api_key') else ''
+    }
+
+
+@router.post('/ai-models')
+async def update_ai_models_settings(
+    settings: AIModelsSettings,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Update AI models settings (admin only)"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    update_data = {
+        'type': 'ai_models',
+        'claude_haiku_enabled': settings.claude_haiku_enabled,
+        'claude_haiku_enabled_for_all_clients': settings.claude_haiku_enabled_for_all_clients,
+        'updated_at': datetime.utcnow()
+    }
+    
+    # Only update API key if not masked
+    if settings.anthropic_api_key and settings.anthropic_api_key != '****KEY_SAVED****':
+        update_data['anthropic_api_key'] = settings.anthropic_api_key
+        # Also set environment variable for the service
+        os.environ['ANTHROPIC_API_KEY'] = settings.anthropic_api_key
+    else:
+        existing = await db.settings.find_one({'type': 'ai_models'}, {'_id': 0})
+        if existing and existing.get('anthropic_api_key'):
+            update_data['anthropic_api_key'] = existing['anthropic_api_key']
+    
+    await db.settings.update_one(
+        {'type': 'ai_models'},
+        {'$set': update_data},
+        upsert=True
+    )
+    
+    return {'success': True, 'message': 'تم حفظ إعدادات الذكاء الاصطناعي بنجاح'}
+
+
+@router.get('/public/ai-models')
+async def get_public_ai_models_settings():
+    """Get public AI models status (no auth required)"""
+    db = get_db()
+    settings = await db.settings.find_one({'type': 'ai_models'}, {'_id': 0})
+    
+    return {
+        'claude_haiku_available': settings.get('claude_haiku_enabled', False) if settings else False,
+        'available_for_all': settings.get('claude_haiku_enabled_for_all_clients', False) if settings else False
+    }
+
