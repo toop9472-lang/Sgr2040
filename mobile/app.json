@@ -53,17 +53,7 @@
       ]
     ],
     "extra": {
-      "apiUrl": "https://adviewer-6.preview.emergentagent.com",
-      "eas": {
-        "projectId": "your-project-id"
-      }
-    },
-    "owner": "saqr-team",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/your-project-id"
+      "apiUrl": "https://adviewer-6.preview.emergentagent.com"
     }
   }
 }
