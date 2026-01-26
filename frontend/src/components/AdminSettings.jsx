@@ -373,6 +373,11 @@ const AdminSettings = () => {
           <PointsSystemSettings />
         </TabsContent>
 
+        {/* Reports and Notifications Tab */}
+        <TabsContent value="reports">
+          <ReportsAndNotifications adminToken={localStorage.getItem('admin_token')} />
+        </TabsContent>
+
         {/* Payment Gateways Tab */}
         <TabsContent value="payments">
           <Card>
