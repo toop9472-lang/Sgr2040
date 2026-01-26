@@ -216,41 +216,127 @@ async def send_notification_to_all_users(
 ):
     """
     Send notification to all users (for new ads, etc.)
+    Uses unified push service for both Expo and FCM
     """
-    # Get all users
-    users = await db.users.find({}, {'id': 1, 'user_id': 1}).to_list(10000)
+    from services.push_notification_service import push_service
     
-    notifications = []
-    all_tokens = []
+    # Initialize push service with settings
+    settings = await db.settings.find_one({'type': 'push_notifications'}, {'_id': 0})
+    if settings:
+        await push_service.initialize(settings)
     
-    for user in users:
-        user_id = user.get('id') or user.get('user_id')
-        
-        # Save notification to database
-        notification = Notification(
-            user_id=user_id,
+    result = await push_service.broadcast(
+        db=db,
+        title=title,
+        body=body,
+        notification_type=notification_type,
+        data=data
+    )
+    
+    return result.get('users_notified', 0)
+
+
+# === Admin Notification Routes ===
+
+@router.post('/admin/send', response_model=dict)
+async def admin_send_notification(
+    data: dict,
+    user_id: str = Depends(get_current_user_id)
+):
+    """
+    Admin: Send notification to specific user or all users
+    
+    Body:
+    - target: 'all' or user_id
+    - title: Notification title
+    - body: Notification body
+    - type: Notification type
+    """
+    from services.push_notification_service import push_service
+    
+    db = get_db()
+    
+    # Verify admin
+    admin = await db.admins.find_one({
+        '$or': [{'id': user_id}, {'email': user_id}]
+    })
+    if not admin:
+        raise HTTPException(status_code=403, detail='Admin access required')
+    
+    target = data.get('target', 'all')
+    title = data.get('title', '')
+    body = data.get('body', '')
+    notification_type = data.get('type', 'admin_message')
+    extra_data = data.get('data', {})
+    
+    if not title or not body:
+        raise HTTPException(status_code=400, detail='Title and body are required')
+    
+    # Initialize push service
+    settings = await db.settings.find_one({'type': 'push_notifications'}, {'_id': 0})
+    if settings:
+        await push_service.initialize(settings)
+    
+    if target == 'all':
+        result = await push_service.broadcast(
+            db=db,
             title=title,
             body=body,
             notification_type=notification_type,
-            data=data
+            data=extra_data
         )
-        notifications.append(notification.dict())
-        
-        # Get device tokens
-        device_tokens = await db.device_tokens.find({
-            'user_id': user_id,
-            'is_active': True
-        }).to_list(10)
-        
-        all_tokens.extend([dt['token'] for dt in device_tokens])
+    else:
+        result = await push_service.send_to_user(
+            db=db,
+            user_id=target,
+            title=title,
+            body=body,
+            notification_type=notification_type,
+            data=extra_data
+        )
     
-    # Bulk insert notifications
-    if notifications:
-        await db.notifications.insert_many(notifications)
+    return {
+        'success': True,
+        'sent': result.get('sent', 0),
+        'failed': result.get('failed', 0),
+        'message': f"تم إرسال {result.get('sent', 0)} إشعار بنجاح"
+    }
+
+
+@router.get('/admin/stats', response_model=dict)
+async def get_notification_stats(user_id: str = Depends(get_current_user_id)):
+    """
+    Admin: Get notification statistics
+    """
+    db = get_db()
     
-    # Send push notifications in batches of 100
-    for i in range(0, len(all_tokens), 100):
-        batch = all_tokens[i:i+100]
-        await send_expo_push(batch, title, body, data)
+    # Verify admin
+    admin = await db.admins.find_one({
+        '$or': [{'id': user_id}, {'email': user_id}]
+    })
+    if not admin:
+        raise HTTPException(status_code=403, detail='Admin access required')
     
-    return len(notifications)
+    # Get stats
+    total_devices = await db.device_tokens.count_documents({'is_active': True})
+    total_notifications = await db.notifications.count_documents({})
+    unread_notifications = await db.notifications.count_documents({'is_read': False})
+    
+    # Device breakdown by platform
+    ios_devices = await db.device_tokens.count_documents({
+        'is_active': True,
+        'platform': 'ios'
+    })
+    android_devices = await db.device_tokens.count_documents({
+        'is_active': True,
+        'platform': 'android'
+    })
+    
+    return {
+        'total_devices': total_devices,
+        'ios_devices': ios_devices,
+        'android_devices': android_devices,
+        'total_notifications': total_notifications,
+        'unread_notifications': unread_notifications
+    }
+
