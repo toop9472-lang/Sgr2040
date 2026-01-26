@@ -52,6 +52,9 @@ const AIChatModal = ({ isOpen, onClose, user }) => {
       // Build context about user
       const userContext = user ? `المستخدم لديه ${user.points || 0} نقطة. اسمه: ${user.name || 'مستخدم'}` : '';
       
+      // Get the correct token
+      const token = localStorage.getItem('user_token') || localStorage.getItem('token') || localStorage.getItem('saqr_token') || '';
+      
       // Prepare messages for API
       const chatMessages = messages.map(m => ({
         role: m.role,
@@ -63,7 +66,7 @@ const AIChatModal = ({ isOpen, onClose, user }) => {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('user_token') || ''}`
+          'Authorization': `Bearer ${token}`
         },
         credentials: 'include',
         body: JSON.stringify({
@@ -85,16 +88,32 @@ const AIChatModal = ({ isOpen, onClose, user }) => {
       if (data.success) {
         setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
       } else {
+        // Show specific error message
+        let errorMsg = 'عذراً، حدث خطأ. ';
+        if (data.error?.includes('not configured')) {
+          errorMsg += 'المساعد الذكي غير مفعّل حالياً. يرجى التواصل مع الدعم.';
+        } else if (data.error?.includes('Access denied')) {
+          errorMsg += 'يرجى تسجيل الدخول للاستخدام.';
+        } else {
+          errorMsg += 'يرجى المحاولة مرة أخرى. 🙏';
+        }
         setMessages(prev => [...prev, { 
           role: 'assistant', 
-          content: 'عذراً، حدث خطأ. يرجى المحاولة مرة أخرى. 🙏' 
+          content: errorMsg
         }]);
       }
     } catch (error) {
       console.error('Chat error:', error);
+      // More specific error message
+      let errorMsg = 'عذراً، ';
+      if (!navigator.onLine) {
+        errorMsg += 'لا يوجد اتصال بالإنترنت. تأكد من اتصالك وحاول مرة أخرى.';
+      } else {
+        errorMsg += 'حدث خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى.';
+      }
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: 'عذراً، لم أتمكن من الرد الآن. تأكد من اتصالك بالإنترنت.' 
+        content: errorMsg
       }]);
     } finally {
       setIsLoading(false);
