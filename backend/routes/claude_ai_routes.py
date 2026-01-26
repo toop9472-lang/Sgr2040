@@ -284,3 +284,50 @@ async def get_public_claude_status():
         'available': settings.get('claude_haiku_enabled', False) if settings else False,
         'available_for_all': settings.get('claude_haiku_enabled_for_all_clients', False) if settings else False
     }
+
+
+@router.post('/chat/guest')
+async def guest_chat_with_ai(request: ChatRequest):
+    """
+    Public chat endpoint for guests (no authentication required)
+    Has rate limiting and restricted capabilities
+    """
+    from services.claude_ai_service import get_claude_service
+    
+    db = get_db()
+    
+    # Check if AI is enabled
+    if not await verify_ai_enabled(db):
+        return {
+            'success': False,
+            'error': 'المساعد الذكي غير متاح حالياً'
+        }
+    
+    # Check if AI is enabled for all (including guests)
+    settings = await get_ai_settings(db)
+    if not settings.get('claude_haiku_enabled_for_all_clients'):
+        return {
+            'success': False,
+            'error': 'المساعد الذكي غير متاح للزوار. يرجى تسجيل الدخول.'
+        }
+    
+    # Limit messages for guests
+    messages = [{"role": m.role, "content": m.content} for m in request.messages[-5:]]  # Last 5 messages only
+    
+    # Add guest context to system message
+    system_msg = request.system_message or ""
+    system_msg += "\n\nملاحظة: هذا مستخدم زائر. شجعه على إنشاء حساب للاستفادة الكاملة من التطبيق."
+    
+    try:
+        claude_service = await get_claude_service()
+        result = await claude_service.chat(
+            messages=messages,
+            system_message=system_msg
+        )
+        return result
+    except Exception as e:
+        return {
+            'success': False,
+            'error': 'حدث خطأ. يرجى المحاولة مرة أخرى.'
+        }
+
