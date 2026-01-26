@@ -367,8 +367,8 @@ const AdminDashboard = ({ admin, onLogout }) => {
             <TabsTrigger value="withdrawals" className="flex-1 min-w-[100px] text-xs py-2">
               السحوبات ({pendingWithdrawals.length})
             </TabsTrigger>
-            <TabsTrigger value="ads" className="flex-1 min-w-[100px] text-xs py-2">
-              الإعلانات ({pendingAds.length})
+            <TabsTrigger value="ads" className="flex-1 min-w-[100px] text-xs py-2 flex items-center justify-center gap-1">
+              <Video className="w-3 h-3" /> الإعلانات ({pendingAds.length})
             </TabsTrigger>
             <TabsTrigger value="ai-assistant" className="flex-1 min-w-[100px] text-xs py-2 flex items-center justify-center gap-1">
               <Bot className="w-3 h-3" /> مساعد AI
