@@ -1,31 +1,70 @@
 """
-Claude Haiku 4.5 AI Service
-Integration with Anthropic's Claude Haiku model
+Claude Sonnet 4 AI Service
+Integration with Anthropic's Claude Sonnet model
 """
 
 import os
-import json
+import httpx
 from typing import Optional, Dict, Any
-import litellm
-from litellm import completion
+from datetime import datetime
 
 
-class ClaudeHaikuService:
-    """Service for Claude Haiku 4.5 AI interactions"""
+class ClaudeSonnetService:
+    """Service for Claude Sonnet 4 AI interactions"""
     
     def __init__(self):
-        self.model_name = "claude-haiku-4.5"
+        self.model_name = "claude-sonnet-4-20250514"
         self.api_provider = "anthropic"
         self.api_key = os.environ.get('ANTHROPIC_API_KEY', '')
         self.max_tokens = int(os.environ.get('CLAUDE_MAX_TOKENS', '1024'))
-        
-        # Configure litellm
-        if self.api_key:
-            litellm.api_key = self.api_key
+        self.api_url = "https://api.anthropic.com/v1/messages"
+    
+    def set_api_key(self, api_key: str):
+        """Set API key dynamically"""
+        self.api_key = api_key
+        os.environ['ANTHROPIC_API_KEY'] = api_key
     
     def is_configured(self) -> bool:
-        """Check if Claude Haiku is properly configured"""
+        """Check if Claude Sonnet is properly configured"""
         return bool(self.api_key)
+    
+    async def _make_request(
+        self,
+        messages: list,
+        system_message: Optional[str] = None,
+        max_tokens: Optional[int] = None,
+        temperature: float = 0.7
+    ) -> Dict[str, Any]:
+        """Make request to Anthropic API"""
+        headers = {
+            "x-api-key": self.api_key,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json"
+        }
+        
+        payload = {
+            "model": self.model_name,
+            "max_tokens": max_tokens or self.max_tokens,
+            "messages": messages
+        }
+        
+        if system_message:
+            payload["system"] = system_message
+        
+        if temperature != 0.7:
+            payload["temperature"] = temperature
+        
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                self.api_url,
+                headers=headers,
+                json=payload
+            )
+            
+            if response.status_code == 200:
+                return response.json()
+            else:
+                return {"error": response.text, "status_code": response.status_code}
     
     async def generate_response(
         self, 
@@ -35,7 +74,7 @@ class ClaudeHaikuService:
         temperature: float = 0.7
     ) -> Dict[str, Any]:
         """
-        Generate response using Claude Haiku 4.5
+        Generate response using Claude Sonnet 4
         
         Args:
             prompt: User message/prompt
@@ -49,96 +88,222 @@ class ClaudeHaikuService:
         if not self.is_configured():
             return {
                 'success': False,
-                'error': 'Claude Haiku API key is not configured'
+                'error': 'Claude AI is not configured. Please set the API key.',
+                'response': None
             }
         
+        default_system = "أنت مساعد ذكي ودود. أجب بشكل مختصر ومفيد. استخدم العربية إذا كان السؤال بالعربية."
+        
+        messages = [{"role": "user", "content": prompt}]
+        
         try:
-            messages = []
-            if system_message:
-                messages.append({
-                    "role": "system",
-                    "content": system_message
-                })
-            
-            messages.append({
-                "role": "user",
-                "content": prompt
-            })
-            
-            response = completion(
-                model=f"{self.api_provider}/{self.model_name}",
+            result = await self._make_request(
                 messages=messages,
-                max_tokens=max_tokens or self.max_tokens,
-                temperature=temperature,
-                api_key=self.api_key
+                system_message=system_message or default_system,
+                max_tokens=max_tokens,
+                temperature=temperature
             )
+            
+            if "error" in result:
+                return {
+                    'success': False,
+                    'error': result.get('error'),
+                    'response': None
+                }
+            
+            response_text = result.get('content', [{}])[0].get('text', '')
             
             return {
                 'success': True,
-                'response': response.choices[0].message.content,
+                'response': response_text,
                 'model': self.model_name,
                 'provider': self.api_provider,
-                'usage': {
-                    'prompt_tokens': response.usage.prompt_tokens if hasattr(response, 'usage') else 0,
-                    'completion_tokens': response.usage.completion_tokens if hasattr(response, 'usage') else 0
-                }
+                'usage': result.get('usage', {}),
+                'timestamp': datetime.utcnow().isoformat()
             }
-        
+            
         except Exception as e:
             return {
                 'success': False,
-                'error': f'Error calling Claude Haiku API: {str(e)}'
+                'error': str(e),
+                'response': None
             }
     
-    async def generate_summary(self, text: str, language: str = 'ar') -> Dict[str, Any]:
-        """Generate a summary of the given text"""
-        system_msg = f"أنت مساعد ذكي متخصص في تلخيص النصوص. أرجع التلخيص باللغة {language}."
-        prompt = f"اختصر النص التالي:\n\n{text}"
+    async def summarize_text(
+        self,
+        text: str,
+        language: str = "ar",
+        max_length: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """
+        Summarize text using Claude Sonnet
+        
+        Args:
+            text: Text to summarize
+            language: Output language (ar/en)
+            max_length: Maximum summary length in words
+        """
+        lang_instruction = "باللغة العربية" if language == "ar" else "in English"
+        length_instruction = f"في حدود {max_length} كلمة" if max_length else "بشكل مختصر"
+        
+        prompt = f"""لخص النص التالي {lang_instruction} {length_instruction}:
+
+{text}"""
+        
+        system_message = "أنت خبير في تلخيص النصوص. قدم ملخصات واضحة ومفيدة."
         
         return await self.generate_response(
             prompt=prompt,
-            system_message=system_msg,
-            temperature=0.5
-        )
-    
-    async def translate_text(self, text: str, target_language: str = 'en') -> Dict[str, Any]:
-        """Translate text to target language"""
-        system_msg = f"أنت مترجم متقن. ترجم النص إلى اللغة {target_language} فقط."
-        prompt = f"ترجم النص التالي:\n\n{text}"
-        
-        return await self.generate_response(
-            prompt=prompt,
-            system_message=system_msg,
+            system_message=system_message,
+            max_tokens=500,
             temperature=0.3
         )
     
-    async def analyze_content(self, content: str) -> Dict[str, Any]:
-        """Analyze content for relevance and safety"""
-        system_msg = "أنت محلل محتوى متخصص. حلل المحتوى وقيم أمانه ورفاهيته."
-        prompt = f"""
-        حلل المحتوى التالي وقدم التقييم:
-        1. درجة الأمان (آمن/غير آمن)
-        2. ملاءمة المحتوى
-        3. ملاحظات إضافية
-        
-        المحتوى:
-        {content}
+    async def translate_text(
+        self,
+        text: str,
+        source_lang: str = "auto",
+        target_lang: str = "en"
+    ) -> Dict[str, Any]:
         """
+        Translate text using Claude Sonnet
+        
+        Args:
+            text: Text to translate
+            source_lang: Source language (auto for auto-detect)
+            target_lang: Target language code
+        """
+        lang_names = {
+            "ar": "العربية",
+            "en": "الإنجليزية",
+            "fr": "الفرنسية",
+            "es": "الإسبانية",
+            "de": "الألمانية",
+            "auto": "تلقائي"
+        }
+        
+        target_name = lang_names.get(target_lang, target_lang)
+        
+        prompt = f"""ترجم النص التالي إلى {target_name}:
+
+{text}
+
+الترجمة:"""
+        
+        system_message = "أنت مترجم محترف. قدم ترجمات دقيقة وطبيعية."
         
         return await self.generate_response(
             prompt=prompt,
-            system_message=system_msg,
+            system_message=system_message,
+            max_tokens=1000,
+            temperature=0.2
+        )
+    
+    async def analyze_content(
+        self,
+        content: str,
+        analysis_type: str = "general"
+    ) -> Dict[str, Any]:
+        """
+        Analyze content using Claude Sonnet
+        
+        Args:
+            content: Content to analyze
+            analysis_type: Type of analysis (general, sentiment, keywords, etc.)
+        """
+        analysis_prompts = {
+            "general": "حلل هذا المحتوى وقدم نظرة عامة شاملة:",
+            "sentiment": "حلل المشاعر والعواطف في هذا النص:",
+            "keywords": "استخرج الكلمات المفتاحية والمواضيع الرئيسية:",
+            "summary": "قدم ملخصاً تنفيذياً لهذا المحتوى:",
+            "quality": "قيّم جودة هذا المحتوى من حيث الوضوح والفائدة:"
+        }
+        
+        prompt = f"""{analysis_prompts.get(analysis_type, analysis_prompts['general'])}
+
+{content}"""
+        
+        system_message = "أنت محلل محتوى خبير. قدم تحليلات دقيقة ومفيدة."
+        
+        return await self.generate_response(
+            prompt=prompt,
+            system_message=system_message,
+            max_tokens=800,
             temperature=0.4
         )
+    
+    async def chat(
+        self,
+        messages: list,
+        system_message: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Multi-turn chat with Claude Sonnet
+        
+        Args:
+            messages: List of message dicts with 'role' and 'content'
+            system_message: System instructions
+        """
+        if not self.is_configured():
+            return {
+                'success': False,
+                'error': 'Claude AI is not configured.',
+                'response': None
+            }
+        
+        default_system = "أنت مساعد ذكي ودود في تطبيق صقر. ساعد المستخدمين بأسئلتهم حول التطبيق والنقاط والإعلانات."
+        
+        try:
+            result = await self._make_request(
+                messages=messages,
+                system_message=system_message or default_system,
+                max_tokens=1024,
+                temperature=0.7
+            )
+            
+            if "error" in result:
+                return {
+                    'success': False,
+                    'error': result.get('error'),
+                    'response': None
+                }
+            
+            response_text = result.get('content', [{}])[0].get('text', '')
+            
+            return {
+                'success': True,
+                'response': response_text,
+                'model': self.model_name,
+                'usage': result.get('usage', {})
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': str(e),
+                'response': None
+            }
 
 
 # Singleton instance
-_claude_service_instance = None
+claude_service = ClaudeSonnetService()
 
 
-def get_claude_service() -> ClaudeHaikuService:
-    """Get or create Claude Haiku service instance"""
-    global _claude_service_instance
-    if _claude_service_instance is None:
-        _claude_service_instance = ClaudeHaikuService()
-    return _claude_service_instance
+# Helper function for routes
+async def get_claude_service():
+    """Get initialized Claude service with settings from database"""
+    from motor.motor_asyncio import AsyncIOMotorClient
+    
+    mongo_url = os.environ.get('MONGO_URL')
+    db_name = os.environ.get('DB_NAME')
+    
+    if mongo_url and db_name:
+        client = AsyncIOMotorClient(mongo_url)
+        db = client[db_name]
+        
+        settings = await db.settings.find_one({'type': 'ai_models'}, {'_id': 0})
+        
+        if settings and settings.get('anthropic_api_key'):
+            claude_service.set_api_key(settings['anthropic_api_key'])
+    
+    return claude_service
