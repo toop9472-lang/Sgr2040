@@ -10,10 +10,11 @@ import {
   Key, CreditCard, Shield, Eye, EyeOff, Save, RefreshCw, 
   AlertTriangle, Settings, Wrench, Globe, Phone, Mail,
   Users, DollarSign, TrendingUp, Activity, Power, Ban,
-  MessageSquare, Link, Clock, Wallet, Send, CheckCircle, XCircle
+  MessageSquare, Link, Clock, Wallet, Send, CheckCircle, XCircle, Gift
 } from 'lucide-react';
 import axios from 'axios';
 import AdminWallet from './AdminWallet';
+import RewardedAdsSettings from './RewardedAdsSettings';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
