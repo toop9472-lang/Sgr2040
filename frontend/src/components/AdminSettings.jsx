@@ -354,6 +354,11 @@ const AdminSettings = () => {
           </Card>
         </TabsContent>
 
+        {/* Rewarded Ads Tab */}
+        <TabsContent value="rewarded">
+          <RewardedAdsSettings />
+        </TabsContent>
+
         {/* Payment Gateways Tab */}
         <TabsContent value="payments">
           <Card>
