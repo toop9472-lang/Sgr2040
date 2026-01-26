@@ -138,6 +138,7 @@ api_router.include_router(wallet_router)
 api_router.include_router(admin_users_router)
 api_router.include_router(email_router)
 api_router.include_router(rewarded_ads_router)
+api_router.include_router(points_settings_router)
 
 # Include the router in the main app
 app.include_router(api_router)
