@@ -577,61 +577,9 @@ const AdminDashboard = ({ admin, onLogout }) => {
             )}
           </TabsContent>
 
-          {/* Pending Ads */}
-          <TabsContent value="ads" className="space-y-4 mt-4">
-            {pendingAds.length === 0 ? (
-              <Card>
-                <CardContent className="pt-6 text-center text-gray-500">
-                  لا توجد طلبات إعلانات معلقة
-                </CardContent>
-              </Card>
-            ) : (
-              pendingAds.map((ad) => (
-                <Card key={ad.id} className="shadow-md">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{ad.title}</CardTitle>
-                        <CardDescription>{ad.advertiser_name}</CardDescription>
-                      </div>
-                      <Badge variant="outline">{ad.payment_status}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 mb-4">
-                      <p className="text-sm">{ad.description}</p>
-                      <p className="text-sm"><strong>المبلغ:</strong> {ad.price} ر.س</p>
-                      <p className="text-sm"><strong>المدة:</strong> {ad.duration_months} شهر</p>
-                      <p className="text-sm"><strong>البريد:</strong> {ad.advertiser_email}</p>
-                      <p className="text-sm"><strong>الجوال:</strong> {ad.advertiser_phone || '-'}</p>
-                      <a 
-                        href={ad.video_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-sm text-indigo-600 hover:underline block"
-                      >
-                        مشاهدة الفيديو →
-                      </a>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => handleApproveAd(ad.id)}
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                      >
-                        ✓ موافقة وتفعيل
-                      </Button>
-                      <Button
-                        onClick={() => handleRejectAd(ad.id)}
-                        variant="destructive"
-                        className="flex-1"
-                      >
-                        ✗ رفض
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
+          {/* Ads Management */}
+          <TabsContent value="ads" className="mt-4">
+            <AdsManagementPage adminToken={localStorage.getItem('admin_token')} />
           </TabsContent>
 
           {/* AI Assistant Tab */}
