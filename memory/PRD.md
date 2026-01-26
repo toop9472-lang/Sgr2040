@@ -257,5 +257,5 @@
 
 | الخدمة | الرابط |
 |--------|--------|
-| الموقع | https://reelcoin.preview.emergentagent.com |
-| API Docs | https://reelcoin.preview.emergentagent.com/docs |
+| الموقع | https://adviewer-6.preview.emergentagent.com |
+| API Docs | https://adviewer-6.preview.emergentagent.com/docs |
