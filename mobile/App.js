@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -7,45 +7,75 @@ import {
   TouchableOpacity, 
   ScrollView,
   ActivityIndicator,
-  Alert
+  Alert,
+  TextInput,
+  Dimensions,
+  Animated
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// API Configuration
+const API_URL = 'https://rewardviewer-2.preview.emergentagent.com/api';
+
+const { width, height } = Dimensions.get('window');
+
 export default function App() {
   const [screen, setScreen] = useState('loading');
-  const [points, setPoints] = useState(0);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [watchTime, setWatchTime] = useState(0);
-  const [userName, setUserName] = useState('');
+  const [isWatching, setIsWatching] = useState(false);
+  const [todayStats, setTodayStats] = useState({ views: 0, remaining: 50 });
+  const [loading, setLoading] = useState(false);
+  
+  // Login form state
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [isRegister, setIsRegister] = useState(false);
+  
+  // Animation
+  const progressAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     checkLogin();
   }, []);
 
+  // Watch timer effect
   useEffect(() => {
-    if (screen === 'home') {
-      const timer = setInterval(() => {
+    let timer;
+    if (isWatching && screen === 'home') {
+      timer = setInterval(() => {
         setWatchTime(prev => {
           const newTime = prev + 1;
-          if (newTime >= 60) {
-            setPoints(p => p + 1);
-            Alert.alert('مبروك!', 'حصلت على 1 نقطة!');
+          // Update progress animation
+          Animated.timing(progressAnim, {
+            toValue: newTime / 30,
+            duration: 900,
+            useNativeDriver: false
+          }).start();
+          
+          if (newTime >= 30) {
+            completeAdWatch();
             return 0;
           }
           return newTime;
         });
       }, 1000);
-      return () => clearInterval(timer);
     }
-  }, [screen]);
+    return () => clearInterval(timer);
+  }, [isWatching, screen]);
 
   const checkLogin = async () => {
     try {
-      const saved = await AsyncStorage.getItem('saqr_user');
-      if (saved) {
-        const data = JSON.parse(saved);
-        setUserName(data.name);
-        setPoints(data.points || 0);
+      const savedToken = await AsyncStorage.getItem('saqr_token');
+      const savedUser = await AsyncStorage.getItem('saqr_user');
+      
+      if (savedToken && savedUser) {
+        setToken(savedToken);
+        setUser(JSON.parse(savedUser));
         setScreen('home');
+        fetchUserStats(savedToken);
       } else {
         setScreen('login');
       }
@@ -54,97 +84,346 @@ export default function App() {
     }
   };
 
+  const fetchUserStats = async (authToken) => {
+    try {
+      const response = await fetch(`${API_URL}/rewarded-ads/stats`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTodayStats(data.today || { views: 0, remaining: 50 });
+      }
+    } catch (e) {
+      console.log('Stats fetch error:', e);
+    }
+  };
+
+  const handleEmailLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('خطأ', 'يرجى إدخال البريد وكلمة المرور');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/auth/signin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        await AsyncStorage.setItem('saqr_token', data.token);
+        await AsyncStorage.setItem('saqr_user', JSON.stringify(data.user));
+        setToken(data.token);
+        setUser(data.user);
+        setScreen('home');
+        fetchUserStats(data.token);
+      } else {
+        Alert.alert('خطأ', data.detail || 'فشل تسجيل الدخول');
+      }
+    } catch (e) {
+      Alert.alert('خطأ', 'تعذر الاتصال بالخادم');
+    }
+    setLoading(false);
+  };
+
+  const handleRegister = async () => {
+    if (!email || !password || !name) {
+      Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        await AsyncStorage.setItem('saqr_token', data.token);
+        await AsyncStorage.setItem('saqr_user', JSON.stringify(data.user));
+        setToken(data.token);
+        setUser(data.user);
+        setScreen('home');
+      } else {
+        Alert.alert('خطأ', data.detail || 'فشل إنشاء الحساب');
+      }
+    } catch (e) {
+      Alert.alert('خطأ', 'تعذر الاتصال بالخادم');
+    }
+    setLoading(false);
+  };
+
   const guestLogin = async () => {
-    const userData = { name: 'زائر', points: 0, isGuest: true };
-    await AsyncStorage.setItem('saqr_user', JSON.stringify(userData));
-    setUserName('زائر');
-    setPoints(0);
+    const guestUser = { 
+      id: 'guest_' + Date.now(), 
+      name: 'زائر', 
+      points: 0, 
+      isGuest: true 
+    };
+    await AsyncStorage.setItem('saqr_user', JSON.stringify(guestUser));
+    setUser(guestUser);
     setScreen('home');
   };
 
-  const logout = async () => {
-    await AsyncStorage.removeItem('saqr_user');
-    setScreen('login');
-    setPoints(0);
-    setUserName('');
+  const startWatching = () => {
+    if (todayStats.remaining <= 0 && !user?.isGuest) {
+      Alert.alert('تنبيه', 'وصلت للحد اليومي من المشاهدات');
+      return;
+    }
+    setIsWatching(true);
+    setWatchTime(0);
+    progressAnim.setValue(0);
   };
 
+  const completeAdWatch = async () => {
+    setIsWatching(false);
+    progressAnim.setValue(0);
+    
+    // For guests, just update local points
+    if (user?.isGuest) {
+      const newPoints = (user.points || 0) + 5;
+      const updatedUser = { ...user, points: newPoints };
+      setUser(updatedUser);
+      await AsyncStorage.setItem('saqr_user', JSON.stringify(updatedUser));
+      Alert.alert('مبروك! 🎉', 'حصلت على 5 نقاط!');
+      return;
+    }
+    
+    // For registered users, call API
+    try {
+      const response = await fetch(`${API_URL}/rewarded-ads/complete`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ad_type: 'personal',
+          completed: true,
+          watch_duration: 30
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setUser(prev => ({ ...prev, points: data.total_points }));
+        await AsyncStorage.setItem('saqr_user', JSON.stringify({ ...user, points: data.total_points }));
+        fetchUserStats(token);
+        Alert.alert('مبروك! 🎉', data.message);
+      } else {
+        Alert.alert('تنبيه', data.message || 'حدث خطأ');
+      }
+    } catch (e) {
+      // Offline fallback
+      const newPoints = (user.points || 0) + 5;
+      const updatedUser = { ...user, points: newPoints };
+      setUser(updatedUser);
+      await AsyncStorage.setItem('saqr_user', JSON.stringify(updatedUser));
+      Alert.alert('مبروك! 🎉', 'حصلت على 5 نقاط!');
+    }
+  };
+
+  const logout = async () => {
+    await AsyncStorage.multiRemove(['saqr_token', 'saqr_user']);
+    setToken(null);
+    setUser(null);
+    setScreen('login');
+    setEmail('');
+    setPassword('');
+    setName('');
+  };
+
+  // Loading Screen
   if (screen === 'loading') {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingLogo}>🦅</Text>
+        <Text style={styles.loadingLogo}>صقر</Text>
         <ActivityIndicator size="large" color="#FFFFFF" />
         <StatusBar style="light" />
       </View>
     );
   }
 
+  // Login Screen
   if (screen === 'login') {
     return (
       <View style={styles.loginContainer}>
-        <Text style={styles.loginLogo}>🦅</Text>
-        <Text style={styles.loginTitle}>صقر</Text>
+        <StatusBar style="light" />
+        
+        <Text style={styles.loginLogo}>صقر</Text>
         <Text style={styles.loginSubtitle}>شاهد واكسب النقاط</Text>
+        
+        <View style={styles.formContainer}>
+          {isRegister && (
+            <TextInput
+              style={styles.input}
+              placeholder="الاسم"
+              placeholderTextColor="#9CA3AF"
+              value={name}
+              onChangeText={setName}
+              textAlign="right"
+            />
+          )}
+          
+          <TextInput
+            style={styles.input}
+            placeholder="البريد الإلكتروني"
+            placeholderTextColor="#9CA3AF"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            textAlign="right"
+          />
+          
+          <TextInput
+            style={styles.input}
+            placeholder="كلمة المرور"
+            placeholderTextColor="#9CA3AF"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            textAlign="right"
+          />
+          
+          <TouchableOpacity 
+            style={styles.primaryButton} 
+            onPress={isRegister ? handleRegister : handleEmailLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#4F46E5" />
+            ) : (
+              <Text style={styles.primaryButtonText}>
+                {isRegister ? 'إنشاء حساب' : 'تسجيل الدخول'}
+              </Text>
+            )}
+          </TouchableOpacity>
+          
+          <TouchableOpacity onPress={() => setIsRegister(!isRegister)}>
+            <Text style={styles.switchText}>
+              {isRegister ? 'لديك حساب؟ سجل دخول' : 'ليس لديك حساب؟ أنشئ واحداً'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>أو</Text>
+          <View style={styles.dividerLine} />
+        </View>
         
         <TouchableOpacity style={styles.guestButton} onPress={guestLogin}>
           <Text style={styles.guestButtonText}>دخول كزائر</Text>
         </TouchableOpacity>
         
         <Text style={styles.loginInfo}>500 نقطة = 1 دولار</Text>
-        <StatusBar style="light" />
       </View>
     );
   }
+
+  // Home Screen
+  const progressWidth = progressAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%']
+  });
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
       
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={logout}>
           <Text style={styles.logoutText}>خروج</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>صقر</Text>
         <View style={styles.pointsBadge}>
-          <Text style={styles.pointsText}>{points} نقطة</Text>
+          <Text style={styles.pointsText}>{user?.points || 0} ⭐</Text>
         </View>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Welcome Card */}
         <View style={styles.welcomeCard}>
-          <Text style={styles.welcomeText}>مرحبا {userName}!</Text>
+          <Text style={styles.welcomeText}>مرحباً {user?.name || 'زائر'}!</Text>
+          {user?.isGuest && (
+            <Text style={styles.guestNote}>سجل للحفاظ على نقاطك</Text>
+          )}
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>وقت المشاهدة</Text>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: (watchTime / 60 * 100) + '%' }]} />
-          </View>
-          <Text style={styles.progressText}>{watchTime}/60 ثانية</Text>
+        {/* Ad Viewer */}
+        <View style={styles.adCard}>
+          {isWatching ? (
+            <>
+              <View style={styles.adPlaceholder}>
+                <Text style={styles.adText}>جاري عرض الإعلان...</Text>
+                <Text style={styles.timerText}>{30 - watchTime} ثانية</Text>
+              </View>
+              <View style={styles.progressContainer}>
+                <Animated.View style={[styles.progressBar, { width: progressWidth }]} />
+              </View>
+              <Text style={styles.watchHint}>استمر بالمشاهدة للحصول على 5 نقاط</Text>
+            </>
+          ) : (
+            <>
+              <View style={styles.adPlaceholder}>
+                <Text style={styles.adIcon}>▶️</Text>
+                <Text style={styles.adReadyText}>إعلان جاهز للمشاهدة</Text>
+              </View>
+              <TouchableOpacity style={styles.watchButton} onPress={startWatching}>
+                <Text style={styles.watchButtonText}>شاهد واكسب 5 نقاط</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
 
+        {/* Stats */}
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{points}</Text>
+            <Text style={styles.statNumber}>{user?.points || 0}</Text>
             <Text style={styles.statLabel}>نقاطك</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statNumber}>${(points / 500).toFixed(2)}</Text>
+            <Text style={styles.statNumber}>${((user?.points || 0) / 500).toFixed(2)}</Text>
             <Text style={styles.statLabel}>رصيدك</Text>
           </View>
         </View>
 
+        {/* Daily Stats (for registered users) */}
+        {!user?.isGuest && (
+          <View style={styles.dailyCard}>
+            <Text style={styles.dailyTitle}>إحصائيات اليوم</Text>
+            <Text style={styles.dailyText}>المشاهدات: {todayStats.views}</Text>
+            <Text style={styles.dailyText}>المتبقي: {todayStats.remaining}</Text>
+          </View>
+        )}
+
+        {/* Info */}
         <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>كيف تكسب النقاط؟</Text>
-          <Text style={styles.infoText}>ابق في التطبيق دقيقة = 1 نقطة</Text>
-          <Text style={styles.infoText}>500 نقطة = 1 دولار</Text>
+          <Text style={styles.infoTitle}>كيف تكسب؟</Text>
+          <Text style={styles.infoText}>• شاهد إعلان لمدة 30 ثانية = 5 نقاط</Text>
+          <Text style={styles.infoText}>• 500 نقطة = 1 دولار</Text>
+          <Text style={styles.infoText}>• الحد اليومي: 50 مشاهدة</Text>
         </View>
 
-        {points >= 500 && (
+        {/* Withdraw Button */}
+        {(user?.points || 0) >= 500 && !user?.isGuest && (
           <TouchableOpacity style={styles.withdrawButton}>
-            <Text style={styles.withdrawButtonText}>اسحب ارباحك</Text>
+            <Text style={styles.withdrawButtonText}>اسحب أرباحك 💰</Text>
           </TouchableOpacity>
         )}
+        
+        <View style={{ height: 30 }} />
       </ScrollView>
     </View>
   );
@@ -158,7 +437,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingLogo: {
-    fontSize: 80,
+    fontSize: 60,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
     marginBottom: 20,
   },
   loginContainer: {
@@ -169,35 +450,79 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   loginLogo: {
-    fontSize: 100,
-    marginBottom: 10,
-  },
-  loginTitle: {
-    fontSize: 56,
+    fontSize: 70,
     fontWeight: 'bold',
     color: '#FFFFFF',
+    marginBottom: 5,
   },
   loginSubtitle: {
-    fontSize: 20,
+    fontSize: 18,
     color: 'rgba(255,255,255,0.8)',
-    marginBottom: 50,
+    marginBottom: 30,
+  },
+  formContainer: {
+    width: '100%',
+    paddingHorizontal: 10,
+  },
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    fontSize: 16,
+    color: '#1F2937',
+  },
+  primaryButton: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 5,
+    marginBottom: 15,
+  },
+  primaryButtonText: {
+    color: '#4F46E5',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  switchText: {
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    fontSize: 14,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginVertical: 25,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+  },
+  dividerText: {
+    color: 'rgba(255,255,255,0.7)',
+    marginHorizontal: 15,
+    fontSize: 14,
   },
   guestButton: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 18,
-    paddingHorizontal: 60,
-    borderRadius: 30,
-    marginBottom: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingVertical: 16,
+    paddingHorizontal: 50,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
   guestButtonText: {
-    color: '#4F46E5',
-    fontSize: 20,
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   loginInfo: {
     color: 'rgba(255,255,255,0.6)',
-    fontSize: 14,
-    marginTop: 20,
+    fontSize: 13,
+    marginTop: 25,
   },
   container: {
     flex: 1,
@@ -210,10 +535,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 50,
-    paddingBottom: 20,
+    paddingBottom: 15,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
@@ -223,14 +548,14 @@ const styles = StyleSheet.create({
   },
   pointsBadge: {
     backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
     borderRadius: 20,
   },
   pointsText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 14,
   },
   content: {
     flex: 1,
@@ -238,93 +563,172 @@ const styles = StyleSheet.create({
   },
   welcomeCard: {
     backgroundColor: '#FFFFFF',
-    padding: 20,
+    padding: 18,
     borderRadius: 16,
-    marginBottom: 16,
+    marginBottom: 14,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   welcomeText: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '600',
     color: '#1F2937',
   },
-  card: {
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 16,
+  guestNote: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 5,
   },
-  cardTitle: {
+  adCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  adPlaceholder: {
+    backgroundColor: '#1F2937',
+    borderRadius: 12,
+    height: 180,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  adText: {
+    color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
-    color: '#374151',
-    marginBottom: 16,
-    textAlign: 'right',
+  },
+  timerText: {
+    color: '#10B981',
+    fontSize: 36,
+    fontWeight: 'bold',
+    marginTop: 10,
+  },
+  adIcon: {
+    fontSize: 50,
+    marginBottom: 10,
+  },
+  adReadyText: {
+    color: '#9CA3AF',
+    fontSize: 16,
+  },
+  progressContainer: {
+    height: 8,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 12,
   },
   progressBar: {
-    height: 16,
-    backgroundColor: '#E5E7EB',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  progressFill: {
     height: '100%',
-    backgroundColor: '#4F46E5',
-    borderRadius: 8,
+    backgroundColor: '#10B981',
+    borderRadius: 4,
   },
-  progressText: {
+  watchHint: {
     textAlign: 'center',
-    marginTop: 10,
     color: '#6B7280',
-    fontSize: 14,
+    fontSize: 13,
+  },
+  watchButton: {
+    backgroundColor: '#10B981',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  watchButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   statsRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   statCard: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    padding: 20,
+    padding: 18,
     borderRadius: 16,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   statNumber: {
-    fontSize: 36,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#4F46E5',
   },
   statLabel: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#6B7280',
     marginTop: 4,
   },
-  infoCard: {
+  dailyCard: {
     backgroundColor: '#EEF2FF',
-    padding: 20,
+    padding: 16,
     borderRadius: 16,
-    marginBottom: 16,
+    marginBottom: 14,
   },
-  infoTitle: {
-    fontSize: 18,
+  dailyTitle: {
+    fontSize: 16,
     fontWeight: '600',
     color: '#4F46E5',
+    marginBottom: 8,
+    textAlign: 'right',
+  },
+  dailyText: {
+    fontSize: 14,
+    color: '#4338CA',
+    textAlign: 'right',
+    marginBottom: 3,
+  },
+  infoCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 18,
+    borderRadius: 16,
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  infoTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
     marginBottom: 12,
     textAlign: 'right',
   },
   infoText: {
-    fontSize: 15,
-    color: '#4338CA',
-    marginBottom: 8,
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 6,
     textAlign: 'right',
   },
   withdrawButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#4F46E5',
     padding: 18,
     borderRadius: 16,
     alignItems: 'center',
-    marginBottom: 30,
+    shadowColor: '#4F46E5',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   withdrawButtonText: {
     color: '#FFFFFF',
