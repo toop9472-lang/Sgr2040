@@ -8,7 +8,8 @@ import { toast } from '../hooks/use-toast';
 import axios from 'axios';
 import AdminSettings from './AdminSettings';
 import AdminAIAssistant from './AdminAIAssistant';
-import { Search, Ban, Trash2, UserCheck, RefreshCw, Eye, Edit2, Bot } from 'lucide-react';
+import DevRequestsPage from './DevRequestsPage';
+import { Search, Ban, Trash2, UserCheck, RefreshCw, Eye, Edit2, Bot, FileText } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
