@@ -53,7 +53,7 @@
       ]
     ],
     "extra": {
-      "apiUrl": "https://reelcoin.preview.emergentagent.com",
+      "apiUrl": "https://adviewer-6.preview.emergentagent.com",
       "eas": {
         "projectId": "your-project-id"
       }

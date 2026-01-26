@@ -34,7 +34,7 @@ const AuthScreen = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const redirectUrl = 'https://reelcoin.preview.emergentagent.com/';
+      const redirectUrl = 'https://adviewer-6.preview.emergentagent.com/';
       const authUrl = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
       
       const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
