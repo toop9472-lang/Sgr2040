@@ -648,6 +648,11 @@ const AdminDashboard = ({ admin, onLogout }) => {
             <InvoicesContent />
           </TabsContent>
 
+          {/* Development Requests Tab */}
+          <TabsContent value="dev-requests" className="mt-4">
+            <DevRequestsPage adminToken={localStorage.getItem('admin_token')} />
+          </TabsContent>
+
           {/* Settings Tab */}
           <TabsContent value="settings" className="mt-4">
             <AdminSettings />
