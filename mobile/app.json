@@ -1,35 +1,55 @@
 {
   "expo": {
-    "name": "Saqr",
+    "name": "صقر",
     "slug": "saqr-app",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#4F46E5"
+      "backgroundColor": "#1a1a2e"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.saqr.app"
+      "bundleIdentifier": "com.saqr.rewards",
+      "buildNumber": "2.0.0",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#4F46E5"
+        "backgroundColor": "#1a1a2e"
       },
-      "package": "com.saqr.app"
+      "package": "com.saqr.rewards",
+      "versionCode": 2,
+      "permissions": [
+        "INTERNET",
+        "VIBRATE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "owner": "ziyad333",
     "extra": {
       "eas": {
-        "projectId": "2a08ac90-1772-4377-bf99-af5d2357db30"
+        "projectId": "your-project-id"
       }
+    },
+    "owner": "ziyad333",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/your-project-id"
     }
   }
 }
