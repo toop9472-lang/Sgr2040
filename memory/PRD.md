@@ -98,8 +98,8 @@
 - **Ads:** Google AdMob
 
 ### الـ URLs
-- **Frontend:** https://saqr-ads.preview.emergentagent.com
-- **API:** https://saqr-ads.preview.emergentagent.com/api
+- **Frontend:** https://rewardviewer-2.preview.emergentagent.com
+- **API:** https://rewardviewer-2.preview.emergentagent.com/api
 
 ### الحسابات
 - **Admin:** sky-321@hotmail.com / Wsxzaq123
