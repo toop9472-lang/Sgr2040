@@ -21,7 +21,8 @@
       "infoPlist": {
         "NSCameraUsageDescription": "نحتاج إذن الكاميرا لتحميل فيديوهات الإعلانات",
         "NSPhotoLibraryUsageDescription": "نحتاج إذن الصور لتحميل محتوى الإعلانات",
-        "CFBundleAllowMixedLocalizations": true
+        "CFBundleAllowMixedLocalizations": true,
+        "GADApplicationIdentifier": "ca-app-pub-5132559433385403~XXXXXXXXXX"
       },
       "config": {
         "usesNonExemptEncryption": false
@@ -37,8 +38,12 @@
       "permissions": [
         "INTERNET",
         "VIBRATE",
-        "RECEIVE_BOOT_COMPLETED"
-      ]
+        "RECEIVE_BOOT_COMPLETED",
+        "com.google.android.gms.permission.AD_ID"
+      ],
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-5132559433385403~XXXXXXXXXX"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -55,6 +60,7 @@
     "owner": "ziyad333",
     "extra": {
       "apiUrl": "https://saqr-ads.preview.emergentagent.com",
+      "admobPublisherId": "pub-5132559433385403",
       "eas": {
         "projectId": "2a08ac90-1772-4377-bf99-af5d2357db30"
       }
