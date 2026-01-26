@@ -448,15 +448,43 @@ const AdminSettings = () => {
                     />
                   </div>
                   {paymentSettings.applepay_enabled && (
-                    <div className="space-y-2">
-                      <Input
-                        type={showKeys['applepay'] ? 'text' : 'password'}
-                        value={paymentSettings.applepay_merchant_id}
-                        onChange={(e) => setPaymentSettings(prev => ({ ...prev, applepay_merchant_id: e.target.value }))}
-                        placeholder="Merchant ID"
-                        className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
-                      />
-                      <p className="text-xs text-gray-400">يعمل من خلال Stripe - تأكد من تفعيل Stripe أولاً</p>
+                    <div className="space-y-3">
+                      <div className={`p-3 rounded-lg ${paymentSettings.stripe_enabled ? 'bg-green-900/50 border border-green-600' : 'bg-red-900/50 border border-red-600'}`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          {paymentSettings.stripe_enabled ? (
+                            <CheckCircle className="w-4 h-4 text-green-400" />
+                          ) : (
+                            <XCircle className="w-4 h-4 text-red-400" />
+                          )}
+                          <span className="text-sm text-white font-medium">
+                            {paymentSettings.stripe_enabled ? 'Stripe مفعّل ✓' : 'Stripe غير مفعّل!'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-300">
+                          {paymentSettings.stripe_enabled 
+                            ? 'Apple Pay يعمل تلقائياً عبر Stripe. سيظهر للمستخدمين على أجهزة Apple المتوافقة.'
+                            : 'Apple Pay يتطلب تفعيل Stripe أولاً. قم بتفعيل Stripe وإدخال مفتاح API.'}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs text-gray-400">Merchant ID (اختياري)</label>
+                        <Input
+                          type={showKeys['applepay'] ? 'text' : 'password'}
+                          value={paymentSettings.applepay_merchant_id}
+                          onChange={(e) => setPaymentSettings(prev => ({ ...prev, applepay_merchant_id: e.target.value }))}
+                          placeholder="merchant.com.yourapp (اختياري)"
+                          className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
+                        />
+                      </div>
+                      <div className="p-2 bg-gray-800 rounded-lg text-xs text-gray-400">
+                        <p className="font-medium text-gray-300 mb-1">💡 كيف يعمل Apple Pay؟</p>
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>عند الدفع عبر Stripe Checkout من iPhone/iPad/Mac</li>
+                          <li>يظهر زر Apple Pay تلقائياً للمستخدم</li>
+                          <li>لا حاجة لإعداد إضافي - Stripe يتكفل بالباقي</li>
+                          <li>فعّل Apple Pay في لوحة Stripe: Settings → Payment Methods</li>
+                        </ul>
+                      </div>
                     </div>
                   )}
                 </div>
