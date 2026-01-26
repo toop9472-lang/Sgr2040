@@ -1,12 +1,12 @@
 """
-Claude Haiku 4.5 AI Routes
+Claude Sonnet 4 AI Routes
 Endpoints for Claude AI interactions
 """
 
 from fastapi import APIRouter, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from auth.dependencies import get_current_user_id
 import os
 
@@ -32,17 +32,32 @@ class SummaryRequest(BaseModel):
     """Request to summarize text"""
     text: str
     language: Optional[str] = 'ar'
+    max_length: Optional[int] = None
 
 
 class TranslationRequest(BaseModel):
     """Request to translate text"""
     text: str
+    source_language: Optional[str] = 'auto'
     target_language: Optional[str] = 'en'
 
 
 class ContentAnalysisRequest(BaseModel):
     """Request to analyze content"""
     content: str
+    analysis_type: Optional[str] = 'general'
+
+
+class ChatMessage(BaseModel):
+    """Chat message"""
+    role: str  # 'user' or 'assistant'
+    content: str
+
+
+class ChatRequest(BaseModel):
+    """Chat request with message history"""
+    messages: List[ChatMessage]
+    system_message: Optional[str] = None
 
 
 async def verify_ai_enabled(db) -> bool:
@@ -53,12 +68,17 @@ async def verify_ai_enabled(db) -> bool:
     return settings.get('claude_haiku_enabled', False)
 
 
+async def get_ai_settings(db):
+    """Get AI settings from database"""
+    return await db.settings.find_one({'type': 'ai_models'}, {'_id': 0})
+
+
 @router.post('/generate-response')
 async def generate_ai_response(
     request: TextPrompt,
     user_id: str = Depends(get_current_user_id)
 ):
-    """Generate response using Claude Haiku 4.5"""
+    """Generate response using Claude Sonnet 4"""
     from services.claude_ai_service import get_claude_service
     
     db = get_db()
@@ -67,21 +87,23 @@ async def generate_ai_response(
     if not await verify_ai_enabled(db):
         raise HTTPException(
             status_code=403,
-            detail='Claude Haiku AI is not enabled'
+            detail='Claude AI is not enabled. Please enable it in admin settings.'
         )
     
     # Check if user is authorized to use AI
-    settings = await db.settings.find_one({'type': 'ai_models'}, {'_id': 0})
+    settings = await get_ai_settings(db)
     if not settings.get('claude_haiku_enabled_for_all_clients'):
         # Only admins can use if not enabled for all
-        admin = await db.admins.find_one({'id': user_id}, {'_id': 0})
+        admin = await db.admins.find_one({
+            '$or': [{'id': user_id}, {'email': user_id}]
+        }, {'_id': 0})
         if not admin:
             raise HTTPException(
                 status_code=403,
                 detail='Access denied: Claude AI is not available for your account'
             )
     
-    claude_service = get_claude_service()
+    claude_service = await get_claude_service()
     result = await claude_service.generate_response(
         prompt=request.prompt,
         system_message=request.system_message,
@@ -97,7 +119,7 @@ async def summarize_text(
     request: SummaryRequest,
     user_id: str = Depends(get_current_user_id)
 ):
-    """Summarize text using Claude Haiku 4.5"""
+    """Summarize text using Claude Sonnet 4"""
     from services.claude_ai_service import get_claude_service
     
     db = get_db()
@@ -106,13 +128,14 @@ async def summarize_text(
     if not await verify_ai_enabled(db):
         raise HTTPException(
             status_code=403,
-            detail='Claude Haiku AI is not enabled'
+            detail='Claude AI is not enabled'
         )
     
-    claude_service = get_claude_service()
-    result = await claude_service.generate_summary(
+    claude_service = await get_claude_service()
+    result = await claude_service.summarize_text(
         text=request.text,
-        language=request.language
+        language=request.language,
+        max_length=request.max_length
     )
     
     return result
@@ -123,7 +146,7 @@ async def translate_text(
     request: TranslationRequest,
     user_id: str = Depends(get_current_user_id)
 ):
-    """Translate text using Claude Haiku 4.5"""
+    """Translate text using Claude Sonnet 4"""
     from services.claude_ai_service import get_claude_service
     
     db = get_db()
@@ -132,13 +155,14 @@ async def translate_text(
     if not await verify_ai_enabled(db):
         raise HTTPException(
             status_code=403,
-            detail='Claude Haiku AI is not enabled'
+            detail='Claude AI is not enabled'
         )
     
-    claude_service = get_claude_service()
+    claude_service = await get_claude_service()
     result = await claude_service.translate_text(
         text=request.text,
-        target_language=request.target_language
+        source_lang=request.source_language,
+        target_lang=request.target_language
     )
     
     return result
@@ -149,7 +173,7 @@ async def analyze_content(
     request: ContentAnalysisRequest,
     user_id: str = Depends(get_current_user_id)
 ):
-    """Analyze content using Claude Haiku 4.5"""
+    """Analyze content using Claude Sonnet 4"""
     from services.claude_ai_service import get_claude_service
     
     db = get_db()
@@ -158,19 +182,65 @@ async def analyze_content(
     if not await verify_ai_enabled(db):
         raise HTTPException(
             status_code=403,
-            detail='Claude Haiku AI is not enabled'
+            detail='Claude AI is not enabled'
         )
     
     # Only admins can analyze content
-    admin = await db.admins.find_one({'id': user_id}, {'_id': 0})
+    admin = await db.admins.find_one({
+        '$or': [{'id': user_id}, {'email': user_id}]
+    }, {'_id': 0})
     if not admin:
         raise HTTPException(
             status_code=403,
             detail='Only admins can analyze content'
         )
     
-    claude_service = get_claude_service()
-    result = await claude_service.analyze_content(content=request.content)
+    claude_service = await get_claude_service()
+    result = await claude_service.analyze_content(
+        content=request.content,
+        analysis_type=request.analysis_type
+    )
+    
+    return result
+
+
+@router.post('/chat')
+async def chat_with_ai(
+    request: ChatRequest,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Multi-turn chat with Claude Sonnet 4"""
+    from services.claude_ai_service import get_claude_service
+    
+    db = get_db()
+    
+    # Check if AI is enabled
+    if not await verify_ai_enabled(db):
+        raise HTTPException(
+            status_code=403,
+            detail='Claude AI is not enabled'
+        )
+    
+    # Check if user is authorized
+    settings = await get_ai_settings(db)
+    if not settings.get('claude_haiku_enabled_for_all_clients'):
+        admin = await db.admins.find_one({
+            '$or': [{'id': user_id}, {'email': user_id}]
+        }, {'_id': 0})
+        if not admin:
+            raise HTTPException(
+                status_code=403,
+                detail='Access denied: Claude AI is not available for your account'
+            )
+    
+    # Convert messages to dict format
+    messages = [{"role": m.role, "content": m.content} for m in request.messages]
+    
+    claude_service = await get_claude_service()
+    result = await claude_service.chat(
+        messages=messages,
+        system_message=request.system_message
+    )
     
     return result
 
@@ -181,25 +251,36 @@ async def get_claude_status(user_id: str = Depends(get_current_user_id)):
     from services.claude_ai_service import get_claude_service
     
     db = get_db()
-    claude_service = get_claude_service()
-    
-    # Get AI settings
-    settings = await db.settings.find_one({'type': 'ai_models'}, {'_id': 0})
+    settings = await get_ai_settings(db)
     
     if not settings:
         return {
             'enabled': False,
             'enabled_for_all': False,
             'status': 'disabled',
-            'message': 'Claude Haiku AI is not configured'
+            'message': 'Claude AI is not configured'
         }
+    
+    claude_service = await get_claude_service()
+    is_configured = claude_service.is_configured()
     
     return {
         'enabled': settings.get('claude_haiku_enabled', False),
         'enabled_for_all': settings.get('claude_haiku_enabled_for_all_clients', False),
-        'status': 'active' if settings.get('claude_haiku_enabled') else 'disabled',
-        'model': settings.get('model_name', 'claude-haiku-4.5'),
-        'provider': settings.get('api_provider', 'anthropic'),
-        'configured': claude_service.is_configured(),
-        'message': 'Claude Haiku 4.5 is active' if claude_service.is_configured() else 'API key is not configured'
+        'configured': is_configured,
+        'model': claude_service.model_name,
+        'status': 'active' if (settings.get('claude_haiku_enabled') and is_configured) else 'inactive',
+        'message': 'Claude Sonnet 4 is ready' if is_configured else 'API key not configured'
+    }
+
+
+@router.get('/public/status')
+async def get_public_claude_status():
+    """Get public Claude AI status (no auth required)"""
+    db = get_db()
+    settings = await get_ai_settings(db)
+    
+    return {
+        'available': settings.get('claude_haiku_enabled', False) if settings else False,
+        'available_for_all': settings.get('claude_haiku_enabled_for_all_clients', False) if settings else False
     }
