@@ -3,186 +3,174 @@ The user wants to create an application named صقر (Saqr), which is an adverti
 
 **PRODUCT REQUIREMENTS:**
 -   **Core Functionality:** Users scroll through a vertical, full-screen feed of video ads.
--   **Points System:** Users earn points for watching ads, redeemable for cash. The conversion rate and earning rules must be configurable by the admin. The user specified that a point should be earned after a cumulative minute of ad watching.
--   **AI Features:** The user requested AI-powered features for the admin and a user-facing AI chat component.
--   **UI/UX Enhancements:** A professional, full-screen UI for the ad viewer where controls are hidden. Swiping up/down navigates ads, and swiping left/right navigates between app sections. A professional logo. Dark/light mode.
+-   **Points System:** Users earn points for watching ads, redeemable for cash. The conversion rate and earning rules must be configurable by the admin. A point is earned after a cumulative minute of ad watching.
+-   **AI Features:** AI-powered features for the admin and a user-facing AI chat component.
+-   **UI/UX Enhancements:** A professional, full-screen UI for the ad viewer where controls are hidden. Swiping navigates ads and sections. A professional logo. Dark/light mode.
 -   **Authentication:** User registration via Google, Apple, and email/password.
--   **Admin Panel:** A comprehensive, well-organized dashboard to manage withdrawals, ads, users, finances, and control all core application settings (like rewards) dynamically.
--   **Mobile App:** A React Native mobile application that is 100% the focus. The user has explicitly requested a downloadable APK file and has no access to a computer, so the agent must perform the build. The mobile app must be identical in features and quality to the web app.
+-   **Admin Panel:** A comprehensive dashboard to manage withdrawals, ads, users, finances, and application settings.
+-   **Mobile App:** A React Native mobile application is the primary focus. The user has no computer, so the agent must build and provide the downloadable APK file. The mobile app must have feature and quality parity with the web app.
 -   **Advertiser Features:** A section for advertisers to post ads for a fee.
--   **Withdrawals:** Admin approval is required for all withdrawal requests. All mock data must be removed.
--   **Security:** An anti-cheat system to detect and flag users trying to game the points system.
--   **Homepage:** The main page should not be for ads but should contain useful, engaging content for the user, like analytics, to break the monotony of ad-watching.
+-   **Withdrawals:** Admin approval is required for all withdrawal requests.
+-   **Security:** An anti-cheat system.
+-   **Homepage:** An engaging user homepage with analytics, not just an ad feed.
 
 **User's preferred language**: Arabic
 
 **what currently exists?**
--   **Web App:** The web application has been significantly enhanced and serves as the gold standard for features. It includes a new TikTok-style full-screen ad viewer, a new user homepage with analytics, a reorganized admin dashboard with a new rewards settings page, and a functional dark/light mode.
--   **Backend:** The FastAPI backend has been extended to support all the new frontend features. This includes new endpoints for fetching and updating rewards settings (), getting user analytics (), and a more robust points system.
--   **Mobile App:** The mobile app is the main point of failure. It has been rewritten and rebuilt multiple times, but the user is extremely dissatisfied, reporting that it looks primitive and lacks key features available on the web (working icons, AI assistant, advertiser page, Google/Apple login buttons, correct UI). The latest build (v2.2.0) was a failed attempt to address these issues.
+-   A functional FastAPI backend and React web application.
+-   The user has just requested a complete UI overhaul based on an image they provided. The new design features a dark background with blue circular accents and a modern, clean aesthetic. The agent has started implementing this on the web frontend.
+-   The mobile application's code has been significantly refactored from a single monolithic  file into a modern, component-based architecture under . However, the UI of these new components has not been updated to match the latest design requested by the user.
+-   Placeholder backend routes and frontend pages have been created for Tabby, Tamara, and Unity Ads integrations, but they contain no functional logic.
 
 **Last working item**:
--   Last item agent was working: The agent was attempting to fix the mobile application to match the functionality and design of the web application after the user provided extensive negative feedback on the latest APK. This involved another complete rewrite of  and initiating a new Expo build.
+-   Last item agent was working: The agent was in the middle of a major UI overhaul across the web application to match a new professional design requested by the user, who provided a reference image. The agent updated , , , , and  and was about to continue with the remaining pages.
 -   Status: IN PROGRESS
 -   Agent Testing Done: N
--   Which testing method agent to use? both. After rebuilding the mobile app, the agent must guide the user to test the new APK. The agent should also use the testing agent on the web app to ensure no regressions were introduced.
--   User Testing Done: Y (User tested the last APK and reported it as broken and feature-incomplete).
+-   Which testing method agent to use? frontend testing agent. The UI changes are extensive. The agent should first complete and test the web UI, get user approval via screenshots, and only then apply the changes to the mobile app and build an APK.
+-   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   Issue 1: (P0) Mobile App is Broken and Lacks Feature Parity.
--   Issue 2: (P2) Implement Backend Logic for Payment Gateways.
--   Issue 3: (P2) N+1 Query Problem in Admin Dashboard.
+-   Issue 1: (P0) Mobile App Lacks UI and Feature Parity
+-   Issue 2: (P1) Mobile App Performance
+-   Issue 3: (P2) Implement Backend Logic for Payment Gateways & Ad Networks
 
 Issues Detail:
--   **Issue 1: Mobile App is Broken and Lacks Feature Parity.**
-    -   **Attempted fixes:** The agent has rewritten  multiple times and successfully built several APKs. However, none of them have met the user's expectations. The latest version was reported to have non-working icons, missing pages (AI assistant, advertiser), missing login options, and an incorrect UI.
+-   **Issue 1: Mobile App Lacks UI and Feature Parity.**
+    -   **Attempted fixes:** The agent successfully refactored the monolithic  into a proper component structure. This fixed the underlying architectural issue. However, the UI for these new components is now outdated and does not reflect the latest design requested by the user.
     -   **Next debug checklist:**
-        1.  **STOP** building new APKs immediately.
-        2.  **Analyze** the web app's component structure (, , , , etc.).
-        3.  **Refactor** the monolithic  into a proper component-based architecture mirroring the web app. Create separate files for each page/major component.
-        4.  **Implement** all missing features one by one: Auth page with Google/Apple buttons, AI chat, Advertiser page, Profile page. Ensure navigation works correctly.
-        5.  **Style** the components to be visually identical to the web version (gray icons, correct layout, etc.).
-        6.  Once the code is properly structured and features are implemented, perform a new APK build.
-    -   **Why fix this issue and what will be achieved with the fix?** This is the user's highest priority. The application is intended to be mobile-first, and the current mobile app is unusable and unacceptable to the user.
+        1.  **FINISH** implementing the new UI design on the **web application** first.
+        2.  Get **user approval** for the web UI using screenshots.
+        3.  Once approved, systematically update the new mobile components in  and  to match the web app's new styles and functionality.
+        4.  Ensure all pages (Home, Ads, Profile, Advertiser, AI Chat) are present and correctly styled.
+        5.  Build a new APK for user testing.
+    -   **Why fix this issue and what will be achieved with the fix?** This is the user's highest priority. The mobile app is the main product, and it must match the approved design and functionality of the web app.
     -   **Status:** IN PROGRESS
     -   **Is recurring issue?** Y
     -   **Should Test frontend/backend/both after fix?** frontend
-    -   **Blocked on other issue:** None.
--   **Issue 2: Implement Backend Logic for Payment Gateways.**
-    -   **Attempted fixes:** None. UI and DB storage exist, but backend logic for Tap, Tabby, Tamara, STC Pay, PayPal, Apple Pay is missing.
-    -   **Next debug checklist:** Implement FastAPI routes for each payment gateway to handle payment processing.
-    -   **Why fix this issue and what will be achieved with the fix?** This is critical for the application's monetization strategy.
+    -   **Blocked on other issue:** In-progress Task 1 (Complete UI Redesign).
+-   **Issue 2: Mobile App Performance.**
+    -   **Attempted fixes:** The architectural refactor was the first step.
+    -   **Next debug checklist:**
+        1.  Investigate and implement performance optimizations for the mobile app.
+        2.  Focus on video handling: use  with optimizations, consider lazy loading or flatlists for video components.
+        3.  Minimize re-renders in components.
+    -   **Why fix this issue and what will be achieved with the fix?** The user reported that the app hangs and closes on its own (التطبيق ثقيل), indicating significant performance problems.
     -   **Status:** NOT STARTED
     -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** backend
-    -   **Blocked on other issue:** None.
--   **Issue 3: N+1 Query Problem in Admin Dashboard.**
-    -   **Attempted fixes:** None in this session.
-    -   **Next debug checklist:** Analyze dashboard-related routes in  for loops making individual database calls. Refactor to use efficient database aggregations or joins.
-    -   **Why fix this issue and what will be achieved with the fix?** Prevents the admin dashboard from becoming slow or unresponsive as the user base and data grow.
+    -   **Should Test frontend/backend/both after fix?** frontend
+    -   **Blocked on other issue:** Issue 1.
+-   **Issue 3: Implement Backend Logic for Payment Gateways & Ad Networks.**
+    -   **Attempted fixes:** The agent created placeholder files (, , ) and corresponding frontend settings pages. The backend files only return not configured messages.
+    -   **Next debug checklist:**
+        1.  Implement the full API logic for Tabby, Tamara, and Unity Ads integrations within their respective route files.
+        2.  Connect the frontend settings pages (, ) to these backend endpoints.
+        3.  Add links to these new settings pages within the Admin Dashboard so they are accessible.
+    -   **Why fix this issue and what will be achieved with the fix?** This is critical for the app's monetization strategy.
     -   **Status:** NOT STARTED
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix:** backend
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on other issue:** None.
 
 **In progress Task List**:
--   **Task 1: Overhaul Mobile Application**
-    -   **Where to resume:** Start by creating a new, component-based structure for the mobile app in the  directory, mirroring the web app's  structure.
-    -   **What will be achieved with this?** A functional, high-quality mobile app that is identical to the web version, fulfilling the user's core request.
+-   **Task 1: Complete Web App UI/UX Redesign (P0)**
+    -   **Where to resume:** The agent has updated , , and . The next step is to apply the new professional design (dark theme, blue accents) to the remaining web components: , , , etc., to ensure a consistent look and feel across the entire web application.
+    -   **What will be achieved with this?** A visually consistent and professionally designed web application that meets the user's explicit request, ready for their approval before applying it to the mobile app.
     -   **Status:** IN PROGRESS
     -   **Should Test frontend/backend/both after fix?** frontend
     -   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   (P1) **iOS App Build:** Guide the user through the process for creating an iOS version.
-    -   (P2) **Integrate other Ad Networks:** Add support for Unity Ads or AppLovin.
+    -   (P0) **Build New APK:** After the mobile app UI is updated with the new design, build a new APK for user testing.
+    -   (P1) **iOS App Build:** Guide the user on the necessity and process of acquiring an Apple Developer account.
 -   **Future Tasks:**
     -   Deploy the web and backend applications to a production environment.
     -   Publish the mobile app to the Apple App Store and Google Play Store.
-    -   Add advanced PDF reporting for financial analytics.
+    -   Add advanced PDF reporting functionality.
+    -   Implement a referral system for user acquisition.
 
 **Completed work in this session**
--   **Web UI Overhaul (Completed & User Approved):**
-    -   Implemented a full-screen, swipeable, TikTok-style ad viewer () with advertiser info displayed on touch.
-    -   Created a new engaging User Homepage () with analytics cards, replacing the old ad list.
-    -   Implemented Dark/Light mode using React Context ().
-    -   Cleaned up the bottom navigation to show only four essential, monochrome icons.
--   **Admin Dashboard Enhancements (Completed & User Approved):**
-    -   Reorganized the  layout with tabs for better organization.
-    -   Created a new  component to allow the admin to dynamically control points, watch time, and conversion rates.
--   **Backend Development (Completed):**
-    -   Added new endpoints (, ) to support the rewards settings page.
-    -   Added a new endpoint () to feed data to the new user homepage.
--   **Mobile App Development (Attempted, Failed User Acceptance):**
-    -   Multiple attempts to build an APK for the user.
-    -   The agent successfully logged into the user's Expo account and ran the build process. However, the resulting app was severely lacking in features and quality compared to the web counterpart.
+-   **Mobile App Architecture Refactor:** The monolithic  was completely rewritten into a modern, component-based structure under , resolving a major technical debt and recurring issue.
+-   **AI Chat Endpoint Fix:** Corrected the API endpoint for the AI chat feature in the mobile app's API service file.
+-   **Feature Scaffolding:** Created placeholder backend routes and frontend components for Tabby, Tamara, and Unity Ads integrations.
+-   **UI/UX Iteration:** Attempted two different branding/logo updates which were rejected by the user, leading to the current task of implementing a user-provided design concept.
+-   **Multiple APK Builds:** Generated several APKs (v3.0.0, v3.0.1, v3.1.0) during the development and feedback cycle.
 
 **Earlier issues found/mentioned but not fixed**
--   None that aren't already listed in the pending issues.
+-   The new settings pages (, ) have been created but were not added to the  navigation, making them inaccessible from the UI.
 
 **Known issue recurrence from previous fork**
--   **Issue recurrence in previous fork:** Mobile APK build process.
--   **Recurrence count:** 3+
--   **Status:** BLOCKED. The issue has evolved beyond simple build errors. It is now a fundamental quality and feature-parity problem. The agent's approach of rewriting a single monolithic  file is not working and must be changed.
+-   **Issue recurrence in previous fork:** Mobile App Quality and Build Cycle.
+-   **Recurrence count:** 4+
+-   **Status:** IN PROGRESS. The root *architectural* problem has been addressed by refactoring . However, the risk of the user rejecting the *visual* implementation remains high. The cycle of build - rejection is still the primary workflow risk.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend:** React, Tailwind CSS, shadcn/ui, React Context API, 
+-   **Frontend:** React, Tailwind CSS
 -   **Backend:** FastAPI, Motor (async MongoDB)
--   **Mobile:** React Native, Expo
+-   **Mobile:** React Native, Expo, **Component-Based Architecture**
 -   **Database:** MongoDB
--   **AI:** Anthropic Claude
--   **Deployment:** Kubernetes, Expo EAS Build
+-   **Deployment:** Expo EAS Build
 
 **key DB schema**
--   **settings:** Document now stores global reward settings like , , , etc.
+-   No changes made in this session.
 
 **changes in tech stack**
--    was added and installed in the mobile project.
--    was used for the web frontend swipe navigation.
+-   No new dependencies were installed. The primary change was the structural refactoring of the React Native application.
 
 **All files of reference**
--    (The source of the main problem; needs a total refactor)
--    (Reference for the ad viewer UI)
--    (Reference for the user homepage UI)
--    (Reference for admin UI)
--    (Reference for rewards UI)
--    (Backend for settings)
--    (Backend for user analytics)
+-   : Contains the new CSS variables for the redesign.
+-   : Example of the new UI implementation.
+-   : The new directory containing the refactored mobile application code that needs to be updated.
+-   : Placeholder for Tabby payment integration.
+-   : Placeholder for Tamara payment integration.
 
 **Areas that need refactoring**:
--   **/app/mobile/App.js:** This is CRITICAL. The monolithic file must be broken down into a component-based architecture similar to the web application to manage complexity and implement all required features correctly. This is the root cause of the user's dissatisfaction.
+-   The placeholder routes (, , ) need to be implemented with actual logic.
 
 **key api endpoints**
--   
--   
--   
--   
+-    (Placeholder)
+-    (Placeholder)
+-    (Placeholder)
 
 **Critical Info for New Agent**
--   **The user is extremely unhappy with the mobile app.** Your absolute top priority (P0) is to fix the mobile app. Do not work on anything else until the mobile app is a perfect mirror of the web app in terms of features, UI, and quality.
--   **The current mobile app approach is failing.** Stop rewriting the single  file. You must refactor the mobile app into a proper, modern component-based structure. Look at the  directory for inspiration.
--   **The user has no computer.** You are responsible for the entire APK build process. The process is fragile and has failed multiple times due to interactive prompts. You have the user's Expo credentials.
--   **The web app is the source of truth.** The user likes the web app. Use it as a direct reference for how the mobile app should look and behave.
+-   **User is driving the UI design.** Your current top priority is to finish the new UI redesign on the WEB application, as per the user's latest request. Use screenshots to get their explicit approval on the web version *before* you start implementing it on the mobile app.
+-   **Do not start an APK build prematurely.** The user has rejected multiple builds due to design issues. The cycle is costly. Get design approval first.
+-   **The mobile app has a new, clean architecture.** The code in  is your foundation. Your task is to update the styles and functionality of these components to match the newly approved web design.
+-   **The user has no computer.** You are solely responsible for the entire Expo APK build process.
 
 **documents and test reports created in this job**
--   
--   
--   
--   
+-    (overwritten multiple times)
 
 **Last 10 User Messages and any pending HUMAN messages**
-10. User confirms they have no computer to build the APK.
-9.  Agent asks for Expo password.
-8.  User provides Expo password.
-7.  Agent initiates APK build but runs into multiple issues with interactive prompts (keystore creation).
-6.  Agent eventually gets a build completed and provides a download link.
-5.  **CRITICAL FEEDBACK:** User tests the APK and reports it's broken. Icons don't work, pages are missing (AI, ads), icons are the wrong color, login doesn't work, and the app feels primitive and nothing like the web version.
-4.  Agent acknowledges feedback and promises to rebuild the mobile app to match the web app.
-3.  Agent rewrites  and initiates another build.
-2.  Agent successfully builds a new APK (v2.2.0) and provides the link.
-1.  **CRITICAL FEEDBACK:** User reports the new APK is also broken. Packages are incorrect, the page is incomplete, AI doesn't work, and Google/Apple login buttons are missing. User asks to make the app identical to the web version and include a test ad.
+-   **10. USER: Likes the new professional design concept and asks the agent to apply it to all pages, including the circular background decorations from the reference image. (CURRENT TASK)**
+-   9. AGENT: Asks for feedback on the initial implementation of the new professional design on the login page.
+-   **8. USER: (Critical) Sends a reference image for a new UI they want. Asks the agent to create a similar professional design and to STOP before building the APK to see the result. (NEW DIRECTION)**
+-   7. USER: States they will go get a logo and asks the agent to wait.
+-   6. AGENT: Reverts UI to a dark theme and starts a new build.
+-   5. USER: Clarifies they wanted the dark theme from *before* the branding changes, not the light theme.
+-   4. AGENT: Reverts the UI to the original light theme.
+-   3. USER: Expresses strong dislike for the generated logo/branding and asks the agent to revert the changes.
+-   2. USER: Asks for modifications to the AI-generated logo (transparent background, no sharp corners).
+-   1. USER: Agrees to the branding customizations and asks if an Apple Developer account is needed for an iOS app.
 
 **Project Health Check:**
--   **Broken:** The Mobile Application ().
--   **Mocked:** Backend logic for payment gateways and Apple OAuth.
+-   **Broken:** The mobile application's UI is functionally broken as it does not reflect the current design direction.
+-   **Mocked:** Backend logic for Tabby, Tamara, and Unity Ads integrations.
 
 **3rd Party Integrations**
--   **Anthropic Claude Sonnet 4:** (Text Generation) Integrated for admin/user chat.
--   **Stripe (Payments):** Partially integrated (UI/DB only).
--   **Firebase Admin SDK (Push Notifications):** Integrated.
--   **Resend (Email):** Fully integrated.
--   **Google AdMob (Rewarded Ads):** Configured.
--   **Emergent-managed Google Auth:** Configured, backend logic is present.
+-   **Anthropic Claude Sonnet 4:** Integrated for chat.
+-   **Expo EAS Build:** Used for mobile app builds.
+-   **Google/Apple Auth:** Configured.
+-   **Tabby/Tamara/Unity Ads:** Scaffolding exists, but not integrated.
 
 **Testing status**
--   Testing agent used after significant changes: YES (for web app changes, passed successfully)
+-   Testing agent used after significant changes: NO
 -   Troubleshoot agent used after agent stuck in loop: NO
 -   Test files created: []
--   Known regressions: The entire mobile application is a regression from the user's expectation.
+-   Known regressions: The mobile application's UI is out of sync with the user's latest request.
 
 **Credentials to test flow:**
 -   **Admin User:**
@@ -193,4 +181,6 @@ Issues Detail:
     -   Password: 
 
 **What agent forgot to execute**
--   The agent failed to create a mobile app that meets the user's quality and feature requirements. The core mistake was continuing to patch a single monolithic file () instead of performing a necessary architectural refactor to a component-based system, leading to a product that was functionally and visually divergent from the web version.</analysis>
+-   The agent created placeholder routes for new integrations (Tabby, Tamara, Unity Ads) but did not implement any of the required backend logic.
+-   The agent created new frontend settings pages (, ) but forgot to add them to the admin dashboard navigation, making them inaccessible.
+-   The agent identified mobile app performance as an issue (التطبيق ثقيل) but did not implement any specific optimizations like lazy loading during the refactor.</analysis>

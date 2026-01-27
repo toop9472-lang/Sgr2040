@@ -177,7 +177,7 @@ eas build --platform ios --profile production
 
 ### API URL:
 ```
-https://saqr-video-ads.preview.emergentagent.com
+https://saqr-stream.preview.emergentagent.com
 ```
 
 ---
