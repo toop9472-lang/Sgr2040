@@ -140,41 +140,41 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
 
   if (showEmailForm) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f] p-4 relative overflow-hidden">
+        {/* Decorative Blue Circles */}
+        <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#3b82f6]/20 blur-3xl"></div>
+        <div className="absolute bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#3b82f6]/15 blur-3xl"></div>
+        
         {/* Language Switcher */}
         <div className="fixed top-4 left-4 z-50">
-          <LanguageSwitcher className="!bg-indigo-600 hover:!bg-indigo-700" />
+          <LanguageSwitcher className="!bg-[#1a1a2e] hover:!bg-[#252545] !border-white/10" />
         </div>
 
-        <Card className="w-full max-w-md shadow-xl border-0">
+        <Card className="w-full max-w-md shadow-2xl border border-white/10 bg-[#111118]/80 backdrop-blur-xl rounded-2xl">
           <CardHeader className="text-center pb-6 pt-8 relative">
             <button
               onClick={() => setShowEmailForm(false)}
-              className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} text-gray-500 hover:text-gray-700`}
+              className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} text-gray-400 hover:text-white`}
             >
               {isRTL ? '←' : '→'}
             </button>
-            <div className="mx-auto mb-4 w-16 h-16 rounded-xl overflow-hidden shadow-lg bg-gradient-to-br from-indigo-600 to-purple-600 p-0.5">
-              <img 
-                src="/logo_new.png" 
-                alt="صقر" 
-                className="w-full h-full object-contain rounded-lg bg-white/10"
-              />
+            <div className="mx-auto mb-6 text-5xl">
+              🦅
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-800">
+            <CardTitle className="text-2xl font-bold text-white">
               {isRegister ? t('register') : t('login')}
             </CardTitle>
-            <CardDescription className="text-gray-600">
+            <CardDescription className="text-gray-400">
               {isRegister 
                 ? (isRTL ? 'أدخل بياناتك لإنشاء حساب' : 'Enter your details to create an account')
                 : (isRTL ? 'أدخل بريدك الإلكتروني وكلمة المرور' : 'Enter your email and password')}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 pb-8">
+          <CardContent className="space-y-4 pb-8 px-8">
             <form onSubmit={handleEmailAuth} className="space-y-4">
               {isRegister && (
                 <div>
-                  <Label htmlFor="name">{t('name')}</Label>
+                  <Label htmlFor="name" className="text-gray-300">{t('name')}</Label>
                   <Input
                     id="name"
                     type="text"
@@ -182,14 +182,14 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
                     placeholder={isRTL ? 'اسمك الكامل' : 'Your full name'}
-                    className="mt-1"
+                    className="mt-1 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                     dir={isRTL ? 'rtl' : 'ltr'}
                     data-testid="auth-name-input"
                   />
                 </div>
               )}
               <div>
-                <Label htmlFor="email">{t('email')}</Label>
+                <Label htmlFor="email" className="text-gray-300">{t('email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -197,13 +197,13 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                   placeholder="your@email.com"
-                  className="mt-1"
+                  className="mt-1 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                   dir="ltr"
                   data-testid="auth-email-input"
                 />
               </div>
               <div>
-                <Label htmlFor="password">{t('password')}</Label>
+                <Label htmlFor="password" className="text-gray-300">{t('password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -211,7 +211,7 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
                   placeholder="••••••••"
-                  className="mt-1"
+                  className="mt-1 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                   minLength={6}
                   data-testid="auth-password-input"
                 />
@@ -219,7 +219,7 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+                className="w-full h-12 bg-gradient-to-r from-[#3b82f6] to-[#6366f1] hover:from-[#2563eb] hover:to-[#4f46e5] text-white rounded-full font-medium"
                 data-testid="auth-submit-btn"
               >
                 {isLoading ? t('loading') : (isRegister ? t('register') : t('login'))}
@@ -230,7 +230,7 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
               <button
                 type="button"
                 onClick={() => setIsRegister(!isRegister)}
-                className="text-indigo-600 hover:underline text-sm"
+                className="text-[#60a5fa] hover:underline text-sm"
               >
                 {isRegister ? t('haveAccount') : t('noAccount')}
               </button>
