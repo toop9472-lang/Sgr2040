@@ -23,18 +23,18 @@ const HomePage = ({ user, onNavigateToAds }) => {
     { title: 'المثابر', target: 10, reward: 50, icon: '🔥', desc: 'شاهد 10 إعلانات متتالية' },
   ];
 
+  // اختيار التحدي اليومي عند التحميل
+  const today = new Date().getDate();
+  const dailyChallenge = challenges[today % challenges.length];
+
   useEffect(() => {
     // تغيير النصيحة كل 4 ثواني
     const interval = setInterval(() => {
       setCurrentTip(prev => (prev + 1) % tips.length);
     }, 4000);
 
-    // اختيار تحدي يومي عشوائي
-    const today = new Date().getDate();
-    setDailyChallenge(challenges[today % challenges.length]);
-
     return () => clearInterval(interval);
-  }, []);
+  }, [tips.length]);
 
   const userPoints = user?.points || 0;
   const userBalance = (userPoints / 500).toFixed(2);
