@@ -119,7 +119,7 @@ const HomePage = ({ user, onNavigateToAds }) => {
                 className="w-11 h-11 object-contain"
               />
             </div>
-            <h1 className="text-3xl font-bold text-white">صقر</h1>
+            <h1 className="text-3xl font-bold text-[#60a5fa]">صقر</h1>
           </div>
         </div>
         
