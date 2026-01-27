@@ -203,7 +203,7 @@ class TestAdminRewardsSettings:
         }
         
         response = requests.put(
-            f"{BASE_URL}/api/admin/settings/rewards",
+            f"{BASE_URL}/api/settings/rewards",
             headers=headers,
             json=update_data
         )
