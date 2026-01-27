@@ -340,64 +340,113 @@ const AdvertiserPage = ({ onNavigate }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 pb-20">
+    <div className="min-h-screen bg-[#0a0a0f] pb-20 relative overflow-hidden">
+      {/* Decorative Blue Circles */}
+      <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#3b82f6]/20 blur-3xl"></div>
+      <div className="absolute bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#3b82f6]/15 blur-3xl"></div>
+      
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 pt-8 pb-16 rounded-b-3xl shadow-lg">
+      <div className="relative px-4 pt-8 pb-12">
         <button
           onClick={() => onNavigate('home')}
-          className="text-white mb-4 flex items-center gap-2 hover:underline"
+          className="text-gray-400 hover:text-white mb-4 flex items-center gap-2 transition-colors"
           data-testid="back-btn"
         >
           <ArrowRight className="rotate-180" size={20} />
           عودة
         </button>
-        <h1 className="text-white text-2xl font-bold">أضف إعلانك</h1>
-        <p className="text-white/80 mt-2">وصّل إعلانك لآلاف المستخدمين</p>
+        <h1 className="text-white text-3xl font-bold">أضف إعلانك</h1>
+        <p className="text-gray-400 mt-2">وصّل إعلانك لآلاف المستخدمين النشطين</p>
       </div>
 
-      <div className="px-4 -mt-8 space-y-4">
-        {/* Pricing Packages */}
+      <div className="px-4 space-y-6">
+        {/* Pricing Packages - New Professional Design */}
         {packages.length > 0 && step === 1 && (
-          <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-emerald-50">
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">اختر باقتك</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {packages.map((pkg) => (
-                  <div
-                    key={pkg.id}
-                    onClick={() => {
-                      setSelectedPackage(pkg.id);
-                      setAdData({ ...adData, duration_months: pkg.duration_months });
-                    }}
-                    className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                      selectedPackage === pkg.id
-                        ? 'border-green-600 bg-green-100'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-green-600">{pkg.amount}</p>
-                      <p className="text-sm text-gray-600">ريال</p>
-                      <p className="text-xs text-gray-500 mt-1">{pkg.description}</p>
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-white mb-6 text-center">اختر باقتك</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {packages.map((pkg, index) => (
+                <div
+                  key={pkg.id}
+                  onClick={() => {
+                    setSelectedPackage(pkg.id);
+                    setAdData({ ...adData, duration_months: pkg.duration_months });
+                  }}
+                  className={`relative p-6 rounded-2xl border cursor-pointer transition-all duration-300 ${
+                    selectedPackage === pkg.id
+                      ? 'border-[#3b82f6] bg-[#3b82f6]/10 shadow-lg shadow-[#3b82f6]/20'
+                      : 'border-white/10 bg-[#111118]/80 hover:border-white/30'
+                  }`}
+                >
+                  {/* Popular Badge */}
+                  {index === 1 && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#3b82f6] text-white text-xs font-bold rounded-full">
+                      الأكثر شعبية
+                    </div>
+                  )}
+                  
+                  {/* Package Icon */}
+                  <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                    <svg className="w-7 h-7 text-[#60a5fa]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  
+                  <div className="text-center">
+                    <p className="text-sm text-gray-400 mb-2">{pkg.description}</p>
+                    <p className="text-3xl font-bold text-[#3b82f6]">${pkg.amount}</p>
+                    <p className="text-sm text-gray-500 mt-1">ريال سعودي</p>
+                  </div>
+                  
+                  {/* Features */}
+                  <div className="mt-6 space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <div className="w-5 h-5 rounded-full bg-[#3b82f6]/20 flex items-center justify-center">
+                        <Check size={12} className="text-[#3b82f6]" />
+                      </div>
+                      <span>{pkg.duration_months} شهر عرض</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <div className="w-5 h-5 rounded-full bg-[#3b82f6]/20 flex items-center justify-center">
+                        <Check size={12} className="text-[#3b82f6]" />
+                      </div>
+                      <span>تقارير الأداء</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <div className="w-5 h-5 rounded-full bg-[#3b82f6]/20 flex items-center justify-center">
+                        <Check size={12} className="text-[#3b82f6]" />
+                      </div>
+                      <span>دعم فني</span>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  
+                  {/* Select Button */}
+                  <button
+                    className={`w-full mt-6 py-3 rounded-full font-medium transition-all ${
+                      selectedPackage === pkg.id
+                        ? 'bg-[#3b82f6] text-white'
+                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                    }`}
+                  >
+                    {selectedPackage === pkg.id ? 'تم الاختيار ✓' : 'اختر الباقة'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Step 1: Ad Form */}
         {step === 1 && (
-          <Card className="shadow-md border-0">
+          <Card className="shadow-xl border border-white/10 bg-[#111118]/80 backdrop-blur-xl rounded-2xl">
             <CardHeader>
-              <CardTitle>تفاصيل الإعلان</CardTitle>
-              <CardDescription>أدخل معلومات إعلانك</CardDescription>
+              <CardTitle className="text-white">تفاصيل الإعلان</CardTitle>
+              <CardDescription className="text-gray-400">أدخل معلومات إعلانك</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmitAd} className="space-y-4">
                 <div>
-                  <Label htmlFor="advertiser_name">اسم المعلن *</Label>
+                  <Label htmlFor="advertiser_name" className="text-gray-300">اسم المعلن *</Label>
                   <Input
                     id="advertiser_name"
                     name="advertiser_name"
@@ -405,12 +454,13 @@ const AdvertiserPage = ({ onNavigate }) => {
                     onChange={handleInputChange}
                     required
                     placeholder="اسم شركتك أو علامتك التجارية"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#3b82f6]"
                     data-testid="advertiser-name-input"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="advertiser_email">البريد الإلكتروني *</Label>
+                  <Label htmlFor="advertiser_email" className="text-gray-300">البريد الإلكتروني *</Label>
                   <Input
                     id="advertiser_email"
                     name="advertiser_email"
@@ -419,12 +469,13 @@ const AdvertiserPage = ({ onNavigate }) => {
                     onChange={handleInputChange}
                     required
                     placeholder="your@email.com"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#3b82f6]"
                     data-testid="advertiser-email-input"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="advertiser_phone">رقم الجوال</Label>
+                  <Label htmlFor="advertiser_phone" className="text-gray-300">رقم الجوال</Label>
                   <Input
                     id="advertiser_phone"
                     name="advertiser_phone"
@@ -432,12 +483,13 @@ const AdvertiserPage = ({ onNavigate }) => {
                     value={adData.advertiser_phone}
                     onChange={handleInputChange}
                     placeholder="05xxxxxxxx"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#3b82f6]"
                     data-testid="advertiser-phone-input"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="website_url">رابط موقعك (اختياري)</Label>
+                  <Label htmlFor="website_url" className="text-gray-300">رابط موقعك (اختياري)</Label>
                   <Input
                     id="website_url"
                     name="website_url"
@@ -445,6 +497,7 @@ const AdvertiserPage = ({ onNavigate }) => {
                     value={adData.website_url}
                     onChange={handleInputChange}
                     placeholder="https://www.yourwebsite.com"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#3b82f6]"
                     data-testid="website-url-input"
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -453,7 +506,7 @@ const AdvertiserPage = ({ onNavigate }) => {
                 </div>
 
                 <div>
-                  <Label htmlFor="title">عنوان الإعلان *</Label>
+                  <Label htmlFor="title" className="text-gray-300">عنوان الإعلان *</Label>
                   <Input
                     id="title"
                     name="title"
@@ -461,12 +514,13 @@ const AdvertiserPage = ({ onNavigate }) => {
                     onChange={handleInputChange}
                     required
                     placeholder="عنوان جذاب لإعلانك"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#3b82f6]"
                     data-testid="ad-title-input"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="description">وصف الإعلان *</Label>
+                  <Label htmlFor="description" className="text-gray-300">وصف الإعلان *</Label>
                   <Textarea
                     id="description"
                     name="description"
@@ -475,12 +529,13 @@ const AdvertiserPage = ({ onNavigate }) => {
                     required
                     placeholder="اكتب وصفاً مختصراً لإعلانك"
                     rows={3}
+                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#3b82f6]"
                     data-testid="ad-description-input"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="video_url">رابط الفيديو *</Label>
+                  <Label htmlFor="video_url" className="text-gray-300">رابط الفيديو *</Label>
                   <Input
                     id="video_url"
                     name="video_url"
@@ -489,6 +544,7 @@ const AdvertiserPage = ({ onNavigate }) => {
                     onChange={handleInputChange}
                     required
                     placeholder="https://example.com/video.mp4"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#3b82f6]"
                     data-testid="video-url-input"
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -497,7 +553,7 @@ const AdvertiserPage = ({ onNavigate }) => {
                 </div>
 
                 <div>
-                  <Label htmlFor="thumbnail_url">رابط الصورة المصغرة</Label>
+                  <Label htmlFor="thumbnail_url" className="text-gray-300">رابط الصورة المصغرة</Label>
                   <Input
                     id="thumbnail_url"
                     name="thumbnail_url"
