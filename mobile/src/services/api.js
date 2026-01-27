@@ -48,12 +48,15 @@ export const api = {
 
   // AI Chat
   async sendChatMessage(message, token = null) {
-    const endpoint = token ? '/api/ai/chat' : '/api/ai/guest-chat';
+    const endpoint = token ? '/api/claude-ai/chat' : '/api/claude-ai/chat/guest';
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     return this.fetch(endpoint, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ 
+        messages: [{ role: 'user', content: message }],
+        system_message: 'أنت مساعد ذكي في تطبيق صقر. ساعد المستخدم باللغة العربية.'
+      }),
     });
   },
 
