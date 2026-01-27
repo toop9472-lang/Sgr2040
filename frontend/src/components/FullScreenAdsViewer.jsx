@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Eye, Star, Volume2, VolumeX, ChevronUp, ChevronDown } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -10,12 +10,13 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   const [watchTime, setWatchTime] = useState(0);
   const [isWatching, setIsWatching] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
+  const [showControls, setShowControls] = useState(false);
+  const [touchStartY, setTouchStartY] = useState(null);
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [touchEndY, setTouchEndY] = useState(null);
+  const [touchEndX, setTouchEndX] = useState(null);
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [showPointsAnimation, setShowPointsAnimation] = useState(false);
-  const [viewerCount, setViewerCount] = useState(0);
   const [transitioning, setTransitioning] = useState(false);
   
   const videoRef = useRef(null);
@@ -25,7 +26,8 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
 
   const REQUIRED_WATCH_TIME = 30;
   const POINTS_PER_AD = 5;
-  const MIN_SWIPE_DISTANCE = 50;
+  const MIN_SWIPE_DISTANCE_Y = 50; // للتنقل بين الإعلانات (أعلى/أسفل)
+  const MIN_SWIPE_DISTANCE_X = 80; // للخروج (يمين/يسار)
 
   // Load ads
   useEffect(() => {
