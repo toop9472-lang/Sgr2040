@@ -256,10 +256,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
     <div 
       ref={containerRef}
       className="fixed inset-0 bg-black z-50 select-none"
-      onTouchStart={(e) => {
-        handleTouchStart(e);
-        handleHorizontalSwipe(e);
-      }}
+      onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onWheel={handleWheel}
