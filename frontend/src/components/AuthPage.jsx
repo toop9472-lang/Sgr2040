@@ -242,25 +242,21 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f0f23] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
       {/* Language Switcher */}
       <div className="fixed top-4 left-4 z-50">
-        <LanguageSwitcher className="!bg-[#6B4C9A] hover:!bg-[#4A3470]" />
+        <LanguageSwitcher className="!bg-indigo-600 hover:!bg-indigo-700" />
       </div>
 
-      <Card className="w-full max-w-md shadow-2xl border-0 bg-white/5 backdrop-blur-lg border border-white/10">
+      <Card className="w-full max-w-md shadow-xl border-0">
         <CardHeader className="text-center pb-8 pt-10">
-          <div className="mx-auto mb-6 w-28 h-28">
-            <img 
-              src="/images/logo.png" 
-              alt="صقر" 
-              className="w-full h-full object-contain drop-shadow-2xl"
-            />
+          <div className="mx-auto mb-6 text-8xl">
+            🦅
           </div>
-          <CardTitle className="text-3xl font-bold text-[#D4AF37]">
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
             {t('appName')}
           </CardTitle>
-          <CardDescription className="text-base mt-3 text-white/70">
+          <CardDescription className="text-base mt-3 text-gray-600">
             {t('watchAdsEarnPoints')}
           </CardDescription>
         </CardHeader>
@@ -268,7 +264,7 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
           {oauthSettings.google_enabled && (
             <Button
               onClick={handleGoogleLogin}
-              className="w-full h-12 bg-white hover:bg-gray-100 text-gray-700 flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-xl"
+              className="w-full h-12 bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-3 transition-all shadow-sm hover:shadow"
               variant="outline"
               data-testid="google-login-btn"
             >
@@ -297,7 +293,7 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
           {oauthSettings.apple_enabled && (
             <Button
               onClick={handleAppleLogin}
-              className="w-full h-12 bg-black hover:bg-gray-900 text-white flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-xl"
+              className="w-full h-12 bg-black hover:bg-gray-900 text-white flex items-center justify-center gap-3 transition-all shadow-sm hover:shadow"
               data-testid="apple-login-btn"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -310,10 +306,10 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
           {(oauthSettings.google_enabled || oauthSettings.apple_enabled) && (
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/20"></div>
+                <div className="w-full border-t border-gray-200"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-transparent text-white/50">{t('or')}</span>
+                <span className="px-2 bg-white text-gray-500">{t('or')}</span>
               </div>
             </div>
           )}
@@ -321,7 +317,7 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
           <Button
             onClick={() => setShowEmailForm(true)}
             variant="outline"
-            className="w-full h-12 border-2 border-[#D4AF37]/50 hover:border-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center gap-3 transition-all"
+            className="w-full h-12 border-2 border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 text-indigo-700 flex items-center justify-center gap-3 transition-all"
             data-testid="email-login-btn"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -333,7 +329,7 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
           <Button
             onClick={handleGuestMode}
             variant="outline"
-            className="w-full h-12 border-2 border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 text-white/80 flex items-center justify-center gap-3 transition-all"
+            className="w-full h-12 border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-700 flex items-center justify-center gap-3 transition-all"
             data-testid="guest-mode-btn"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
