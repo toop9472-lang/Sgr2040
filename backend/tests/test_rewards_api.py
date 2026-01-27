@@ -158,7 +158,7 @@ class TestAdminRewardsSettings:
     def admin_token(self):
         """Get admin token for authenticated requests"""
         response = requests.post(
-            f"{BASE_URL}/api/admin/login",
+            f"{BASE_URL}/api/admin/auth/login",
             json={
                 "email": "sky-321@hotmail.com",
                 "password": "Wsxzaq123"
