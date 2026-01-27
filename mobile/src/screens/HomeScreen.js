@@ -147,13 +147,32 @@ const HomeScreen = ({ user, onNavigateToAds, settings }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.dark.bg },
-  content: { padding: 20, paddingTop: 60, paddingBottom: 100 },
+  content: { padding: 20, paddingTop: 40, paddingBottom: 100 },
+
+  logoHeader: { alignItems: 'center', marginBottom: 20 },
+  logoContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#0a0a0f',
+    borderWidth: 2,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  logoImage: { width: 48, height: 48 },
+  appName: { fontSize: 28, fontWeight: 'bold', color: '#60a5fa', marginTop: 8 },
 
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  welcomeText: { fontSize: 24, fontWeight: 'bold', color: colors.dark.text },
+  welcomeText: { fontSize: 20, fontWeight: 'bold', color: colors.dark.text },
   subText: { fontSize: 14, color: colors.dark.textSecondary, marginTop: 4 },
-  pointsBadge: { backgroundColor: 'rgba(251,191,36,0.2)', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20 },
-  pointsBadgeText: { color: colors.accent, fontWeight: 'bold', fontSize: 16 },
+  pointsBadge: { backgroundColor: 'rgba(59,130,246,0.2)', borderWidth: 1, borderColor: 'rgba(59,130,246,0.3)', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20 },
+  pointsBadgeText: { color: '#60a5fa', fontWeight: 'bold', fontSize: 16 },
 
   balanceCard: { borderRadius: 24, padding: 24, marginBottom: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   balanceInfo: {},
