@@ -2,32 +2,32 @@
   "expo": {
     "name": "صقر",
     "slug": "saqr-app",
-    "version": "3.3.1",
+    "version": "3.4.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo_saqr.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logo_saqr.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1a1a2e"
+      "backgroundColor": "#0a0a0f"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.saqr.rewards",
-      "buildNumber": "3.3.1"
+      "buildNumber": "3.4.0"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#1a1a2e"
+        "foregroundImage": "./assets/logo_saqr.png",
+        "backgroundColor": "#0a0a0f"
       },
       "package": "com.saqr.rewards",
-      "versionCode": 11,
+      "versionCode": 12,
       "permissions": ["INTERNET", "VIBRATE"]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/logo_saqr.png"
     },
     "owner": "ziyad333",
     "extra": {
