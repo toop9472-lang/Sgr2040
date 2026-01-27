@@ -157,8 +157,12 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
             >
               {isRTL ? '←' : '→'}
             </button>
-            <div className="mx-auto mb-6 text-5xl">
-              🦅
+            <div className="mx-auto mb-4 w-20 h-20 rounded-full bg-[#0a0a0f] border-2 border-[#3b82f6]/30 flex items-center justify-center overflow-hidden">
+              <img 
+                src="/logo_saqr.png" 
+                alt="صقر" 
+                className="w-16 h-16 object-contain"
+              />
             </div>
             <CardTitle className="text-2xl font-bold text-white">
               {isRegister ? t('register') : t('login')}
@@ -254,10 +258,14 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
 
       <Card className="w-full max-w-md shadow-2xl border border-white/10 bg-[#111118]/80 backdrop-blur-xl rounded-2xl">
         <CardHeader className="text-center pb-6 pt-10">
-          <div className="mx-auto mb-6 text-7xl">
-            🦅
+          <div className="mx-auto mb-4 w-24 h-24 rounded-full bg-[#0a0a0f] border-2 border-[#3b82f6]/30 flex items-center justify-center overflow-hidden shadow-lg shadow-[#3b82f6]/20">
+            <img 
+              src="/logo_saqr.png" 
+              alt="صقر" 
+              className="w-20 h-20 object-contain"
+            />
           </div>
-          <CardTitle className="text-3xl font-bold text-white">
+          <CardTitle className="text-4xl font-bold text-white mt-2">
             {t('appName')}
           </CardTitle>
           <CardDescription className="text-base mt-3 text-gray-400">
