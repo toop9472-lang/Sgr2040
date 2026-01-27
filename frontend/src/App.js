@@ -433,27 +433,28 @@ function MainApp() {
                   onNavigate={handleNavigate}
                 />
               )}
-              {currentPage === 'advertiser' && (
+              {currentPage === 'advertiser' && !showFullScreenAds && (
                 <AdvertiserPage 
                   onNavigate={handleNavigate}
                 />
               )}
-              {currentPage === 'notifications' && (
+              {currentPage === 'notifications' && !showFullScreenAds && (
                 <NotificationsPage 
                   user={user}
                 />
               )}
-              {currentPage === 'withdraw' && (
+              {currentPage === 'withdraw' && !showFullScreenAds && (
                 <WithdrawPage 
                   user={user}
                   onNavigate={handleNavigate}
                   onWithdrawRequest={handleWithdrawRequest}
                 />
               )}
-              {currentPage !== 'withdraw' && (
+              {currentPage !== 'withdraw' && !showFullScreenAds && (
                 <BottomNav 
                   currentPage={currentPage}
                   onNavigate={handleNavigate}
+                  showAdsTab={true}
                 />
               )}
             </>
