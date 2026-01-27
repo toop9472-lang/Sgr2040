@@ -145,7 +145,13 @@ const AuthScreen = ({ onLogin }) => {
             </TouchableOpacity>
 
             {/* Logo */}
-            <Text style={styles.logoSmall}>🦅</Text>
+            <View style={styles.logoContainerSmall}>
+              <Image 
+                source={require('../../assets/logo_saqr.png')} 
+                style={styles.logoImageSmall}
+                resizeMode="contain"
+              />
+            </View>
             <Text style={styles.formTitle}>
               {mode === 'register' ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
             </Text>
