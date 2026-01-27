@@ -183,11 +183,16 @@ const styles = StyleSheet.create({
   
   loadingContainer: { 
     flex: 1, 
-    backgroundColor: colors.dark.bg, 
     justifyContent: 'center', 
     alignItems: 'center' 
   },
-  loadingLogo: { fontSize: 80, marginBottom: 20 },
+  loadingLogo: { width: 150, height: 150 },
+  loadingAppName: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: colors.accent,
+    marginTop: 16,
+  },
   loadingText: { 
     color: 'rgba(255,255,255,0.6)', 
     marginTop: 16, 
