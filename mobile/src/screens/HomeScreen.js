@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import api from '../services/api';
@@ -42,6 +43,18 @@ const HomeScreen = ({ user, onNavigateToAds, settings }) => {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
+        {/* App Logo and Name */}
+        <View style={styles.logoHeader}>
+          <View style={styles.logoContainer}>
+            <Image 
+              source={require('../../assets/logo_saqr.png')} 
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+          </View>
+          <Text style={styles.appName}>صقر</Text>
+        </View>
+
         {/* Header */}
         <View style={styles.header}>
           <View>
