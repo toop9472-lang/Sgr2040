@@ -182,11 +182,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center' 
   },
-  loadingLogo: { width: 150, height: 150 },
+  loadingLogo: { fontSize: 80 },
   loadingAppName: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: colors.accent,
+    color: '#FFF',
     marginTop: 16,
   },
   loadingText: { 
