@@ -12,7 +12,6 @@ import {
   Platform,
   Linking,
   StyleSheet,
-  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import api from '../services/api';
