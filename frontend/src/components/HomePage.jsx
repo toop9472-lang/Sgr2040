@@ -95,11 +95,11 @@ const HomePage = ({ user, onNavigateToAds }) => {
   }
 
   return (
-    <div className={`min-h-screen ${bgClass} pb-24 overflow-x-hidden relative`}>
+    <div className={`min-h-screen ${bgClass} pb-28 relative overflow-y-auto overflow-x-hidden`}>
       {/* Decorative Blue Circles */}
-      <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#3b82f6]/20 blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#3b82f6]/15 blur-3xl pointer-events-none"></div>
-      <div className="absolute top-[40%] right-[-100px] w-[300px] h-[300px] rounded-full bg-[#60a5fa]/10 blur-2xl pointer-events-none"></div>
+      <div className="fixed top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#3b82f6]/20 blur-3xl pointer-events-none"></div>
+      <div className="fixed bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#3b82f6]/15 blur-3xl pointer-events-none"></div>
+      <div className="fixed top-[40%] right-[-100px] w-[300px] h-[300px] rounded-full bg-[#60a5fa]/10 blur-2xl pointer-events-none"></div>
       {/* Header مع ترحيب + زر الوضع */}
       <div className="relative z-10 pt-12 px-5 pb-6">
         <div className="flex items-center justify-between mb-6">
