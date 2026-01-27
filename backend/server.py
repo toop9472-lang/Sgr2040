@@ -39,6 +39,7 @@ from routes.reports_routes import router as reports_router
 from routes.claude_ai_routes import router as claude_ai_router
 from routes.dev_requests_routes import router as dev_requests_router
 from routes.security_routes import router as security_router
+from routes.unity_ads_routes import router as unity_ads_router
 
 
 ROOT_DIR = Path(__file__).parent
