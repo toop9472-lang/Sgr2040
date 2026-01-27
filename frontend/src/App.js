@@ -417,10 +417,9 @@ function MainApp() {
               
               {currentPage === 'home' && !showFullScreenAds && (
                 <>
-                  <AdViewer 
-                    ads={ads} 
-                    onAdWatched={handleAdWatched}
+                  <HomePage 
                     user={user}
+                    onNavigateToAds={() => setShowFullScreenAds(true)}
                   />
                   <AIFloatingButton user={user} />
                 </>
