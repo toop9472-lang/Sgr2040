@@ -77,27 +77,29 @@ const HomePage = ({ user, onNavigateToAds }) => {
     { icon: '💡', text: 'شاهد الإعلانات واكسب النقاط!', enabled: true },
   ];
 
-  // Theme classes
-  const bgClass = isDark 
-    ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900' 
-    : 'bg-gradient-to-br from-indigo-50 via-white to-purple-50';
-  const cardClass = isDark 
-    ? 'bg-white/5 backdrop-blur-sm border-white/10' 
-    : 'bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm';
-  const textClass = isDark ? 'text-white' : 'text-gray-900';
-  const textMutedClass = isDark ? 'text-white/70' : 'text-gray-600';
-  const textDimClass = isDark ? 'text-white/50' : 'text-gray-400';
+  // Theme classes - New Professional Dark Design
+  const bgClass = 'bg-[#0a0a0f]';
+  const cardClass = 'bg-[#111118]/80 backdrop-blur-xl border-white/10';
+  const textClass = 'text-white';
+  const textMutedClass = 'text-gray-400';
+  const textDimClass = 'text-gray-500';
 
   if (isLoading) {
     return (
-      <div className={`min-h-screen ${bgClass} flex items-center justify-center`}>
+      <div className={`min-h-screen ${bgClass} flex items-center justify-center relative overflow-hidden`}>
+        <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#3b82f6]/20 blur-3xl"></div>
+        <div className="absolute bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#3b82f6]/15 blur-3xl"></div>
         <div className={`animate-pulse ${textClass}`}>جاري التحميل...</div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen ${bgClass} pb-24 overflow-x-hidden`}>
+    <div className={`min-h-screen ${bgClass} pb-24 overflow-x-hidden relative`}>
+      {/* Decorative Blue Circles */}
+      <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#3b82f6]/20 blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#3b82f6]/15 blur-3xl pointer-events-none"></div>
+      <div className="absolute top-[40%] right-[-100px] w-[300px] h-[300px] rounded-full bg-[#60a5fa]/10 blur-2xl pointer-events-none"></div>
       {/* Header مع ترحيب + زر الوضع */}
       <div className="pt-12 px-5 pb-6">
         <div className="flex items-center justify-between mb-6">
