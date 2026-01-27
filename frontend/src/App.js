@@ -438,11 +438,6 @@ function MainApp() {
                   onNavigate={handleNavigate}
                 />
               )}
-              {currentPage === 'notifications' && !showFullScreenAds && (
-                <NotificationsPage 
-                  user={user}
-                />
-              )}
               {currentPage === 'withdraw' && !showFullScreenAds && (
                 <WithdrawPage 
                   user={user}
@@ -454,7 +449,6 @@ function MainApp() {
                 <BottomNav 
                   currentPage={currentPage}
                   onNavigate={handleNavigate}
-                  showAdsTab={true}
                 />
               )}
             </>
