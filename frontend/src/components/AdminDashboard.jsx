@@ -382,6 +382,9 @@ const AdminDashboard = ({ admin, onLogout }) => {
             <TabsTrigger value="dev-requests" className="flex-1 min-w-[100px] text-xs py-2 flex items-center justify-center gap-1">
               <FileText className="w-3 h-3" /> طلبات التطوير
             </TabsTrigger>
+            <TabsTrigger value="rewards" className="flex-1 min-w-[100px] text-xs py-2">
+              🎁 المكافآت
+            </TabsTrigger>
             <TabsTrigger value="settings" className="flex-1 min-w-[100px] text-xs py-2">
               الإعدادات
             </TabsTrigger>
