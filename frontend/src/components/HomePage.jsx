@@ -86,10 +86,17 @@ const HomePage = ({ user, onNavigateToAds }) => {
 
   if (isLoading) {
     return (
-      <div className={`min-h-screen ${bgClass} flex items-center justify-center relative overflow-hidden`}>
+      <div className={`min-h-screen ${bgClass} flex flex-col items-center justify-center relative overflow-hidden`}>
         <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#3b82f6]/20 blur-3xl"></div>
         <div className="absolute bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#3b82f6]/15 blur-3xl"></div>
-        <div className={`animate-pulse ${textClass}`}>جاري التحميل...</div>
+        <div className="w-24 h-24 rounded-full bg-[#0a0a0f] border-2 border-[#3b82f6]/30 flex items-center justify-center overflow-hidden mb-4 animate-pulse shadow-lg shadow-[#3b82f6]/20">
+          <img 
+            src="/logo_saqr.png" 
+            alt="صقر" 
+            className="w-20 h-20 object-contain"
+          />
+        </div>
+        <div className={`${textClass} text-lg`}>جاري التحميل...</div>
       </div>
     );
   }
