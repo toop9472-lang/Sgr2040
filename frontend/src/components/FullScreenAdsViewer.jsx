@@ -365,7 +365,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
             : 'opacity-0 translate-y-8 pointer-events-none'
         }`}
       >
-        <div className="bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-16 pb-8 px-5">
+        <div className="bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-16 pb-20 px-5">
           {/* اسم المعلن والأفاتار */}
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
