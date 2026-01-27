@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import AuthPage from "./components/AuthPage";
 import AuthCallback from "./components/AuthCallback";
 import AdViewer from "./components/AdViewer";
+import FullScreenAdsViewer from "./components/FullScreenAdsViewer";
 import AIFloatingButton from "./components/AIFloatingButton";
 import ProfilePage from "./components/ProfilePage";
 import WithdrawPage from "./components/WithdrawPage";
