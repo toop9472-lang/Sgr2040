@@ -38,9 +38,11 @@ const AIChatModal = ({ visible, onClose }) => {
 
       if (response.ok) {
         const data = await response.json();
+        // Handle different response formats
+        const aiResponse = data.response || data.message || data.content || 'تم استلام رسالتك!';
         setMessages(prev => [...prev, { 
           role: 'assistant', 
-          content: data.response || data.message || 'تم استلام رسالتك!'
+          content: aiResponse
         }]);
       } else {
         throw new Error('Failed');
