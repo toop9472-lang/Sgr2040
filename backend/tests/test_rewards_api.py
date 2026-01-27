@@ -121,7 +121,7 @@ class TestAdminAuth:
     def test_admin_login_success(self):
         """Test admin login with valid credentials"""
         response = requests.post(
-            f"{BASE_URL}/api/admin/login",
+            f"{BASE_URL}/api/admin/auth/login",
             json={
                 "email": "sky-321@hotmail.com",
                 "password": "Wsxzaq123"
@@ -140,7 +140,7 @@ class TestAdminAuth:
     def test_admin_login_invalid_credentials(self):
         """Test admin login with invalid credentials"""
         response = requests.post(
-            f"{BASE_URL}/api/admin/login",
+            f"{BASE_URL}/api/admin/auth/login",
             json={
                 "email": "invalid@test.com",
                 "password": "wrongpassword"
