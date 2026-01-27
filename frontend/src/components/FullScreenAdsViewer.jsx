@@ -254,7 +254,14 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
+        <div className="w-20 h-20 rounded-full bg-[#0a0a0f] border-2 border-[#3b82f6]/30 flex items-center justify-center overflow-hidden mb-4 animate-pulse">
+          <img 
+            src="/logo_saqr.png" 
+            alt="صقر" 
+            className="w-16 h-16 object-contain"
+          />
+        </div>
         <div className="text-white text-xl">جاري التحميل...</div>
       </div>
     );
