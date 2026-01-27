@@ -82,11 +82,7 @@ const AuthScreen = ({ onLogin }) => {
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             {/* Logo */}
-            <Image 
-              source={require('../../assets/images/logo.png')} 
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
+            <Text style={styles.logo}>🦅</Text>
             <Text style={styles.appName}>صقر</Text>
             <Text style={styles.tagline}>شاهد الإعلانات واكسب المال</Text>
 
