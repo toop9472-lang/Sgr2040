@@ -83,7 +83,13 @@ const AuthScreen = ({ onLogin }) => {
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             {/* Logo */}
-            <Text style={styles.logo}>🦅</Text>
+            <View style={styles.logoContainer}>
+              <Image 
+                source={require('../../assets/logo_saqr.png')} 
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
+            </View>
             <Text style={styles.appName}>صقر</Text>
             <Text style={styles.tagline}>شاهد الإعلانات واكسب المال</Text>
 
@@ -117,11 +123,6 @@ const AuthScreen = ({ onLogin }) => {
               <Text style={styles.registerText}>
                 ليس لديك حساب؟ <Text style={styles.registerBold}>سجل الآن</Text>
               </Text>
-            </TouchableOpacity>
-
-            {/* Guest Mode */}
-            <TouchableOpacity style={styles.guestBtn} onPress={handleGuestMode}>
-              <Text style={styles.guestText}>👤 الدخول كزائر</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
