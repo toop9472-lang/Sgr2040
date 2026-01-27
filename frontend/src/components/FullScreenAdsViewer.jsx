@@ -214,6 +214,16 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
 
   const handleScreenTap = () => {
     setShowControls(true);
+    setShowAdInfo(true);
+  };
+
+  // فتح رابط المعلن
+  const handleVisitSite = (e) => {
+    e.stopPropagation();
+    const currentAd = ads[currentIndex];
+    if (currentAd?.website_url) {
+      window.open(currentAd.website_url, '_blank');
+    }
   };
 
   const handleKeyDown = useCallback((e) => {
