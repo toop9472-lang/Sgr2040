@@ -2,10 +2,10 @@
   "expo": {
     "name": "صقر",
     "slug": "saqr-app",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -17,12 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.saqr.rewards",
-      "buildNumber": "2.0.0",
-      "infoPlist": {
-        "NSAppTransportSecurity": {
-          "NSAllowsArbitraryLoads": true
-        }
-      }
+      "buildNumber": "2.1.0"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,7 +25,7 @@
         "backgroundColor": "#1a1a2e"
       },
       "package": "com.saqr.rewards",
-      "versionCode": 2,
+      "versionCode": 3,
       "permissions": [
         "INTERNET",
         "VIBRATE"
@@ -39,17 +34,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "your-project-id"
-      }
-    },
-    "owner": "ziyad333",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/your-project-id"
-    }
+    "owner": "ziyad333"
   }
 }
