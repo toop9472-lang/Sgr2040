@@ -265,7 +265,7 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
               className="w-20 h-20 object-contain"
             />
           </div>
-          <CardTitle className="text-4xl font-bold text-white mt-2">
+          <CardTitle className="text-4xl font-bold text-[#60a5fa] mt-2">
             {t('appName')}
           </CardTitle>
           <CardDescription className="text-base mt-3 text-gray-400">
