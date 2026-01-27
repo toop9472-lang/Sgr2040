@@ -81,3 +81,39 @@ async def update_profile(
             'total_earned': user['total_earned']
         }
     }
+
+
+@router.get('/analytics', response_model=dict)
+async def get_user_analytics(user_id: str = Depends(get_current_user_id)):
+    """
+    Get user analytics for homepage
+    """
+    db = get_db()
+    user = await db.users.find_one({'$or': [{'id': user_id}, {'user_id': user_id}]})
+    
+    if not user:
+        return {
+            'today_watches': 0,
+            'total_watches': 0,
+            'total_points': 0,
+            'streak_days': 0
+        }
+    
+    # Count today's watches
+    from datetime import timedelta
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    watched_ads = user.get('watched_ads', [])
+    
+    today_watches = 0
+    for wa in watched_ads:
+        watched_at = wa.get('watched_at')
+        if watched_at and watched_at >= today_start:
+            today_watches += 1
+    
+    return {
+        'today_watches': today_watches,
+        'total_watches': len(watched_ads),
+        'total_points': user.get('total_earned', 0),
+        'current_points': user.get('points', 0),
+        'streak_days': user.get('streak_days', 0)
+    }
