@@ -45,13 +45,28 @@ const AuthScreen = ({ onLogin }) => {
       const data = await response.json();
 
       if (response.ok) {
-        await storage.setToken(data.token);
-        await storage.setUserData(data.user);
-        onLogin(data.user);
+        // For registration, login after successful registration
+        if (mode === 'register' && data.success) {
+          const loginResponse = await api.login(email, password);
+          const loginData = await loginResponse.json();
+          if (loginResponse.ok) {
+            await storage.setToken(loginData.token);
+            await storage.setUserData(loginData.user);
+            onLogin(loginData.user);
+          } else {
+            Alert.alert('خطأ', loginData.detail || 'فشل تسجيل الدخول بعد التسجيل');
+          }
+        } else {
+          // Normal login
+          await storage.setToken(data.token);
+          await storage.setUserData(data.user);
+          onLogin(data.user);
+        }
       } else {
         Alert.alert('خطأ', data.detail || 'فشل تسجيل الدخول');
       }
     } catch (error) {
+      console.log('Auth error:', error);
       Alert.alert('خطأ', 'تحقق من اتصالك بالإنترنت');
     } finally {
       setIsLoading(false);
