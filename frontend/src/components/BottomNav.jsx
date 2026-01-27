@@ -14,7 +14,7 @@ const BottomNav = ({ currentPage, onNavigate }) => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40">
+    <div className="fixed bottom-0 left-0 right-0 bg-[#0a0a0f]/95 backdrop-blur-xl border-t border-white/10 z-40">
       <div className="flex items-center justify-around px-2 py-2 safe-area-pb">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -25,10 +25,10 @@ const BottomNav = ({ currentPage, onNavigate }) => {
               onClick={() => onNavigate(item.id)}
               className={`flex flex-col items-center gap-1 py-2 px-4 rounded-xl transition-all duration-200 ${
                 item.highlight 
-                  ? 'text-white bg-gradient-to-r from-red-500 to-pink-500 shadow-lg hover:shadow-xl transform hover:scale-105' 
+                  ? 'text-white bg-gradient-to-r from-[#ef4444] to-[#ec4899] shadow-lg shadow-[#ef4444]/30 hover:shadow-xl transform hover:scale-105' 
                   : isActive
-                    ? 'text-indigo-600 bg-indigo-50'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    ? 'text-[#60a5fa] bg-[#3b82f6]/10'
+                    : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
               }`}
               data-testid={`nav-${item.id}`}
             >
