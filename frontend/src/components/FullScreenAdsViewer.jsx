@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, ExternalLink } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -11,6 +11,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   const [isWatching, setIsWatching] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(false);
+  const [showAdInfo, setShowAdInfo] = useState(false);
   const [touchStartY, setTouchStartY] = useState(null);
   const [touchStartX, setTouchStartX] = useState(null);
   const [touchEndY, setTouchEndY] = useState(null);
@@ -23,11 +24,12 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   const containerRef = useRef(null);
   const watchTimerRef = useRef(null);
   const controlsTimerRef = useRef(null);
+  const infoTimerRef = useRef(null);
 
   const REQUIRED_WATCH_TIME = 30;
   const POINTS_PER_AD = 5;
-  const MIN_SWIPE_DISTANCE_Y = 50; // للتنقل بين الإعلانات (أعلى/أسفل)
-  const MIN_SWIPE_DISTANCE_X = 80; // للخروج (يمين/يسار)
+  const MIN_SWIPE_DISTANCE_Y = 50;
+  const MIN_SWIPE_DISTANCE_X = 80;
 
   // Load ads
   useEffect(() => {
