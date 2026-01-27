@@ -42,17 +42,16 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   useEffect(() => {
     if (ads.length > 0) {
       startWatching();
-      setViewerCount(Math.floor(Math.random() * 500) + 100);
     }
   }, [currentIndex, ads]);
 
-  // Hide controls after 3 seconds
+  // Hide controls after 2 seconds
   useEffect(() => {
     if (showControls) {
       if (controlsTimerRef.current) clearTimeout(controlsTimerRef.current);
       controlsTimerRef.current = setTimeout(() => {
         setShowControls(false);
-      }, 3000);
+      }, 2000);
     }
     return () => {
       if (controlsTimerRef.current) clearTimeout(controlsTimerRef.current);
