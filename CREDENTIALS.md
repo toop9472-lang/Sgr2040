@@ -23,14 +23,14 @@ APPLEPAY_MERCHANT_ID=
 
 ### Frontend (`/app/frontend/.env`)
 ```env
-REACT_APP_BACKEND_URL=https://rewardviewer-2.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://saqr-ads-1.preview.emergentagent.com
 WDS_SOCKET_PORT=443
 ENABLE_HEALTH_CHECK=false
 ```
 
 ### Mobile (`/app/mobile/.env`)
 ```env
-API_URL=https://rewardviewer-2.preview.emergentagent.com
+API_URL=https://saqr-ads-1.preview.emergentagent.com
 ```
 
 ---
@@ -177,9 +177,9 @@ API_URL=https://rewardviewer-2.preview.emergentagent.com
 
 | الوصف | الرابط |
 |-------|--------|
-| **الموقع** | https://rewardviewer-2.preview.emergentagent.com |
-| **API Docs** | https://rewardviewer-2.preview.emergentagent.com/docs |
-| **لوحة المدير** | https://rewardviewer-2.preview.emergentagent.com (سجّل دخول كمدير) |
+| **الموقع** | https://saqr-ads-1.preview.emergentagent.com |
+| **API Docs** | https://saqr-ads-1.preview.emergentagent.com/docs |
+| **لوحة المدير** | https://saqr-ads-1.preview.emergentagent.com (سجّل دخول كمدير) |
 
 ---
 
@@ -189,7 +189,7 @@ API_URL=https://rewardviewer-2.preview.emergentagent.com
 |-------|--------|
 | **Bundle ID (iOS)** | `com.saqr.app` |
 | **Package Name (Android)** | `com.saqr.app` |
-| **API URL** | `https://rewardviewer-2.preview.emergentagent.com` |
+| **API URL** | `https://saqr-ads-1.preview.emergentagent.com` |
 
 ---
 
