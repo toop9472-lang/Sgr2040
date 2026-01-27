@@ -177,7 +177,7 @@ eas build --platform ios --profile production
 
 ### API URL:
 ```
-https://rewardviewer-2.preview.emergentagent.com
+https://saqr-ads-1.preview.emergentagent.com
 ```
 
 ---

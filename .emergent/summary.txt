@@ -4,121 +4,126 @@ The user wants to create an application named صقر (Saqr), which is an adverti
 **PRODUCT REQUIREMENTS:**
 -   **Core Functionality:** Users scroll through a vertical, full-screen feed of video ads.
 -   **Points System:** Users earn points for watching ads, redeemable for cash. The conversion rate and earning rules must be configurable by the admin.
--   **AI Features:** The user requested AI-powered features for the admin (e.g., improvements, error analysis) and a user-facing AI component.
--   **UI/UX Enhancements:** A professional UI for the ad viewer, where controls hide during playback and a notification appears when a point is earned. A new professional logo was also requested and implemented.
+-   **AI Features:** The user requested AI-powered features for the admin (e.g., improvements, error analysis, ad auto-approval) and a user-facing AI chat component.
+-   **UI/UX Enhancements:** A professional, full-screen UI for the ad viewer where controls are hidden. A professional logo. Dark/light mode.
 -   **Authentication:** User registration via Google, Apple, and email/password.
--   **Admin Panel:** A comprehensive dashboard to manage withdrawals, ads, users, finances, and control all core application settings dynamically. A feature to track development requests was also added.
--   **Mobile App:** A React Native mobile application. The user has specifically requested a downloadable APK file, which was successfully built after extensive guidance.
+-   **Admin Panel:** A comprehensive dashboard to manage withdrawals, ads (including deletion), users, finances, and control all core application settings dynamically.
+-   **Mobile App:** A React Native mobile application. The user has specifically requested a downloadable APK file.
 -   **Advertiser Features:** A section for advertisers to post ads for a fee.
 -   **Ad Integrations:** The ability to show real ads from networks like AdMob.
--   **Withdrawals:** Admin approval is required for all withdrawal requests.
+-   **Withdrawals:** Admin approval is required for all withdrawal requests. All mock data must be removed.
+-   **Security:** An anti-cheat system to detect and flag users trying to game the points system.
 
 **User's preferred language**: Arabic
 
 **what currently exists?**
 The project is a full-stack application with a FastAPI backend, a React frontend, and a React Native mobile app.
--   **Web App:** Features a comprehensive admin dashboard allowing dynamic management of payment gateways, OAuth providers, email services (Resend), a full AdMob configuration UI, a points system, PDF reports, Firebase push notifications, and a working Claude AI integration for both admin analysis and user chat. A new Development Requests page has also been added for the admin to track future work.
--   **Backend:** Supports all admin panel functionality, including APIs for AI, AdMob settings, and the new development requests feature.
--   **Mobile App:** The agent guided the user through an extensive, multi-day, local build process. After numerous failures and code adjustments, the user was finally able to build a functional APK. The current mobile code includes the login/visitor screens and the core ad-watching functionality.
--   **Integrations:**
-    -   **Resend:** Fully integrated for emails.
-    -   **Anthropic (Claude Sonnet 4):** Fully integrated for AI features.
-    -   **Firebase Admin SDK:** Integrated for push notifications.
-    -   **Google AdMob:** Fully configured on both backend and frontend. The user has provided their Publisher, App, and Ad Unit IDs, which are saved in the database. The mobile app has the necessary configuration in  but the ads will only become active after AdMob approves the user's account.
+-   **Web App:** Features a comprehensive admin dashboard. Major work was done to remove mock data, replacing it with real API calls (e.g., for withdrawal methods). A new dedicated Ads Management page was created to handle ad deletion and AI-powered auto-approval. The ad viewing experience is being refactored into a full-screen, TikTok-style viewer.
+-   **Backend:** Supports all admin panel functionality. New endpoints have been added for an AI-based anti-cheat system (), ad deletion, and toggling AI ad approval. A root-level  endpoint was added to fix deployment issues. The AI chat feature was enhanced with a dedicated endpoint for guest users ().
+-   **Mobile App:** The  has been completely rewritten to support a more professional, modern UI, including a new full-screen ad viewer to match the user's latest request. It also integrates the new anti-cheat system.
+-   **Integrations:** Resend, Anthropic (Claude), Firebase, and Google AdMob are configured. No new integrations were added.
 
 **Last working item**:
--   Last item agent was working: The agent's primary focus was an exhaustive, step-by-step guidance process to help the non-technical user build the mobile app's APK on their local machine. This was necessary due to platform limitations preventing the agent from building it directly. After numerous debugging cycles involving dependency issues, environment setup, and code simplification, the user successfully generated a working APK.
--   Status: USER VERIFICATION PENDING
+-   Last item agent was working: The agent was implementing a major UI overhaul for the ad viewing experience, as requested by the user, to mimic YouTube Shorts/TikTok. This involved creating a new full-screen ad viewer for both the web () and mobile ( rewrite). The agent just updated the mobile app's  to include  for video playback but has not yet installed it or guided the user through a new build.
+-   Status: IN PROGRESS
 -   Agent Testing Done: N
--   Which testing method agent to use? The user is testing the APK they built on their own Android device. No further testing is needed from the agent on this item.
--   User Testing Done: IN PROGRESS
+-   Which testing method agent to use? both. Use the screenshot tool for the web frontend's new UI. For the mobile app, after installing the new dependency, the agent must guide the user to build and test a new APK.
+-   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   Issue 1: (P0) Mobile App Functionality Verification.
--   Issue 2: (P1) Backend logic for most payment gateways is missing (Tap, Tabby, Tamara, STC Pay, PayPal, Apple Pay).
--   Issue 3: (P2) Backend logic for Google & Apple OAuth is not implemented.
--   Issue 4: (P2) Potential N+1 query issue in the admin dashboard.
+-   Issue 1: (P0) Complete and Test Full-Screen Ad Viewer.
+-   Issue 2: (P1) Mobile App Build & Verification.
+-   Issue 3: (P2) Implement Backend Logic for Payment Gateways.
+-   Issue 4: (P2) Implement Backend Logic for Google & Apple OAuth.
 
 Issues Detail:
--   **Issue 1: Mobile App Functionality Verification.**
-    -   **Attempted fixes:** The agent guided the user to successfully build a new APK after the previous one was just a splash screen. The new build contains the complete, updated mobile application code.
-    -   **Next debug checklist:** The agent must ask the user to confirm that the latest APK they built is fully functional (i.e., shows the login/visitor screen, allows entry, and displays the ad viewer interface).
-    -   **Why fix this issue and what will be achieved with the fix?** This confirms that the primary blocker (APK generation) is resolved and the core mobile application is usable by the user.
-    -   **Status:** USER VERIFICATION PENDING
+-   **Issue 1: Complete and Test Full-Screen Ad Viewer.**
+    -   **Attempted fixes:** The agent created a new  component for the web, updated  to route to it, and completely rewrote  for the new UI.
+    -   **Next debug checklist:**
+        1.  Run yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.11s. in the  directory to install the newly added  dependency.
+        2.  Thoroughly test the new full-screen UI on the web app using the screenshot tool. Ensure the bottom navigation is hidden and the layout is correct.
+        3.  Update the  with any new instructions.
+        4.  Guide the user to build a new APK and test the new UI on their device.
+    -   **Why fix this issue and what will be achieved with the fix?** This implements the user's most recent and critical UI/UX requirement for a professional, immersive ad-watching experience.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** both
+    -   **Blocked on other issue:** None.
+-   **Issue 2: Mobile App Build & Verification.**
+    -   **Attempted fixes:** This is an ongoing process. The agent has successfully guided the user to build an APK in the past. Now, with major UI changes and new features, a new build is required.
+    -   **Next debug checklist:** After completing Issue 1, the agent must provide clear, step-by-step instructions for the user to generate a new APK file and test it.
+    -   **Why fix this issue and what will be achieved with the fix?** To deliver the latest features and bug fixes to the user for testing on a real device.
+    -   **Status:** NOT STARTED
     -   **Is recurring issue?** Y
     -   **Should Test frontend/backend/both after fix?** frontend
-    -   **Blocked on other issue:** None.
--   **Issue 2: Backend logic for payment gateways is missing.**
-    -   **Attempted fixes:** None in this session. UI and DB storage exist from previous sessions.
-    -   **Next debug checklist:** Implement backend routes for each gateway to handle payments and withdrawals.
-    -   **Why fix this issue and what will be achieved with the fix?** Critical for monetization (advertiser payments and user cash-outs).
+    -   **Blocked on other issue:** Issue 1.
+-   **Issue 3: Implement Backend Logic for Payment Gateways.**
+    -   **Attempted fixes:** None. UI and DB storage exist, but backend logic for Tap, Tabby, Tamara, STC Pay, PayPal, Apple Pay is missing.
+    -   **Next debug checklist:** Implement FastAPI routes for each payment gateway to handle payment processing.
+    -   **Why fix this issue and what will be achieved with the fix?** This is critical for the application's monetization strategy.
     -   **Status:** NOT STARTED
     -   **Is recurring issue?** N
     -   **Should Test frontend/backend/both after fix?** backend
     -   **Blocked on other issue:** None.
--   **Issue 3: Backend logic for Google & Apple OAuth is not implemented.**
+-   **Issue 4: Implement Backend Logic for Google & Apple OAuth.**
     -   **Attempted fixes:** None.
     -   **Next debug checklist:** Implement the backend routes and logic to handle the OAuth2 flow for Google and Apple sign-ins.
-    -   **Why fix this issue and what will be achieved with the fix?** Fulfills a user requirement for multiple login options.
+    -   **Why fix this issue and what will be achieved with the fix?** Fulfills a core user requirement for multiple login options.
     -   **Status:** NOT STARTED
     -   **Is recurring issue?** N
     -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on other issue:** None.
--   **Issue 4: Potential N+1 query issue in the admin dashboard.**
-    -   **Attempted fixes:** None.
-    -   **Next debug checklist:** Analyze dashboard-related backend routes for database queries inside loops and refactor them to use aggregation pipelines.
-    -   **Why fix this issue and what will be achieved with the fix?** Improves performance and prevents the admin panel from slowing down as data grows.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** backend
-    -   **Blocked on other issue:** None.
 
 **In progress Task List**:
--   **Task 1: Comprehensive UI/UX & AI Feature Enhancement**
-    -   **Where to resume:** The UI and AI portions of this task are complete. The remaining work is to implement the backend logic for withdrawal processing in , which is currently a placeholder.
-    -   **What will be achieved with this?** Allows the admin to approve and process user withdrawal requests, a core part of the app's monetization loop.
+-   **Task 1: Overhaul Ad Viewing Experience**
+    -   **Where to resume:** Resume by running yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.06s. inside the  directory to install . Then, proceed with testing the web UI and guiding the user on the mobile APK build.
+    -   **What will be achieved with this?** A modern, full-screen, swipeable ad viewer similar to TikTok/YouTube Shorts, fulfilling a key user request.
     -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** backend
+    -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   (P1) **iOS App Build:** The user has requested an iPhone version. This will require guiding them through the process again, contingent on them having an Apple Developer account (9/year).
-    -   (P2) **Integrate other Ad Networks:** The user expressed interest in using other ad networks like Unity Ads or AppLovin via mediation. This can be done after AdMob is fully verified and functional.
+    -   (P1) **Implement Dark/Light Mode:** User has requested this feature.
+    -   (P1) **iOS App Build:** Guide the user through the process for creating an iOS version.
+    -   (P2) **Integrate other Ad Networks:** Add support for Unity Ads or AppLovin.
 -   **Future Tasks:**
     -   Deploy the web and backend applications to a production environment.
     -   Publish the mobile app to the Apple App Store and Google Play Store.
     -   Add advanced PDF reporting for financial analytics.
 
 **Completed work in this session**
--   **Mobile App APK Build:** Successfully guided the user through an extremely detailed and difficult local build process, resolving numerous environment, dependency, and configuration errors, resulting in a working APK.
--   **AI Features Implementation:**
-    -   Added a floating AI chat button and modal for end-users (, ).
-    -   Added an AI Assistant tab to the admin dashboard with analysis features ().
--   **AdMob Integration:**
-    -   Created a full UI and backend system for the admin to configure Google AdMob.
-    -   Saved the user's Publisher ID, App IDs, and Rewarded Ad Unit ID to the database.
-    -   Updated the mobile app configuration to include these IDs.
--   **New Logo & UI:**
-    -   Generated several AI logos based on user feedback (minimalist falcon silhouette).
-    -   Updated the web app's auth page and all mobile app icons/splash screens with the new logo.
--   **Development Request Feature:**
-    -   Created a new page in the admin dashboard () for the user to add and track future development tasks.
-    -   Implemented the full backend API () for CRUD operations on these requests.
--   **Code & Dependency Stabilization:**
-    -   Performed multiple rounds of simplification and cleanup on the mobile app's , , and  to enable a successful build.
+-   **Ad Management Enhancements:**
+    -   Implemented a feature to **delete ads** from a new Ads Management page () in the admin dashboard, supported by a new backend endpoint ().
+    -   Implemented **AI-powered auto-approval** for ads, with a toggle switch in the admin UI and a supporting backend endpoint.
+-   **Anti-Cheat System:**
+    -   Created a backend service () to detect and flag suspicious user activity (e.g., watching ads too quickly).
+    -   Integrated this security reporting into the mobile app.
+-   **Deployment Readiness & Bug Fixes:**
+    -   Fixed a critical deployment blocker by adding a root  endpoint to the backend for Kubernetes health checks.
+    -   Removed all hardcoded URLs from the mobile app, moving the backend URL to a  file.
+    -   Resolved a bug where the **AI chat was not working for guest users** by creating a separate, unauthenticated endpoint ().
+-   **Data & UI Refactoring:**
+    -   **Removed all mock data** from the user-facing app, specifically by refactoring the  to fetch data from a live API and deleting .
+    -   Initiated a complete overhaul of the mobile app's UI by rewriting  for a more professional look and feel.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1: N+1 Query Problem:** The deployment agent reported a potential N+1 query issue in the admin dashboard in a previous session. This was not investigated or fixed.
-    -   **Debug checklist:** Analyze the backend code for fetching dashboard statistics or user lists to identify loops that make database calls. Use database aggregation pipelines to fetch data in a single query.
-    -   **Why to solve this issue and what will be achieved with this?** Prevents the admin dashboard from becoming slow or unresponsive with a large user base.
+-   **Issue 1: Potential N+1 Query Problem in Admin Dashboard.**
+    -   **Debug checklist:** The agent fixed one instance of this in  related to withdrawal processing. However, the original report was for the dashboard in general. A broader analysis of all dashboard-related routes is needed to check for other loops making database calls. Refactor any found to use efficient database aggregations.
+    -   **Why to solve this issue and what will be achieved with this?** Prevents the admin dashboard from becoming slow or unresponsive as the user base and data grow.
     -   **Should Test frontend/backend/both after fix:** backend
     -   **Is recurring issue?** Y
 
 **Known issue recurrence from previous fork**
--   **Issue:** Mobile APK build failure.
--   **Recurrence count:** 2 (Blocked in the previous fork, became a major debugging task in this one).
--   **Status:** RESOLVED (by guiding the user to build locally). The underlying platform limitation remains, so any future mobile app changes will require the user to rebuild.
+-   **Issue recurrence in previous fork:** Mobile APK build failure.
+-   **Recurrence count:** 2+
+-   **Status:** IN PROGRESS. The issue is managed via a workaround (guiding the non-technical user through a local build). It is not permanently resolved, as any change to mobile dependencies requires repeating this fragile process.
 
 **Code Architecture**
 
@@ -126,86 +131,84 @@ Issues Detail:
 **Key Technical Concepts**
 -   **Frontend:** React, Tailwind CSS, shadcn/ui
 -   **Backend:** FastAPI, Motor (async MongoDB)
--   **Mobile:** React Native, **Expo (EAS Build & Expo Go)**
+-   **Mobile:** React Native, Expo
 -   **Database:** MongoDB
--   **AI:** Anthropic Claude Sonnet 4
--   **Ad-Network:** Google AdMob
+-   **AI:** Anthropic Claude (for chat and ad approval), Custom Anomaly/Cheat Detection Logic
+-   **Deployment:** Kubernetes-aware health checks
 
 **key DB schema**
--   **settings:** Document added for .
--   **dev_requests:** New collection with schema .
+-   **settings:** Document updated to include a boolean flag for .
+-   **ads:** No schema change, but now supports states like , , .
+-   **activity_logs:** New implicit collection used by the anti-cheat system to log user actions with timestamps.
 
 **changes in tech stack**
--   The mobile app's Expo SDK was temporarily upgraded to 54 and then reverted to 51 to achieve a stable build. Numerous dependencies were added, removed, and version-locked during the build debugging process.
+-    was added to  to support video playback for the new full-screen viewer. It needs to be installed.
 
 **All files of reference**
--   
--   
--   
--   
--   
--   
--   
--   
--   
+-    (Heavily modified for the new UI)
+-    (New component for web)
+-    (Modified for new routing)
+-    (New admin page)
+-    (New anti-cheat endpoint)
+-    (Modified for ad deletion/approval)
+-    (Refactored to remove mock data)
+-    (Modified for health checks)
+-    (Modified for guest chat)
+-    (Updated with new dependency)
 
 **Areas that need refactoring**:
--    and  are becoming monoliths. Each tab's content should be broken into a separate, self-contained component to improve maintainability. The agent added more tabs, making this problem worse.
+-    remains a large monolithic component. Although the agent created a separate  (a good first step), the main dashboard still contains logic for users, settings, and stats that could be broken into smaller, maintainable components.
 
 **key api endpoints**
 -   
 -   
+-   
+-   
+-   
+-    (Root endpoint for Kubernetes)
 
 **Critical Info for New Agent**
--   **The user is non-technical.** All instructions for local actions (like building the app) must be extremely simple, broken down into single steps, and assume zero prior knowledge. The agent spent hundreds of messages guiding the user through the last build.
--   **The mobile APK build process is solved but fragile.** The user now knows how to build the APK on their local machine. Any changes to the mobile app's native dependencies or configuration will require you to guide the user to rebuild. Do not attempt to change mobile dependencies unless absolutely necessary.
--   The user has successfully built and installed a functional APK. Your first action should be to confirm with the user if the app is working as expected (shows login, etc.).
+-   **User's High Expectations:** The user is non-technical but has a very strong vision for a high-quality, professional, and extraordinary application. The latest request for a TikTok-style UI is an example. Be prepared for detailed aesthetic feedback.
+-   **Fragile Mobile Build Process:** The only way to update the mobile app is to guide the user to build an APK locally. This process is error-prone and requires extremely clear, simple, step-by-step instructions. Assume zero technical knowledge from the user.
+-   **Prioritize Real Data:** The user explicitly requested to remove all fake or mock data. Ensure all new features are connected to the live backend and database.
 
 **documents and test reports created in this job**
 -   
--    (Updated)
 -   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Provided logs showing a yarn install v1.22.22
-[1/4] Resolving packages...
-success Already up-to-date.
-Done in 0.12s. error and a subsequent  failure due to a missing git command.
-2.  **User:** Replied with y after being told to install a missing dependency.
-3.  **User:** Provided logs showing the  command failing because of a missing  plugin.
-4.  **User:** Provided logs of  failing because yarn install v1.22.22
-[1/4] Resolving packages...
-success Already up-to-date.
-Done in 0.05s. was not found.
-5.  **User:** Provided logs showing the build failing because  does not exist.
-6.  **User:** Asked for their AdMob client ID.
-7.  **User:** Provided logs of a build failing because of a concurrency limit, as a previous build was stuck in the queue.
-8.  **User:** Provided logs of the build failing in the Install dependencies phase due to an incompatible Node.js version on the build server.
-9.  **User:** Provided logs showing the  command failed due to multiple lock files.
-10. **User:** Stated that the build was successful but the app was showing a code screen in Expo Go. The agent clarified this is expected and the user should install the final APK.
+1.  **Request for AI Chat Fix:** User reported that the AI chat responds with check your internet connection.
+2.  **Request for Deployment:** User asked to run the deployer agent and health check.
+3.  **Inquiry about Tech Stack:** User asked what programming language the application is written in.
+4.  **Major UI/UX Request:** User requested a complete overhaul of the ad viewing screen to be full-screen, swipeable like YouTube Shorts, with minimal UI elements (only view count and points), and to hide the bottom navigation bar during ad playback.
+5.  **User Confirms Readiness:** User stated they will save the project and get payment/provider files ready, emphasizing the need for a high-quality app worth waiting for.
+6.  **Request for Ad Management Features:** User asked for the ability to delete ads, AI-powered automatic ad approval, and verification of the withdrawal system, with a strong emphasis on removing all mock data.
+7.  **Request for Security & Quality:** User requested major ad improvements, including an AI-based anti-cheat system, high-quality ad display, dark/light modes, and ensuring the app is secure against hacking.
+8.  **App Feedback:** User tested the generated APK and reported it only showed a Visitor Login button, was empty inside, and felt very slow/heavy.
+9.  **APK Build Issue:** User reported an  error, then asked if they could run the APK online as they only have an iPhone.
+10. **APK Build Issues:** User reported a series of local build errors.
 
 **Project Health Check:**
 -   **Broken:** None.
 -   **Mocked:**
-    -   Backend payment logic for most gateways (Tap, PayPal, etc.).
+    -   Backend logic for most payment gateways (Tap, PayPal, Apple Pay, etc.).
     -   Backend logic for Apple & Google OAuth.
-    -   Payout processing logic.
 -   **Incomplete/Scaffolded:**
-    -   The mobile app's AdMob integration is configured but not yet displaying live ads pending account verification.
+    -   The new full-screen ad viewer UI is coded but not fully tested or built for mobile.
+    -   AdMob integration is configured but not displaying live ads pending user's account verification by Google.
 
 **3rd Party Integrations**
--   **Anthropic Claude Sonnet 4:** (Text Generation) Fully integrated.
--   **Stripe (Payments):** Partially integrated.
+-   **Anthropic Claude Sonnet 4:** (Text Generation) Fully integrated for admin and user chat.
+-   **Stripe (Payments):** Partially integrated (UI/DB only).
 -   **Firebase Admin SDK (Push Notifications):** Integrated.
 -   **Resend (Email):** Fully integrated.
 -   **Google AdMob (Rewarded Ads):** Configured with user's keys. Awaiting account verification by Google.
 -   **Emergent-managed Google Auth:** Configurable, backend logic pending.
--   **Other Payment Gateways:** UI exists for configuration, but backend logic is missing.
 
 **Testing status**
--   Testing agent used after significant changes: YES (for AI features)
+-   Testing agent used after significant changes: NO
 -   Troubleshoot agent used after agent stuck in loop: NO
--   Test files created: None
+-   Test files created: []
 -   Known regressions: None
 
 **Credentials to test flow:**
@@ -216,5 +219,9 @@ Done in 0.05s. was not found.
     -   Username: 
 
 **What agent forgot to execute**
--   The agent did not refactor the  or  components, instead adding more tabs and complexity, increasing technical debt.
--   The N+1 query issue identified in a previous fork remains unaddressed.</analysis>
+-   The agent added  to  but did not run yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.18s. in the  directory to actually install the dependency before the session ended.
+-   The agent did not add the  mode feature requested by the user.
+-   While a new page was created for Ad Management, the larger task of refactoring the monolithic  component was not fully addressed.</analysis>
