@@ -311,15 +311,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
                 ? `url(${currentAd.thumbnail_url})` 
                 : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
             }}
-          >
-            {/* Ad content overlay - minimal */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
-              <div className="absolute bottom-20 left-6 right-6">
-                <h2 className="text-white text-xl font-bold mb-1">{currentAd.title}</h2>
-                <p className="text-white/70 text-sm line-clamp-2">{currentAd.description}</p>
-              </div>
-            </div>
-          </div>
+          />
         )}
       </div>
 
@@ -333,7 +325,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
 
       {/* عداد الوقت - يظهر فقط عند اللمس */}
       <div 
-        className={`absolute top-4 right-4 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`absolute top-4 right-4 z-20 transition-all duration-500 ease-out ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}
       >
         <div className="bg-black/40 backdrop-blur-sm rounded-full px-3 py-1.5">
           <span className="text-white text-xs font-medium">
@@ -348,7 +340,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
 
       {/* زر كتم الصوت - يظهر فقط عند اللمس */}
       <div 
-        className={`absolute top-4 left-4 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`absolute top-4 left-4 z-20 transition-all duration-500 ease-out ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}
       >
         <button 
           onClick={(e) => {
@@ -365,6 +357,51 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
         </button>
       </div>
 
+      {/* =================== بيانات المعلن - تظهر عند اللمس =================== */}
+      <div 
+        className={`absolute bottom-0 left-0 right-0 z-20 transition-all duration-500 ease-out ${
+          showAdInfo 
+            ? 'opacity-100 translate-y-0' 
+            : 'opacity-0 translate-y-8 pointer-events-none'
+        }`}
+      >
+        <div className="bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-16 pb-8 px-5">
+          {/* اسم المعلن والأفاتار */}
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+              {(currentAd.advertiser || currentAd.title)?.[0]?.toUpperCase() || 'A'}
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-bold text-base">
+                {currentAd.advertiser || 'معلن'}
+              </p>
+              <p className="text-white/60 text-xs">
+                @{(currentAd.advertiser || 'advertiser').toLowerCase().replace(/\s/g, '_')}
+              </p>
+            </div>
+          </div>
+
+          {/* عنوان ووصف الإعلان */}
+          <h3 className="text-white font-bold text-lg mb-1 line-clamp-1">
+            {currentAd.title}
+          </h3>
+          <p className="text-white/70 text-sm mb-4 line-clamp-2">
+            {currentAd.description}
+          </p>
+
+          {/* زر زيارة الموقع */}
+          {currentAd.website_url && (
+            <button
+              onClick={handleVisitSite}
+              className="w-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-all duration-200"
+            >
+              <ExternalLink className="w-4 h-4 text-white" />
+              <span className="text-white font-medium text-sm">زيارة الموقع</span>
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* نقاط مكتسبة - تظهر في الوسط عند الإكمال */}
       {showPointsAnimation && (
         <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
@@ -375,7 +412,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
       )}
 
       {/* إجمالي النقاط المكتسبة في الجلسة */}
-      {earnedPoints > 0 && (
+      {earnedPoints > 0 && !showAdInfo && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
           <div className="bg-yellow-500/90 backdrop-blur-sm rounded-full px-4 py-1.5">
             <span className="text-black font-bold text-sm">
@@ -393,7 +430,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
       </div>
 
       <div 
-        className={`absolute left-1/2 -translate-x-1/2 bottom-16 transition-opacity duration-300 ${showControls && currentIndex < ads.length - 1 ? 'opacity-50' : 'opacity-0'}`}
+        className={`absolute left-1/2 -translate-x-1/2 bottom-44 transition-opacity duration-300 ${showControls && currentIndex < ads.length - 1 && !showAdInfo ? 'opacity-50' : 'opacity-0'}`}
       >
         <div className="text-white text-xs">⬇</div>
       </div>
