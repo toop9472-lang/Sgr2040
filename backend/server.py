@@ -21,6 +21,8 @@ from routes.admin_auth_routes import router as admin_auth_router
 from routes.admin_dashboard_routes import router as admin_dashboard_router
 from routes.payment_routes import router as payment_router
 from routes.tap_routes import router as tap_router
+from routes.tabby_routes import router as tabby_router
+from routes.tamara_routes import router as tamara_router
 from routes.notification_routes import router as notification_router
 from routes.invoice_routes import router as invoice_router
 from routes.analytics_routes import router as analytics_router
