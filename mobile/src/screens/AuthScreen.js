@@ -216,9 +216,9 @@ const styles = StyleSheet.create({
   scroll: { flexGrow: 1, justifyContent: 'center' },
   content: { padding: 24, alignItems: 'center' },
   
-  logoImage: { width: 120, height: 120, marginBottom: 8 },
+  logo: { fontSize: 80, marginBottom: 8 },
   logoSmall: { fontSize: 60, marginBottom: 8 },
-  appName: { fontSize: 42, fontWeight: 'bold', color: colors.accent, marginBottom: 8 },
+  appName: { fontSize: 42, fontWeight: 'bold', color: '#FFF', marginBottom: 8 },
   tagline: { fontSize: 16, color: 'rgba(255,255,255,0.6)', marginBottom: 40, textAlign: 'center' },
   formTitle: { fontSize: 24, fontWeight: 'bold', color: '#FFF', marginBottom: 24 },
 
