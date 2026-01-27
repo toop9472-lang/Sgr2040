@@ -498,6 +498,108 @@ def mask_key(key: str) -> str:
     return '****' + key[-4:]
 
 
+
+class RewardsSettings(BaseModel):
+    points_per_ad: int = 5
+    min_watch_time: int = 30
+    points_per_dollar: int = 500
+    daily_limit: int = 50
+    min_withdrawal: int = 500
+    daily_challenges: List[Dict] = []
+    tips: List[Dict] = []
+
+
+@router.get('/rewards')
+async def get_rewards_settings(user_id: str = Depends(get_current_user_id)):
+    """Get rewards settings (admin only)"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    settings = await db.settings.find_one({'type': 'rewards'}, {'_id': 0})
+    
+    if not settings:
+        return {
+            'points_per_ad': 5,
+            'min_watch_time': 30,
+            'points_per_dollar': 500,
+            'daily_limit': 50,
+            'min_withdrawal': 500,
+            'daily_challenges': [
+                {'title': 'المشاهد النشط', 'target': 5, 'reward': 25, 'icon': '👁️', 'desc': 'شاهد 5 إعلانات', 'enabled': True},
+                {'title': 'جامع النقاط', 'target': 50, 'reward': 30, 'icon': '⭐', 'desc': 'اكسب 50 نقطة', 'enabled': True},
+                {'title': 'المثابر', 'target': 10, 'reward': 50, 'icon': '🔥', 'desc': 'شاهد 10 إعلانات متتالية', 'enabled': True},
+            ],
+            'tips': [
+                {'icon': '💡', 'text': 'شاهد 10 إعلانات = 50 نقطة!', 'enabled': True},
+                {'icon': '🎯', 'text': 'كل 500 نقطة = 1 دولار', 'enabled': True},
+                {'icon': '⚡', 'text': 'الإعلانات الجديدة تعطي نقاط أكثر', 'enabled': True},
+                {'icon': '🏆', 'text': 'حقق التحديات اليومية لمضاعفة النقاط', 'enabled': True},
+                {'icon': '🎁', 'text': 'سجل يومياً للحصول على مكافآت', 'enabled': True},
+            ]
+        }
+    
+    return {k: v for k, v in settings.items() if k not in ['type', '_id']}
+
+
+@router.put('/rewards')
+async def update_rewards_settings(
+    settings: RewardsSettings,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Update rewards settings (admin only)"""
+    db = get_db()
+    await verify_admin(user_id, db)
+    
+    update_data = settings.dict()
+    update_data['type'] = 'rewards'
+    update_data['updated_at'] = datetime.utcnow()
+    
+    await db.settings.update_one(
+        {'type': 'rewards'},
+        {'$set': update_data},
+        upsert=True
+    )
+    
+    return {'message': 'تم حفظ إعدادات المكافآت بنجاح'}
+
+
+@router.get('/public/rewards')
+async def get_public_rewards_settings():
+    """Get rewards settings for public use (no auth required)"""
+    db = get_db()
+    settings = await db.settings.find_one({'type': 'rewards'}, {'_id': 0})
+    
+    if not settings:
+        return {
+            'points_per_ad': 5,
+            'min_watch_time': 30,
+            'points_per_dollar': 500,
+            'daily_limit': 50,
+            'daily_challenges': [
+                {'title': 'المشاهد النشط', 'target': 5, 'reward': 25, 'icon': '👁️', 'desc': 'شاهد 5 إعلانات', 'enabled': True},
+                {'title': 'جامع النقاط', 'target': 50, 'reward': 30, 'icon': '⭐', 'desc': 'اكسب 50 نقطة', 'enabled': True},
+                {'title': 'المثابر', 'target': 10, 'reward': 50, 'icon': '🔥', 'desc': 'شاهد 10 إعلانات متتالية', 'enabled': True},
+            ],
+            'tips': [
+                {'icon': '💡', 'text': 'شاهد 10 إعلانات = 50 نقطة!', 'enabled': True},
+                {'icon': '🎯', 'text': 'كل 500 نقطة = 1 دولار', 'enabled': True},
+                {'icon': '⚡', 'text': 'الإعلانات الجديدة تعطي نقاط أكثر', 'enabled': True},
+            ]
+        }
+    
+    # Return only enabled challenges and tips
+    challenges = [c for c in settings.get('daily_challenges', []) if c.get('enabled', True)]
+    tips = [t for t in settings.get('tips', []) if t.get('enabled', True)]
+    
+    return {
+        'points_per_ad': settings.get('points_per_ad', 5),
+        'min_watch_time': settings.get('min_watch_time', 30),
+        'points_per_dollar': settings.get('points_per_dollar', 500),
+        'daily_limit': settings.get('daily_limit', 50),
+        'daily_challenges': challenges,
+        'tips': tips
+    }
+
 # === Push Notifications Settings ===
 
 class PushNotificationSettings(BaseModel):
