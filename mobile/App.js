@@ -104,11 +104,16 @@ export default function App() {
   // Loading Screen
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingLogo}>🦅</Text>
-        <ActivityIndicator size="large" color={colors.primary} />
+      <LinearGradient colors={colors.gradients.dark} style={styles.loadingContainer}>
+        <Image 
+          source={require('./assets/images/logo.png')} 
+          style={styles.loadingLogo}
+          resizeMode="contain"
+        />
+        <Text style={styles.loadingAppName}>صقر</Text>
+        <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 20 }} />
         <Text style={styles.loadingText}>جاري التحميل...</Text>
-      </View>
+      </LinearGradient>
     );
   }
 
