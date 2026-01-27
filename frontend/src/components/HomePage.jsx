@@ -101,30 +101,23 @@ const HomePage = ({ user, onNavigateToAds }) => {
       <div className="absolute bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#3b82f6]/15 blur-3xl pointer-events-none"></div>
       <div className="absolute top-[40%] right-[-100px] w-[300px] h-[300px] rounded-full bg-[#60a5fa]/10 blur-2xl pointer-events-none"></div>
       {/* Header مع ترحيب + زر الوضع */}
-      <div className="pt-12 px-5 pb-6">
+      <div className="relative z-10 pt-12 px-5 pb-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className={`text-2xl font-bold ${textClass}`}>مرحباً {user?.name || 'صديقي'} 👋</h1>
             <p className={`${textMutedClass} text-sm mt-1`}>جاهز لكسب المزيد اليوم؟</p>
           </div>
           <div className="flex items-center gap-2">
-            {/* زر تبديل الوضع */}
-            <button
-              onClick={() => setIsDark(!isDark)}
-              className={`p-2 rounded-full ${isDark ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-200 text-gray-700'}`}
-              data-testid="theme-toggle"
-            >
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-            <div className={`${isDark ? 'bg-yellow-500/20' : 'bg-yellow-100'} rounded-2xl px-4 py-2`}>
-              <span className="text-yellow-500 font-bold">{userPoints} ⭐</span>
+            <div className="bg-[#3b82f6]/20 border border-[#3b82f6]/30 rounded-full px-4 py-2">
+              <span className="text-[#60a5fa] font-bold">{userPoints} ⭐</span>
             </div>
           </div>
         </div>
 
         {/* بطاقة الرصيد الرئيسية */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-6 mb-6 shadow-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-r from-[#3b82f6] to-[#6366f1] rounded-3xl p-6 mb-6 shadow-2xl shadow-[#3b82f6]/20 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12" />
           <div className="relative z-10 flex items-center justify-between">
             <div>
               <p className="text-white/70 text-sm mb-1">رصيدك الحالي</p>
@@ -140,7 +133,7 @@ const HomePage = ({ user, onNavigateToAds }) => {
         {/* زر المشاهدة الرئيسي */}
         <button
           onClick={onNavigateToAds}
-          className="w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 rounded-2xl p-5 mb-6 shadow-xl transform transition-all hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full bg-gradient-to-r from-[#ef4444] to-[#ec4899] hover:from-[#dc2626] hover:to-[#db2777] rounded-2xl p-5 mb-6 shadow-xl shadow-[#ef4444]/20 transform transition-all hover:scale-[1.02] active:scale-[0.98]"
           data-testid="start-watching-btn"
         >
           <div className="flex items-center justify-between">
@@ -160,20 +153,20 @@ const HomePage = ({ user, onNavigateToAds }) => {
         {/* البيانات التحليلية */}
         <div className={`${cardClass} rounded-2xl p-5 mb-6 border`}>
           <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="w-5 h-5 text-cyan-400" />
+            <BarChart3 className="w-5 h-5 text-[#60a5fa]" />
             <h3 className={`${textClass} font-bold`}>إحصائياتك</h3>
           </div>
           
           <div className="grid grid-cols-2 gap-3">
             {/* إعلانات اليوم */}
-            <div className={`${isDark ? 'bg-black/30' : 'bg-gray-100'} rounded-xl p-3`}>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3">
               <div className="flex items-center gap-2 mb-2">
                 <Calendar className="w-4 h-4 text-green-400" />
                 <span className={`${textDimClass} text-xs`}>اليوم</span>
               </div>
               <p className={`${textClass} text-xl font-bold`}>{watchedToday}</p>
               <p className={`${textDimClass} text-xs`}>من {dailyLimit} إعلان</p>
-              <div className={`mt-2 ${isDark ? 'bg-white/10' : 'bg-gray-200'} rounded-full h-1.5`}>
+              <div className="mt-2 bg-white/10 rounded-full h-1.5">
                 <div 
                   className="bg-green-400 h-1.5 rounded-full transition-all"
                   style={{ width: `${Math.min((watchedToday / dailyLimit) * 100, 100)}%` }}
@@ -182,18 +175,18 @@ const HomePage = ({ user, onNavigateToAds }) => {
             </div>
 
             {/* المتبقي */}
-            <div className={`${isDark ? 'bg-black/30' : 'bg-gray-100'} rounded-xl p-3`}>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3">
               <div className="flex items-center gap-2 mb-2">
-                <Clock className="w-4 h-4 text-blue-400" />
+                <Clock className="w-4 h-4 text-[#60a5fa]" />
                 <span className={`${textDimClass} text-xs`}>المتبقي</span>
               </div>
               <p className={`${textClass} text-xl font-bold`}>{Math.max(dailyLimit - watchedToday, 0)}</p>
               <p className={`${textDimClass} text-xs`}>إعلان متاح</p>
-              <p className="text-blue-400 text-xs mt-2">= {Math.max(dailyLimit - watchedToday, 0) * pointsPerAd} نقطة ممكنة</p>
+              <p className="text-[#60a5fa] text-xs mt-2">= {Math.max(dailyLimit - watchedToday, 0) * pointsPerAd} نقطة ممكنة</p>
             </div>
 
             {/* إجمالي النقاط المكتسبة */}
-            <div className={`${isDark ? 'bg-black/30' : 'bg-gray-100'} rounded-xl p-3`}>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3">
               <div className="flex items-center gap-2 mb-2">
                 <Award className="w-4 h-4 text-yellow-400" />
                 <span className={`${textDimClass} text-xs`}>إجمالي النقاط</span>
@@ -203,9 +196,9 @@ const HomePage = ({ user, onNavigateToAds }) => {
             </div>
 
             {/* معدل الكسب */}
-            <div className={`${isDark ? 'bg-black/30' : 'bg-gray-100'} rounded-xl p-3`}>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3">
               <div className="flex items-center gap-2 mb-2">
-                <Zap className="w-4 h-4 text-purple-400" />
+                <Zap className="w-4 h-4 text-[#a855f7]" />
                 <span className={`${textDimClass} text-xs`}>معدل الكسب</span>
               </div>
               <p className={`${textClass} text-xl font-bold`}>{pointsPerAd}</p>
@@ -216,23 +209,23 @@ const HomePage = ({ user, onNavigateToAds }) => {
 
         {/* التحدي اليومي */}
         {dailyChallenge && dailyChallenge.enabled && (
-          <div className={`${isDark ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border-amber-500/30' : 'bg-gradient-to-r from-amber-100 to-orange-100 border-amber-300'} border rounded-2xl p-5 mb-6`}>
+          <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-2xl p-5 mb-6">
             <div className="flex items-center gap-3 mb-3">
               <span className="text-2xl">{dailyChallenge.icon}</span>
               <div>
-                <p className="text-amber-500 font-bold">التحدي اليومي</p>
+                <p className="text-amber-400 font-bold">التحدي اليومي</p>
                 <p className={`${textMutedClass} text-sm`}>{dailyChallenge.title}</p>
               </div>
             </div>
             <p className={`${textMutedClass} text-sm mb-3`}>{dailyChallenge.desc}</p>
             <div className="flex items-center justify-between">
-              <div className={`flex-1 ${isDark ? 'bg-black/30' : 'bg-white/50'} rounded-full h-2 mr-4`}>
+              <div className="flex-1 bg-white/10 rounded-full h-2 mr-4">
                 <div 
                   className="bg-amber-400 h-2 rounded-full transition-all"
                   style={{ width: `${Math.min((watchedToday / dailyChallenge.target) * 100, 100)}%` }}
                 />
               </div>
-              <span className="text-amber-500 text-sm font-bold">+{dailyChallenge.reward} ⭐</span>
+              <span className="text-amber-400 text-sm font-bold">+{dailyChallenge.reward} ⭐</span>
             </div>
             <p className={`${textDimClass} text-xs mt-2 text-center`}>
               {watchedToday >= dailyChallenge.target ? '🎉 أحسنت! أكملت التحدي' : `${watchedToday}/${dailyChallenge.target}`}
