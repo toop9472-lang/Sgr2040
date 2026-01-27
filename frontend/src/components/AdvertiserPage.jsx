@@ -561,12 +561,13 @@ const AdvertiserPage = ({ onNavigate }) => {
                     value={adData.thumbnail_url}
                     onChange={handleInputChange}
                     placeholder="https://example.com/thumbnail.jpg"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#3b82f6]"
                     data-testid="thumbnail-url-input"
                   />
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-900">
+                <div className="bg-[#3b82f6]/10 border border-[#3b82f6]/30 rounded-xl p-4">
+                  <p className="text-sm text-[#60a5fa]">
                     <strong>المبلغ الإجمالي:</strong> {getCurrentPackage()?.amount || 500} ريال
                   </p>
                 </div>
@@ -574,7 +575,7 @@ const AdvertiserPage = ({ onNavigate }) => {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white h-12"
+                  className="w-full bg-[#3b82f6] hover:bg-[#2563eb] text-white h-12 rounded-full font-medium"
                   data-testid="submit-ad-btn"
                 >
                   {isSubmitting ? 'جاري الإرسال...' : 'متابعة للدفع'}
@@ -586,13 +587,13 @@ const AdvertiserPage = ({ onNavigate }) => {
 
         {/* Step 2: Payment Method Selection */}
         {step === 2 && createdAd && (
-          <Card className="shadow-md border-0">
+          <Card className="shadow-xl border border-white/10 bg-[#111118]/80 backdrop-blur-xl rounded-2xl">
             <CardHeader>
-              <CardTitle>اختر طريقة الدفع</CardTitle>
-              <CardDescription>
-                المبلغ المطلوب: <strong>{getCurrentPackage()?.amount || createdAd.payment.amount} ريال</strong>
+              <CardTitle className="text-white">اختر طريقة الدفع</CardTitle>
+              <CardDescription className="text-gray-400">
+                المبلغ المطلوب: <strong className="text-[#3b82f6]">{getCurrentPackage()?.amount || createdAd.payment.amount} ريال</strong>
                 {getCurrentPackage()?.duration_months > 1 && (
-                  <span className="text-green-600 text-sm mr-2">
+                  <span className="text-green-400 text-sm mr-2">
                     (خصم {getCurrentPackage()?.duration_months === 3 ? '10%' : 
                            getCurrentPackage()?.duration_months === 6 ? '20%' : 
                            getCurrentPackage()?.duration_months === 12 ? '30%' : ''})
