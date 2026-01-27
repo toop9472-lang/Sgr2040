@@ -58,7 +58,7 @@ const AuthScreen = ({ onLogin }) => {
   };
 
   const handleGoogleLogin = () => {
-    const redirectUrl = 'https://saqr-video-ads.preview.emergentagent.com/';
+    const redirectUrl = 'https://saqr-stream.preview.emergentagent.com/';
     Linking.openURL(`https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`);
   };
 
