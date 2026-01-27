@@ -131,40 +131,46 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
 
   // Touch handlers for swipe
   const handleTouchStart = (e) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientY);
+    setTouchEndY(null);
+    setTouchEndX(null);
+    setTouchStartY(e.targetTouches[0].clientY);
+    setTouchStartX(e.targetTouches[0].clientX);
   };
 
   const handleTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientY);
+    setTouchEndY(e.targetTouches[0].clientY);
+    setTouchEndX(e.targetTouches[0].clientX);
   };
 
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+    if (!touchStartY || !touchStartX) return;
     
-    const distance = touchStart - touchEnd;
-    const isSwipeUp = distance > MIN_SWIPE_DISTANCE;
-    const isSwipeDown = distance < -MIN_SWIPE_DISTANCE;
+    const distanceY = touchStartY - (touchEndY || touchStartY);
+    const distanceX = touchStartX - (touchEndX || touchStartX);
     
-    if (isSwipeUp && currentIndex < ads.length - 1) {
-      goToNext();
-    } else if (isSwipeDown && currentIndex > 0) {
-      goToPrevious();
-    }
-  };
-
-  // Horizontal swipe to close
-  const handleHorizontalSwipe = (e) => {
-    const startX = e.changedTouches?.[0]?.clientX || 0;
-    
-    const handleEnd = (endEvent) => {
-      const endX = endEvent.changedTouches?.[0]?.clientX || 0;
-      if (endX - startX > 100) {
-        onClose();
+    // تحديد الاتجاه الرئيسي للسحب
+    if (Math.abs(distanceX) > Math.abs(distanceY)) {
+      // سحب أفقي - للخروج
+      if (Math.abs(distanceX) > MIN_SWIPE_DISTANCE_X) {
+        onClose(); // الخروج يمين أو يسار
       }
-    };
+    } else {
+      // سحب عمودي - للتنقل بين الإعلانات
+      const isSwipeUp = distanceY > MIN_SWIPE_DISTANCE_Y;
+      const isSwipeDown = distanceY < -MIN_SWIPE_DISTANCE_Y;
+      
+      if (isSwipeUp && currentIndex < ads.length - 1) {
+        goToNext();
+      } else if (isSwipeDown && currentIndex > 0) {
+        goToPrevious();
+      }
+    }
     
-    document.addEventListener('touchend', handleEnd, { once: true });
+    // إعادة تعيين
+    setTouchStartY(null);
+    setTouchStartX(null);
+    setTouchEndY(null);
+    setTouchEndX(null);
   };
 
   const goToNext = () => {
