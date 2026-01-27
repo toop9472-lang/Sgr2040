@@ -41,24 +41,24 @@ const AIFloatingButton = ({ user }) => {
         <div className="relative">
           {/* Pulse effect */}
           {showPulse && (
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 animate-ping opacity-75" />
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#3b82f6] to-[#6366f1] animate-ping opacity-75" />
           )}
           
           {/* Button */}
-          <div className="relative w-14 h-14 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg flex items-center justify-center hover:scale-110 transition-transform duration-200">
+          <div className="relative w-14 h-14 rounded-full bg-gradient-to-r from-[#3b82f6] to-[#6366f1] shadow-lg shadow-[#3b82f6]/30 flex items-center justify-center hover:scale-110 transition-transform duration-200">
             <Bot className="w-7 h-7 text-white" />
             
             {/* Sparkle decoration */}
-            <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-yellow-400 flex items-center justify-center animate-bounce">
-              <Sparkles className="w-3 h-3 text-yellow-800" />
+            <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#60a5fa] flex items-center justify-center animate-bounce">
+              <Sparkles className="w-3 h-3 text-white" />
             </div>
           </div>
           
           {/* Tooltip */}
           <div className="absolute left-16 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            <div className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap shadow-lg">
+            <div className="bg-[#111118] border border-white/10 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap shadow-lg">
               اسألني أي شيء! 🤖
-              <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-gray-900" />
+              <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-[#111118]" />
             </div>
           </div>
         </div>
