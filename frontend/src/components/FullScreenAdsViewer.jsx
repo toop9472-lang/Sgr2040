@@ -60,6 +60,19 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
     };
   }, [showControls]);
 
+  // Hide ad info after 3 seconds
+  useEffect(() => {
+    if (showAdInfo) {
+      if (infoTimerRef.current) clearTimeout(infoTimerRef.current);
+      infoTimerRef.current = setTimeout(() => {
+        setShowAdInfo(false);
+      }, 3000);
+    }
+    return () => {
+      if (infoTimerRef.current) clearTimeout(infoTimerRef.current);
+    };
+  }, [showAdInfo]);
+
   const loadAds = async () => {
     try {
       const response = await fetch(`${BACKEND_URL}/api/ads`);
