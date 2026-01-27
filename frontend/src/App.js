@@ -42,6 +42,7 @@ function MainApp() {
   const [ads, setAds] = useState([]);
   const [currentPage, setCurrentPage] = useState('home');
   const [isLoading, setIsLoading] = useState(true);
+  const [showFullScreenAds, setShowFullScreenAds] = useState(false);
   
   // Admin state
   const [isAdmin, setIsAdmin] = useState(false);
