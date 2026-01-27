@@ -285,95 +285,33 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
                 : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
             }}
           >
-            {/* Ad content overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40">
-              <div className="absolute bottom-32 left-6 right-20">
-                <h2 className="text-white text-2xl font-bold mb-2">{currentAd.title}</h2>
-                <p className="text-white/80 text-sm line-clamp-2">{currentAd.description}</p>
-                {currentAd.advertiser && (
-                  <p className="text-white/60 text-xs mt-2">@{currentAd.advertiser}</p>
-                )}
+            {/* Ad content overlay - minimal */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+              <div className="absolute bottom-20 left-6 right-6">
+                <h2 className="text-white text-xl font-bold mb-1">{currentAd.title}</h2>
+                <p className="text-white/70 text-sm line-clamp-2">{currentAd.description}</p>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Progress Bar - Top */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-white/20 z-10">
+      {/* Progress Bar - Top (رفيع جداً) */}
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/10 z-10">
         <div 
           className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-1000"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      {/* Close Button - Swipe hint */}
+      {/* عداد الوقت - يظهر فقط عند اللمس */}
       <div 
-        className={`absolute top-12 left-4 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute top-4 right-4 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
       >
-        <button 
-          onClick={onClose}
-          className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center"
-        >
-          <X className="w-5 h-5 text-white" />
-        </button>
-      </div>
-
-      {/* Right Side Actions */}
-      <div className="absolute right-4 bottom-32 flex flex-col items-center gap-6 z-20">
-        {/* Viewer Count */}
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-            <Eye className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-white text-xs mt-1 font-medium">{viewerCount}</span>
-        </div>
-
-        {/* Points */}
-        <div className="flex flex-col items-center relative">
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-            watchTime >= REQUIRED_WATCH_TIME 
-              ? 'bg-yellow-500 scale-110' 
-              : 'bg-black/50 backdrop-blur-sm'
-          }`}>
-            <Star className={`w-6 h-6 ${watchTime >= REQUIRED_WATCH_TIME ? 'text-white' : 'text-yellow-400'}`} />
-          </div>
-          <span className="text-white text-xs mt-1 font-medium">+{POINTS_PER_AD}</span>
-          
-          {/* Points Animation */}
-          {showPointsAnimation && (
-            <div className="absolute -top-8 left-1/2 -translate-x-1/2 animate-bounce">
-              <span className="text-yellow-400 text-lg font-bold">+{POINTS_PER_AD}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Mute Toggle */}
-        <div className="flex flex-col items-center">
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMuted(!isMuted);
-            }}
-            className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center"
-          >
-            {isMuted ? (
-              <VolumeX className="w-6 h-6 text-white" />
-            ) : (
-              <Volume2 className="w-6 h-6 text-white" />
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Timer Display */}
-      <div 
-        className={`absolute top-12 right-4 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}
-      >
-        <div className="bg-black/50 backdrop-blur-sm rounded-full px-4 py-2">
-          <span className="text-white text-sm font-medium">
+        <div className="bg-black/40 backdrop-blur-sm rounded-full px-3 py-1.5">
+          <span className="text-white text-xs font-medium">
             {watchTime >= REQUIRED_WATCH_TIME ? (
-              <span className="text-yellow-400">✓ مكتمل</span>
+              <span className="text-yellow-400">✓ +{POINTS_PER_AD}</span>
             ) : (
               <span>{REQUIRED_WATCH_TIME - watchTime}s</span>
             )}
@@ -381,61 +319,63 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
         </div>
       </div>
 
-      {/* Swipe Indicators */}
+      {/* زر كتم الصوت - يظهر فقط عند اللمس */}
       <div 
-        className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}
-        style={{ top: '15%' }}
+        className={`absolute top-4 left-4 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
       >
-        {currentIndex > 0 && (
-          <div className="flex flex-col items-center animate-bounce">
-            <ChevronUp className="w-6 h-6 text-white/50" />
-            <span className="text-white/50 text-xs">السابق</span>
-          </div>
-        )}
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsMuted(!isMuted);
+          }}
+          className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center"
+        >
+          {isMuted ? (
+            <VolumeX className="w-4 h-4 text-white" />
+          ) : (
+            <Volume2 className="w-4 h-4 text-white" />
+          )}
+        </button>
       </div>
 
-      <div 
-        className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}
-        style={{ bottom: '15%' }}
-      >
-        {currentIndex < ads.length - 1 && (
-          <div className="flex flex-col items-center animate-bounce">
-            <span className="text-white/50 text-xs">التالي</span>
-            <ChevronDown className="w-6 h-6 text-white/50" />
+      {/* نقاط مكتسبة - تظهر في الوسط عند الإكمال */}
+      {showPointsAnimation && (
+        <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+          <div className="animate-bounce">
+            <span className="text-yellow-400 text-5xl font-bold drop-shadow-lg">+{POINTS_PER_AD}</span>
           </div>
-        )}
-      </div>
-
-      {/* Ad Counter */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
-        <div className="flex items-center gap-1">
-          {ads.slice(0, Math.min(ads.length, 5)).map((_, idx) => (
-            <div 
-              key={idx}
-              className={`w-1.5 h-1.5 rounded-full transition-all ${
-                idx === currentIndex % 5 ? 'bg-white w-4' : 'bg-white/40'
-              }`}
-            />
-          ))}
         </div>
-      </div>
+      )}
 
-      {/* Total Points Earned */}
+      {/* إجمالي النقاط المكتسبة في الجلسة */}
       {earnedPoints > 0 && (
-        <div className="absolute top-12 left-1/2 -translate-x-1/2 z-20">
-          <div className="bg-yellow-500/90 backdrop-blur-sm rounded-full px-4 py-2">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
+          <div className="bg-yellow-500/90 backdrop-blur-sm rounded-full px-4 py-1.5">
             <span className="text-black font-bold text-sm">
-              ⭐ {earnedPoints} نقطة
+              ⭐ {earnedPoints}
             </span>
           </div>
         </div>
       )}
 
-      {/* Swipe to close hint */}
+      {/* مؤشرات التنقل - تظهر فقط عند اللمس */}
       <div 
-        className={`absolute left-2 top-1/2 -translate-y-1/2 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute left-1/2 -translate-x-1/2 top-12 transition-opacity duration-300 ${showControls && currentIndex > 0 ? 'opacity-50' : 'opacity-0'}`}
       >
-        <div className="text-white/30 text-xs writing-vertical">
+        <div className="text-white text-xs">⬆</div>
+      </div>
+
+      <div 
+        className={`absolute left-1/2 -translate-x-1/2 bottom-16 transition-opacity duration-300 ${showControls && currentIndex < ads.length - 1 ? 'opacity-50' : 'opacity-0'}`}
+      >
+        <div className="text-white text-xs">⬇</div>
+      </div>
+
+      {/* تلميح الخروج - يظهر فقط عند اللمس */}
+      <div 
+        className={`absolute right-2 top-1/2 -translate-y-1/2 transition-opacity duration-300 ${showControls ? 'opacity-30' : 'opacity-0'}`}
+      >
+        <div className="text-white text-[10px] rotate-90 whitespace-nowrap">
           ← اسحب للخروج
         </div>
       </div>
