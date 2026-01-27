@@ -105,13 +105,9 @@ export default function App() {
   if (isLoading) {
     return (
       <LinearGradient colors={colors.gradients.dark} style={styles.loadingContainer}>
-        <Image 
-          source={require('./assets/images/logo.png')} 
-          style={styles.loadingLogo}
-          resizeMode="contain"
-        />
+        <Text style={styles.loadingLogo}>🦅</Text>
         <Text style={styles.loadingAppName}>صقر</Text>
-        <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 20 }} />
+        <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 20 }} />
         <Text style={styles.loadingText}>جاري التحميل...</Text>
       </LinearGradient>
     );
