@@ -40,24 +40,22 @@ const theme = {
   }
 };
 
-// ============ FULL SCREEN AD VIEWER ============
+// ============ FULL SCREEN AD VIEWER - Clean Version ============
 const FullScreenAdViewer = ({ ads, onClose, onPointsEarned, user }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [watchTime, setWatchTime] = useState(0);
-  const [showControls, setShowControls] = useState(true);
+  const [showControls, setShowControls] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [showPointsAnimation, setShowPointsAnimation] = useState(false);
-  const [viewerCount, setViewerCount] = useState(0);
   
   const translateY = useRef(new Animated.Value(0)).current;
-  const controlsOpacity = useRef(new Animated.Value(1)).current;
+  const controlsOpacity = useRef(new Animated.Value(0)).current;
   const pointsScale = useRef(new Animated.Value(0)).current;
   const videoRef = useRef(null);
   const watchTimerRef = useRef(null);
 
   useEffect(() => {
     startWatching();
-    setViewerCount(Math.floor(Math.random() * 500) + 100);
     
     return () => {
       if (watchTimerRef.current) clearInterval(watchTimerRef.current);
@@ -78,7 +76,7 @@ const FullScreenAdViewer = ({ ads, onClose, onPointsEarned, user }) => {
           duration: 500,
           useNativeDriver: true
         }).start(() => setShowControls(false));
-      }, 3000);
+      }, 2000);
       
       return () => clearTimeout(timer);
     }
@@ -105,7 +103,6 @@ const FullScreenAdViewer = ({ ads, onClose, onPointsEarned, user }) => {
     const points = POINTS_PER_AD;
     setEarnedPoints(prev => prev + points);
     
-    // Show animation
     setShowPointsAnimation(true);
     Animated.sequence([
       Animated.spring(pointsScale, { toValue: 1.2, useNativeDriver: true }),
@@ -149,23 +146,25 @@ const FullScreenAdViewer = ({ ads, onClose, onPointsEarned, user }) => {
     }
   };
 
+  // التنقل: أعلى/أسفل للإعلانات، يمين/يسار للخروج
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gestureState) => {
         return Math.abs(gestureState.dy) > 10 || Math.abs(gestureState.dx) > 50;
       },
       onPanResponderRelease: (_, gestureState) => {
-        // Swipe up
-        if (gestureState.dy < -50) {
-          goToNext();
-        }
-        // Swipe down
-        else if (gestureState.dy > 50) {
-          goToPrevious();
-        }
-        // Swipe right to close
-        else if (gestureState.dx > 100) {
-          onClose();
+        // سحب أفقي للخروج
+        if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy)) {
+          if (Math.abs(gestureState.dx) > 80) {
+            onClose(); // خروج يمين أو يسار
+          }
+        } else {
+          // سحب عمودي للتنقل بين الإعلانات
+          if (gestureState.dy < -50) {
+            goToNext();
+          } else if (gestureState.dy > 50) {
+            goToPrevious();
+          }
         }
       }
     })
@@ -193,7 +192,7 @@ const FullScreenAdViewer = ({ ads, onClose, onPointsEarned, user }) => {
     <View style={styles.fullScreenContainer} {...panResponder.panHandlers}>
       <StatusBar hidden />
       
-      {/* Ad Content */}
+      {/* محتوى الإعلان - شاشة كاملة */}
       <Animated.View 
         style={[styles.adContent, { transform: [{ translateY }] }]}
       >
@@ -224,86 +223,51 @@ const FullScreenAdViewer = ({ ads, onClose, onPointsEarned, user }) => {
         </TouchableOpacity>
       </Animated.View>
 
-      {/* Progress Bar */}
-      <View style={styles.progressContainer}>
+      {/* شريط التقدم - رفيع في الأعلى */}
+      <View style={styles.progressContainerThin}>
         <View style={[styles.progressBar, { width: `${progress}%` }]} />
       </View>
 
-      {/* Right Side Controls */}
-      <View style={styles.rightControls}>
-        {/* Viewer Count */}
-        <View style={styles.controlItem}>
-          <View style={styles.controlIcon}>
-            <Text style={styles.iconEmoji}>👁️</Text>
-          </View>
-          <Text style={styles.controlText}>{viewerCount}</Text>
-        </View>
-
-        {/* Points */}
-        <View style={styles.controlItem}>
-          <Animated.View style={[
-            styles.controlIcon,
-            watchTime >= REQUIRED_WATCH_TIME && styles.controlIconActive,
-            { transform: [{ scale: showPointsAnimation ? pointsScale : 1 }] }
-          ]}>
-            <Text style={styles.iconEmoji}>⭐</Text>
-          </Animated.View>
-          <Text style={styles.controlText}>+{POINTS_PER_AD}</Text>
-        </View>
-      </View>
-
-      {/* Timer */}
-      <Animated.View style={[styles.timerContainer, { opacity: controlsOpacity }]}>
-        <View style={styles.timerBadge}>
+      {/* عداد الوقت - يظهر عند اللمس فقط */}
+      <Animated.View style={[styles.timerContainerClean, { opacity: controlsOpacity }]}>
+        <View style={styles.timerBadgeClean}>
           {watchTime >= REQUIRED_WATCH_TIME ? (
-            <Text style={styles.timerComplete}>✓ مكتمل</Text>
+            <Text style={styles.timerComplete}>✓ +{POINTS_PER_AD}</Text>
           ) : (
-            <Text style={styles.timerText}>{REQUIRED_WATCH_TIME - watchTime}s</Text>
+            <Text style={styles.timerTextClean}>{REQUIRED_WATCH_TIME - watchTime}s</Text>
           )}
         </View>
       </Animated.View>
 
-      {/* Close Button */}
-      <Animated.View style={[styles.closeContainer, { opacity: controlsOpacity }]}>
-        <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-          <Text style={styles.closeBtnText}>✕</Text>
-        </TouchableOpacity>
-      </Animated.View>
-
-      {/* Total Points Earned */}
+      {/* نقاط مكتسبة في الجلسة */}
       {earnedPoints > 0 && (
-        <View style={styles.totalPointsContainer}>
-          <Text style={styles.totalPointsText}>⭐ {earnedPoints} نقطة</Text>
+        <View style={styles.totalPointsContainerClean}>
+          <Text style={styles.totalPointsTextClean}>⭐ {earnedPoints}</Text>
         </View>
       )}
 
-      {/* Points Animation */}
+      {/* تأثير النقاط */}
       {showPointsAnimation && (
         <View style={styles.pointsAnimationContainer}>
-          <Animated.Text style={[styles.pointsAnimationText, { transform: [{ scale: pointsScale }] }]}>
+          <Animated.Text style={[styles.pointsAnimationTextBig, { transform: [{ scale: pointsScale }] }]}>
             +{POINTS_PER_AD} 🎉
           </Animated.Text>
         </View>
       )}
 
-      {/* Swipe Hints */}
-      <Animated.View style={[styles.swipeHintTop, { opacity: controlsOpacity }]}>
-        {currentIndex > 0 && <Text style={styles.swipeHintText}>⬆️ السابق</Text>}
+      {/* مؤشرات التنقل - تظهر عند اللمس */}
+      <Animated.View style={[styles.swipeHintTopClean, { opacity: controlsOpacity }]}>
+        {currentIndex > 0 && <Text style={styles.swipeArrow}>⬆</Text>}
       </Animated.View>
       
-      <Animated.View style={[styles.swipeHintBottom, { opacity: controlsOpacity }]}>
-        {currentIndex < ads.length - 1 && <Text style={styles.swipeHintText}>⬇️ التالي</Text>}
+      <Animated.View style={[styles.swipeHintBottomClean, { opacity: controlsOpacity }]}>
+        {currentIndex < ads.length - 1 && <Text style={styles.swipeArrow}>⬇</Text>}
       </Animated.View>
 
-      {/* Swipe to close hint */}
-      <Animated.View style={[styles.swipeHintLeft, { opacity: controlsOpacity }]}>
-        <Text style={styles.swipeHintTextVertical}>← اسحب للخروج</Text>
+      {/* تلميح الخروج */}
+      <Animated.View style={[styles.exitHint, { opacity: controlsOpacity }]}>
+        <Text style={styles.exitHintText}>← →</Text>
       </Animated.View>
-
-      {/* Ad Counter */}
-      <View style={styles.adCounter}>
-        <Text style={styles.adCounterText}>{currentIndex + 1}/{ads.length}</Text>
-      </View>
     </View>
   );
 };
