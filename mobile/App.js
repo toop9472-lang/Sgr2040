@@ -1014,4 +1014,78 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: '600',
   },
+  
+  // Clean Ads Viewer Styles
+  progressContainerThin: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  timerContainerClean: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+  },
+  timerBadgeClean: {
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  timerTextClean: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  totalPointsContainerClean: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  totalPointsTextClean: {
+    backgroundColor: 'rgba(255,215,0,0.9)',
+    color: '#000',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 16,
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  pointsAnimationTextBig: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: '#FFD700',
+  },
+  swipeHintTopClean: {
+    position: 'absolute',
+    top: 50,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  swipeHintBottomClean: {
+    position: 'absolute',
+    bottom: 60,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  swipeArrow: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 20,
+  },
+  exitHint: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+  },
+  exitHintText: {
+    color: 'rgba(255,255,255,0.3)',
+    fontSize: 12,
+  },
 });
