@@ -13,9 +13,13 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
   const isGuest = user?.isGuest || false;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 pb-20">
+    <div className="min-h-screen bg-[#0a0a0f] pb-20 relative overflow-hidden">
+      {/* Decorative Blue Circles */}
+      <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#3b82f6]/20 blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#3b82f6]/15 blur-3xl pointer-events-none"></div>
+      
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 pt-8 pb-24 rounded-b-3xl shadow-lg">
+      <div className="relative z-10 bg-gradient-to-r from-[#3b82f6] to-[#6366f1] px-4 pt-8 pb-24 rounded-b-3xl shadow-lg shadow-[#3b82f6]/20">
         <div className="flex justify-between items-start mb-6">
           <h1 className="text-white text-2xl font-bold">{t('profile')}</h1>
           <Button
@@ -30,15 +34,15 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
         </div>
 
         <div className="flex items-center gap-4">
-          <Avatar className="w-20 h-20 border-4 border-white shadow-lg">
+          <Avatar className="w-20 h-20 border-4 border-white/20 shadow-lg">
             <AvatarImage src={user.avatar} />
-            <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
+            <AvatarFallback className="bg-[#111118] text-white text-2xl">{user.name?.[0] || 'U'}</AvatarFallback>
           </Avatar>
           <div>
             <h2 className="text-white text-xl font-bold">{user.name}</h2>
             <p className="text-white/80 text-sm">{user.email}</p>
             {isGuest && (
-              <div className="mt-1 bg-yellow-500/20 text-yellow-100 px-2 py-1 rounded text-xs">
+              <div className="mt-1 bg-[#3b82f6]/30 text-[#60a5fa] px-2 py-1 rounded text-xs">
                 👤 {t('guestModeLabel')}
               </div>
             )}
@@ -51,22 +55,22 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
         </div>
       </div>
 
-      <div className="px-4 -mt-16 space-y-4">
+      <div className="relative z-10 px-4 -mt-16 space-y-4">
         {/* Guest Warning */}
         {isGuest && (
-          <Card className="shadow-lg border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-amber-50">
+          <Card className="shadow-xl border border-[#3b82f6]/30 bg-[#111118]/80 backdrop-blur-xl">
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="text-4xl mb-2">🔒</div>
-                <h3 className="font-bold text-lg mb-2">
+                <h3 className="font-bold text-lg mb-2 text-white">
                   {isRTL ? 'أنت في وضع الزائر' : "You're in Guest Mode"}
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-gray-400 mb-4">
                   {isRTL ? 'سجّل الدخول للحصول على النقاط وكسب المال!' : 'Login to earn points and make money!'}
                 </p>
                 <Button
                   onClick={onLogout}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  className="w-full bg-gradient-to-r from-[#3b82f6] to-[#6366f1] hover:from-[#2563eb] hover:to-[#4f46e5] rounded-full"
                 >
                   {isRTL ? 'تسجيل الدخول الآن' : 'Login Now'}
                 </Button>
@@ -77,27 +81,27 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
 
         {/* Points Card */}
         {!isGuest && (
-          <Card className="shadow-lg border-0">
+          <Card className="shadow-xl border border-white/10 bg-[#111118]/80 backdrop-blur-xl">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <Award className="text-yellow-500" size={24} />
+              <CardTitle className="flex items-center gap-2 text-white">
+                <Award className="text-[#60a5fa]" size={24} />
                 {isRTL ? 'رصيد النقاط' : 'Points Balance'}
               </CardTitle>
             </CardHeader>
             <CardContent>
             <div className="text-center mb-4">
-              <div className="text-5xl font-bold text-indigo-600 mb-2">
+              <div className="text-5xl font-bold text-[#60a5fa] mb-2">
                 {user.points}
               </div>
-              <p className="text-gray-600">{isRTL ? 'نقطة متاحة' : 'points available'}</p>
+              <p className="text-gray-400">{isRTL ? 'نقطة متاحة' : 'points available'}</p>
             </div>
 
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-4 mb-4">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-400">
                   {isRTL ? 'التقدم نحو $1' : 'Progress to $1'}
                 </span>
-                <span className="text-sm font-bold text-indigo-600">
+                <span className="text-sm font-bold text-[#60a5fa]">
                   {pointsToNextDollar} {isRTL ? 'نقطة متبقية' : 'points remaining'}
                 </span>
               </div>
