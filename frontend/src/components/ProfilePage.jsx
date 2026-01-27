@@ -156,48 +156,48 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
 
         {/* Info Card */}
         {!isGuest && (
-          <Card className="shadow-md border-0">
+          <Card className="shadow-xl border border-white/10 bg-[#111118]/80 backdrop-blur-xl">
           <CardHeader>
-            <CardTitle className="text-lg">
+            <CardTitle className="text-lg text-white">
               {isRTL ? 'كيف يعمل النظام؟' : 'How It Works?'}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-indigo-600 font-bold">1</span>
+              <div className="w-8 h-8 rounded-full bg-[#3b82f6]/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-[#60a5fa] font-bold">1</span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-400">
                 {isRTL 
                   ? 'شاهد الإعلانات واحصل على نقطة واحدة لكل دقيقة'
                   : 'Watch ads and earn 1 point per minute'}
               </p>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-indigo-600 font-bold">2</span>
+              <div className="w-8 h-8 rounded-full bg-[#3b82f6]/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-[#60a5fa] font-bold">2</span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-400">
                 {isRTL 
                   ? 'اجمع 500 نقطة لاستبدالها بـ $1'
                   : 'Collect 500 points to redeem $1'}
               </p>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-indigo-600 font-bold">3</span>
+              <div className="w-8 h-8 rounded-full bg-[#3b82f6]/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-[#60a5fa] font-bold">3</span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-400">
                 {isRTL 
                   ? 'اطلب السحب وانتظر موافقة الإدارة'
                   : 'Request withdrawal and wait for approval'}
               </p>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-red-600 font-bold">⚠️</span>
+              <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-red-400 font-bold">⚠️</span>
               </div>
-              <p className="text-sm text-gray-600 font-medium">
+              <p className="text-sm text-gray-400 font-medium">
                 {isRTL 
                   ? 'كل إعلان يُحسب مرة واحدة فقط - منع الغش'
                   : 'Each ad counts once only - anti-cheat'}
