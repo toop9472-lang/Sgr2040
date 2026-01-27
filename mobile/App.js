@@ -24,7 +24,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Video } from 'expo-av';
 
 // ============ CONFIGURATION ============
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://saqr-ads-1.preview.emergentagent.com';
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://saqr-video-ads.preview.emergentagent.com';
 const { width, height } = Dimensions.get('window');
 
 const REQUIRED_WATCH_TIME = 30;
@@ -690,7 +690,7 @@ const LoginPage = ({ onLogin, onGuestMode }) => {
   };
 
   const handleGoogleLogin = () => {
-    const redirectUrl = 'https://saqr-ads-1.preview.emergentagent.com/';
+    const redirectUrl = 'https://saqr-video-ads.preview.emergentagent.com/';
     Linking.openURL(`https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`);
   };
 
