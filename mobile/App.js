@@ -563,7 +563,7 @@ export default function App() {
             </View>
           </ScrollView>
           
-          {/* Bottom Nav */}
+          {/* Bottom Nav - فقط: الرئيسية، حسابي، إعلانات */}
           <View style={styles.bottomNav}>
             <TouchableOpacity style={styles.navItem} onPress={() => {}}>
               <Text style={styles.navIcon}>🏠</Text>
