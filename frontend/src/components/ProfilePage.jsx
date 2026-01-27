@@ -124,30 +124,30 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
         {/* Stats Cards */}
         {!isGuest && (
           <div className="grid grid-cols-2 gap-4">
-          <Card className="shadow-md border-0">
+          <Card className="shadow-xl border border-white/10 bg-[#111118]/80 backdrop-blur-xl">
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-2">
-                  <TrendingUp className="text-green-600" size={24} />
+                <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center mb-2">
+                  <TrendingUp className="text-green-400" size={24} />
                 </div>
-                <div className="text-2xl font-bold text-gray-800">
+                <div className="text-2xl font-bold text-white">
                   ${((user.totalEarned || user.total_earned || 0) / 500).toFixed(2)}
                 </div>
-                <p className="text-xs text-gray-600 mt-1">{t('totalEarned')}</p>
+                <p className="text-xs text-gray-400 mt-1">{t('totalEarned')}</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-md border-0">
+          <Card className="shadow-xl border border-white/10 bg-[#111118]/80 backdrop-blur-xl">
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
-                  <Clock className="text-blue-600" size={24} />
+                <div className="w-12 h-12 rounded-full bg-[#3b82f6]/20 flex items-center justify-center mb-2">
+                  <Clock className="text-[#60a5fa]" size={24} />
                 </div>
-                <div className="text-2xl font-bold text-gray-800">
+                <div className="text-2xl font-bold text-white">
                   {(user.watchedAds || user.watched_ads || []).length}
                 </div>
-                <p className="text-xs text-gray-600 mt-1">{t('watchedAds')}</p>
+                <p className="text-xs text-gray-400 mt-1">{t('watchedAds')}</p>
               </div>
             </CardContent>
           </Card>
