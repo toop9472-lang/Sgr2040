@@ -5,7 +5,6 @@ import { useLanguage } from '../i18n/LanguageContext';
 const HomePage = ({ user, onNavigateToAds }) => {
   const { t } = useLanguage();
   const [currentTip, setCurrentTip] = useState(0);
-  const [dailyChallenge, setDailyChallenge] = useState(null);
 
   // نصائح ترفيهية
   const tips = [
