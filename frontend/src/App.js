@@ -297,7 +297,20 @@ function MainApp() {
   };
 
   const handleNavigate = (page) => {
-    setCurrentPage(page);
+    if (page === 'ads') {
+      setShowFullScreenAds(true);
+    } else {
+      setCurrentPage(page);
+    }
+  };
+
+  const handlePointsEarned = async (points) => {
+    // Refresh user data to get updated points
+    await refreshUser();
+    toast({
+      title: '🎉 رائع!',
+      description: `حصلت على ${points} نقطة!`,
+    });
   };
 
   const handleAdminLogin = (admin) => {
