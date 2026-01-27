@@ -1,49 +1,86 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, Target, Zap, Gift, TrendingUp, Clock, Star, Play, ChevronRight } from 'lucide-react';
+import { TrendingUp, Clock, Play, ChevronRight, BarChart3, Award, Calendar, Zap } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
+import axios from 'axios';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const HomePage = ({ user, onNavigateToAds }) => {
   const { t } = useLanguage();
   const [currentTip, setCurrentTip] = useState(0);
-
-  // نصائح ترفيهية
-  const tips = [
-    { icon: '💡', text: 'شاهد 10 إعلانات = 50 نقطة!' },
-    { icon: '🎯', text: 'كل 500 نقطة = 1 دولار' },
-    { icon: '⚡', text: 'الإعلانات الجديدة تعطي نقاط أكثر' },
-    { icon: '🏆', text: 'حقق التحديات اليومية لمضاعفة النقاط' },
-    { icon: '🎁', text: 'سجل يومياً للحصول على مكافآت' },
-  ];
-
-  // تحدي يومي عشوائي
-  const challenges = [
-    { title: 'المشاهد النشط', target: 5, reward: 25, icon: '👁️', desc: 'شاهد 5 إعلانات' },
-    { title: 'جامع النقاط', target: 50, reward: 30, icon: '⭐', desc: 'اكسب 50 نقطة' },
-    { title: 'المثابر', target: 10, reward: 50, icon: '🔥', desc: 'شاهد 10 إعلانات متتالية' },
-  ];
-
-  // اختيار التحدي اليومي عند التحميل
-  const today = new Date().getDate();
-  const dailyChallenge = challenges[today % challenges.length];
+  const [settings, setSettings] = useState(null);
+  const [userAnalytics, setUserAnalytics] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    loadData();
+    
     // تغيير النصيحة كل 4 ثواني
     const interval = setInterval(() => {
-      setCurrentTip(prev => (prev + 1) % tips.length);
+      setCurrentTip(prev => (prev + 1) % (settings?.tips?.length || 5));
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [tips.length]);
+  }, [settings?.tips?.length]);
+
+  const loadData = async () => {
+    try {
+      // جلب إعدادات المكافآت
+      const settingsRes = await axios.get(`${API_URL}/api/settings/public/rewards`);
+      setSettings(settingsRes.data);
+
+      // جلب تحليلات المستخدم إذا كان مسجل
+      if (user?.id || user?.user_id) {
+        const token = localStorage.getItem('token');
+        if (token) {
+          try {
+            const analyticsRes = await axios.get(`${API_URL}/api/users/analytics`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            setUserAnalytics(analyticsRes.data);
+          } catch (e) {
+            console.log('Analytics not available');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const userPoints = user?.points || 0;
-  const userBalance = (userPoints / 500).toFixed(2);
-  const watchedToday = user?.watched_today || 0;
-  const dailyLimit = 50;
+  const pointsPerDollar = settings?.points_per_dollar || 500;
+  const userBalance = (userPoints / pointsPerDollar).toFixed(2);
+  const watchedToday = user?.watched_today || userAnalytics?.today_watches || 0;
+  const dailyLimit = settings?.daily_limit || 50;
+  const pointsPerAd = settings?.points_per_ad || 5;
+
+  // التحديات اليومية
+  const challenges = settings?.daily_challenges || [
+    { title: 'المشاهد النشط', target: 5, reward: 25, icon: '👁️', desc: 'شاهد 5 إعلانات', enabled: true },
+  ];
+  const today = new Date().getDate();
+  const dailyChallenge = challenges[today % challenges.length];
+
+  // النصائح
+  const tips = settings?.tips || [
+    { icon: '💡', text: 'شاهد الإعلانات واكسب النقاط!', enabled: true },
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center">
+        <div className="animate-pulse text-white">جاري التحميل...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 pb-24 overflow-x-hidden">
       {/* Header مع ترحيب */}
-      <div className="pt-12 px-6 pb-6">
+      <div className="pt-12 px-5 pb-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">مرحباً {user?.name || 'صديقي'} 👋</h1>
@@ -55,12 +92,13 @@ const HomePage = ({ user, onNavigateToAds }) => {
         </div>
 
         {/* بطاقة الرصيد الرئيسية */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-6 mb-6 shadow-2xl">
-          <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-6 mb-6 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+          <div className="relative z-10 flex items-center justify-between">
             <div>
               <p className="text-white/70 text-sm mb-1">رصيدك الحالي</p>
               <p className="text-4xl font-bold text-white">${userBalance}</p>
-              <p className="text-white/60 text-xs mt-2">{userPoints} نقطة</p>
+              <p className="text-white/60 text-xs mt-2">{userPoints} نقطة = {pointsPerDollar} نقطة/دولار</p>
             </div>
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
               <TrendingUp className="w-8 h-8 text-white" />
@@ -81,15 +119,72 @@ const HomePage = ({ user, onNavigateToAds }) => {
               </div>
               <div className="text-right">
                 <p className="text-white font-bold text-lg">ابدأ المشاهدة الآن</p>
-                <p className="text-white/80 text-sm">اكسب 5 نقاط لكل إعلان</p>
+                <p className="text-white/80 text-sm">اكسب {pointsPerAd} نقاط لكل إعلان</p>
               </div>
             </div>
             <ChevronRight className="w-6 h-6 text-white" />
           </div>
         </button>
 
+        {/* البيانات التحليلية */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 mb-6 border border-white/10">
+          <div className="flex items-center gap-2 mb-4">
+            <BarChart3 className="w-5 h-5 text-cyan-400" />
+            <h3 className="text-white font-bold">إحصائياتك</h3>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            {/* إعلانات اليوم */}
+            <div className="bg-black/30 rounded-xl p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Calendar className="w-4 h-4 text-green-400" />
+                <span className="text-white/60 text-xs">اليوم</span>
+              </div>
+              <p className="text-white text-xl font-bold">{watchedToday}</p>
+              <p className="text-white/40 text-xs">من {dailyLimit} إعلان</p>
+              <div className="mt-2 bg-white/10 rounded-full h-1.5">
+                <div 
+                  className="bg-green-400 h-1.5 rounded-full transition-all"
+                  style={{ width: `${Math.min((watchedToday / dailyLimit) * 100, 100)}%` }}
+                />
+              </div>
+            </div>
+
+            {/* المتبقي */}
+            <div className="bg-black/30 rounded-xl p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-blue-400" />
+                <span className="text-white/60 text-xs">المتبقي</span>
+              </div>
+              <p className="text-white text-xl font-bold">{Math.max(dailyLimit - watchedToday, 0)}</p>
+              <p className="text-white/40 text-xs">إعلان متاح</p>
+              <p className="text-blue-400 text-xs mt-2">= {Math.max(dailyLimit - watchedToday, 0) * pointsPerAd} نقطة ممكنة</p>
+            </div>
+
+            {/* إجمالي النقاط المكتسبة */}
+            <div className="bg-black/30 rounded-xl p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Award className="w-4 h-4 text-yellow-400" />
+                <span className="text-white/60 text-xs">إجمالي النقاط</span>
+              </div>
+              <p className="text-white text-xl font-bold">{user?.total_earned || userPoints}</p>
+              <p className="text-white/40 text-xs">نقطة مكتسبة</p>
+            </div>
+
+            {/* معدل الكسب */}
+            <div className="bg-black/30 rounded-xl p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="w-4 h-4 text-purple-400" />
+                <span className="text-white/60 text-xs">معدل الكسب</span>
+              </div>
+              <p className="text-white text-xl font-bold">{pointsPerAd}</p>
+              <p className="text-white/40 text-xs">نقاط/إعلان</p>
+            </div>
+          </div>
+        </div>
+
         {/* التحدي اليومي */}
-        {dailyChallenge && (
+        {dailyChallenge && dailyChallenge.enabled && (
           <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-2xl p-5 mb-6">
             <div className="flex items-center gap-3 mb-3">
               <span className="text-2xl">{dailyChallenge.icon}</span>
@@ -108,68 +203,29 @@ const HomePage = ({ user, onNavigateToAds }) => {
               </div>
               <span className="text-amber-400 text-sm font-bold">+{dailyChallenge.reward} ⭐</span>
             </div>
+            <p className="text-white/50 text-xs mt-2 text-center">
+              {watchedToday >= dailyChallenge.target ? '🎉 أحسنت! أكملت التحدي' : `${watchedToday}/${dailyChallenge.target}`}
+            </p>
           </div>
         )}
 
-        {/* الإحصائيات السريعة */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                <Target className="w-5 h-5 text-green-400" />
-              </div>
-              <span className="text-white/70 text-sm">اليوم</span>
-            </div>
-            <p className="text-white text-2xl font-bold">{watchedToday}/{dailyLimit}</p>
-            <p className="text-white/50 text-xs">إعلان</p>
-          </div>
-
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
-                <Clock className="w-5 h-5 text-blue-400" />
-              </div>
-              <span className="text-white/70 text-sm">المتبقي</span>
-            </div>
-            <p className="text-white text-2xl font-bold">{dailyLimit - watchedToday}</p>
-            <p className="text-white/50 text-xs">إعلان متاح</p>
-          </div>
-        </div>
-
         {/* النصائح المتحركة */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl animate-bounce">{tips[currentTip].icon}</span>
-            <p className="text-white/80 text-sm">{tips[currentTip].text}</p>
+        {tips.length > 0 && (
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl animate-bounce">{tips[currentTip % tips.length]?.icon || '💡'}</span>
+              <p className="text-white/80 text-sm">{tips[currentTip % tips.length]?.text || ''}</p>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* الإنجازات السريعة */}
-        <div className="mt-6">
-          <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-yellow-400" />
-            إنجازاتك
-          </h3>
-          <div className="flex gap-3 overflow-x-auto pb-2">
-            {[
-              { icon: '🌟', name: 'البداية', done: userPoints >= 5 },
-              { icon: '🔥', name: 'نشط', done: userPoints >= 50 },
-              { icon: '💎', name: 'محترف', done: userPoints >= 100 },
-              { icon: '👑', name: 'ملك', done: userPoints >= 500 },
-              { icon: '🚀', name: 'أسطورة', done: userPoints >= 1000 },
-            ].map((achievement, idx) => (
-              <div 
-                key={idx}
-                className={`flex-shrink-0 w-20 h-20 rounded-2xl flex flex-col items-center justify-center ${
-                  achievement.done 
-                    ? 'bg-gradient-to-br from-yellow-500/30 to-amber-500/30 border border-yellow-500/50' 
-                    : 'bg-white/5 border border-white/10 opacity-50'
-                }`}
-              >
-                <span className="text-2xl mb-1">{achievement.icon}</span>
-                <span className="text-white/70 text-[10px]">{achievement.name}</span>
-              </div>
-            ))}
+        {/* معلومات سريعة */}
+        <div className="mt-6 bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+          <h4 className="text-white font-bold mb-3 text-sm">كيف تكسب؟</h4>
+          <div className="space-y-2 text-sm">
+            <p className="text-white/70">✓ شاهد إعلان كامل = <span className="text-green-400">{pointsPerAd} نقاط</span></p>
+            <p className="text-white/70">✓ أكمل التحدي اليومي = <span className="text-amber-400">مكافأة إضافية</span></p>
+            <p className="text-white/70">✓ {pointsPerDollar} نقطة = <span className="text-cyan-400">$1 دولار</span></p>
           </div>
         </div>
       </div>
