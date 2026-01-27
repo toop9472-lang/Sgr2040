@@ -131,6 +131,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
 
   // Touch handlers for swipe
   const handleTouchStart = (e) => {
+    if (!e.targetTouches || !e.targetTouches[0]) return;
     setTouchEndY(null);
     setTouchEndX(null);
     setTouchStartY(e.targetTouches[0].clientY);
@@ -138,6 +139,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   };
 
   const handleTouchMove = (e) => {
+    if (!e.targetTouches || !e.targetTouches[0]) return;
     setTouchEndY(e.targetTouches[0].clientY);
     setTouchEndX(e.targetTouches[0].clientX);
   };
