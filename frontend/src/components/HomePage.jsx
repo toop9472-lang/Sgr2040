@@ -100,11 +100,26 @@ const HomePage = ({ user, onNavigateToAds }) => {
       <div className="fixed top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#3b82f6]/20 blur-3xl pointer-events-none"></div>
       <div className="fixed bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#3b82f6]/15 blur-3xl pointer-events-none"></div>
       <div className="fixed top-[40%] right-[-100px] w-[300px] h-[300px] rounded-full bg-[#60a5fa]/10 blur-2xl pointer-events-none"></div>
-      {/* Header مع ترحيب + زر الوضع */}
-      <div className="relative z-10 pt-12 px-5 pb-6">
+      {/* Header مع الشعار والترحيب */}
+      <div className="relative z-10 pt-8 px-5 pb-6">
+        {/* شعار التطبيق واسمه */}
+        <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-14 h-14 rounded-full bg-[#0a0a0f] border-2 border-[#3b82f6]/30 flex items-center justify-center overflow-hidden shadow-lg shadow-[#3b82f6]/20">
+              <img 
+                src="/logo_saqr.png" 
+                alt="صقر" 
+                className="w-11 h-11 object-contain"
+              />
+            </div>
+            <h1 className="text-3xl font-bold text-white">صقر</h1>
+          </div>
+        </div>
+        
+        {/* ترحيب المستخدم */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className={`text-2xl font-bold ${textClass}`}>مرحباً {user?.name || 'صديقي'} 👋</h1>
+            <h2 className={`text-xl font-bold ${textClass}`}>مرحباً {user?.name || 'صديقي'} 👋</h2>
             <p className={`${textMutedClass} text-sm mt-1`}>جاهز لكسب المزيد اليوم؟</p>
           </div>
           <div className="flex items-center gap-2">
