@@ -2,7 +2,7 @@
 // Optimized and lightweight structure
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 // Screens
