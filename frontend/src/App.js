@@ -407,7 +407,16 @@ function MainApp() {
             </>
           ) : (
             <>
-              {currentPage === 'home' && (
+              {/* Full Screen Ads Viewer */}
+              {showFullScreenAds && (
+                <FullScreenAdsViewer
+                  user={user}
+                  onClose={() => setShowFullScreenAds(false)}
+                  onPointsEarned={handlePointsEarned}
+                />
+              )}
+              
+              {currentPage === 'home' && !showFullScreenAds && (
                 <>
                   <AdViewer 
                     ads={ads} 
@@ -417,7 +426,7 @@ function MainApp() {
                   <AIFloatingButton user={user} />
                 </>
               )}
-              {currentPage === 'profile' && (
+              {currentPage === 'profile' && !showFullScreenAds && (
                 <ProfilePage 
                   user={user} 
                   onLogout={handleLogout}
