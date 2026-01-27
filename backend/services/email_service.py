@@ -80,8 +80,13 @@ async def send_email(
 def get_welcome_email_template(user_name: str, lang: str = 'ar') -> tuple:
     """Generate welcome email for new user registration"""
     
+    # Brand Colors
+    gold = '#D4AF37'
+    purple = '#6B4C9A'
+    dark_bg = '#1a1a2e'
+    
     if lang == 'ar':
-        subject = "🎉 مرحباً بك في صقر!"
+        subject = "🦅 مرحباً بك في صقر!"
         html = f"""
         <!DOCTYPE html>
         <html dir="rtl" lang="ar">
@@ -90,20 +95,23 @@ def get_welcome_email_template(user_name: str, lang: str = 'ar') -> tuple:
             <style>
                 body {{ font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; direction: rtl; }}
                 .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }}
-                .header {{ background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 40px; text-align: center; }}
-                .header h1 {{ color: white; margin: 0; font-size: 28px; }}
+                .header {{ background: linear-gradient(135deg, {dark_bg}, {purple}); padding: 40px; text-align: center; }}
+                .header h1 {{ color: {gold}; margin: 0; font-size: 32px; font-weight: bold; }}
+                .header p {{ color: rgba(255,255,255,0.8); margin-top: 10px; }}
                 .content {{ padding: 40px; }}
                 .welcome-text {{ font-size: 18px; color: #333; line-height: 1.8; }}
-                .feature {{ display: flex; align-items: center; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; }}
+                .feature {{ display: flex; align-items: center; margin: 20px 0; padding: 15px; background: linear-gradient(135deg, {dark_bg}10, {purple}10); border-radius: 12px; border-right: 4px solid {gold}; }}
                 .feature-icon {{ font-size: 24px; margin-left: 15px; }}
-                .cta-button {{ display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-weight: bold; margin: 20px 0; }}
-                .footer {{ background: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 12px; }}
+                .cta-button {{ display: inline-block; background: linear-gradient(135deg, {gold}, #B8960C); color: {dark_bg}; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-weight: bold; margin: 20px 0; }}
+                .footer {{ background: {dark_bg}; padding: 20px; text-align: center; color: rgba(255,255,255,0.6); font-size: 12px; }}
+                .footer a {{ color: {gold}; }}
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
                     <h1>🦅 صقر</h1>
+                    <p>منصة الإعلانات المكافئة</p>
                 </div>
                 <div class="content">
                     <p class="welcome-text">مرحباً <strong>{user_name}</strong>! 👋</p>
@@ -111,15 +119,15 @@ def get_welcome_email_template(user_name: str, lang: str = 'ar') -> tuple:
                     
                     <div class="feature">
                         <span class="feature-icon">💰</span>
-                        <span>اكسب نقطة واحدة لكل دقيقة مشاهدة</span>
+                        <span>اكسب 5 نقاط لكل إعلان تشاهده</span>
                     </div>
                     <div class="feature">
                         <span class="feature-icon">🏦</span>
-                        <span>اسحب أرباحك عند 500 نقطة</span>
+                        <span>اسحب أرباحك عند 500 نقطة = $1</span>
                     </div>
                     <div class="feature">
                         <span class="feature-icon">📱</span>
-                        <span>تطبيق سهل الاستخدام</span>
+                        <span>تطبيق سهل الاستخدام على الجوال</span>
                     </div>
                     
                     <center>
@@ -134,7 +142,7 @@ def get_welcome_email_template(user_name: str, lang: str = 'ar') -> tuple:
         </html>
         """
     else:
-        subject = "🎉 Welcome to Saqr!"
+        subject = "🦅 Welcome to Saqr!"
         html = f"""
         <!DOCTYPE html>
         <html lang="en">
@@ -143,11 +151,12 @@ def get_welcome_email_template(user_name: str, lang: str = 'ar') -> tuple:
             <style>
                 body {{ font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }}
                 .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }}
-                .header {{ background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 40px; text-align: center; }}
-                .header h1 {{ color: white; margin: 0; font-size: 28px; }}
+                .header {{ background: linear-gradient(135deg, {dark_bg}, {purple}); padding: 40px; text-align: center; }}
+                .header h1 {{ color: {gold}; margin: 0; font-size: 32px; font-weight: bold; }}
+                .header p {{ color: rgba(255,255,255,0.8); margin-top: 10px; }}
                 .content {{ padding: 40px; }}
                 .welcome-text {{ font-size: 18px; color: #333; line-height: 1.8; }}
-                .feature {{ display: flex; align-items: center; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; }}
+                .feature {{ display: flex; align-items: center; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid {gold}; }}
                 .feature-icon {{ font-size: 24px; margin-right: 15px; }}
                 .cta-button {{ display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-weight: bold; margin: 20px 0; }}
                 .footer {{ background: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 12px; }}
