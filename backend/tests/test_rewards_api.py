@@ -169,9 +169,9 @@ class TestAdminRewardsSettings:
         pytest.skip("Admin login failed")
     
     def test_get_admin_rewards_settings(self, admin_token):
-        """Test GET /api/admin/settings/rewards returns settings"""
+        """Test GET /api/settings/rewards returns settings"""
         headers = {"Authorization": f"Bearer {admin_token}"}
-        response = requests.get(f"{BASE_URL}/api/admin/settings/rewards", headers=headers)
+        response = requests.get(f"{BASE_URL}/api/settings/rewards", headers=headers)
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
@@ -183,11 +183,11 @@ class TestAdminRewardsSettings:
         print(f"✅ Admin rewards settings retrieved successfully")
     
     def test_update_admin_rewards_settings(self, admin_token):
-        """Test PUT /api/admin/settings/rewards updates settings"""
+        """Test PUT /api/settings/rewards updates settings"""
         headers = {"Authorization": f"Bearer {admin_token}"}
         
         # First get current settings
-        get_response = requests.get(f"{BASE_URL}/api/admin/settings/rewards", headers=headers)
+        get_response = requests.get(f"{BASE_URL}/api/settings/rewards", headers=headers)
         assert get_response.status_code == 200
         current_settings = get_response.json()
         
