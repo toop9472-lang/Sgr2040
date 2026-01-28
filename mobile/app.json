@@ -23,7 +23,7 @@
         "backgroundColor": "#0a0a0f"
       },
       "package": "com.saqr.rewards",
-      "versionCode": 13,
+      "versionCode": 20,
       "permissions": ["INTERNET", "VIBRATE"]
     },
     "web": {
