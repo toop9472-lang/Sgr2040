@@ -23,8 +23,9 @@
         "backgroundColor": "#0a0a0f"
       },
       "package": "com.saqr.rewards",
-      "versionCode": 20,
-      "permissions": ["INTERNET", "VIBRATE"]
+      "versionCode": 21,
+      "permissions": ["INTERNET", "VIBRATE"],
+      "blockedPermissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
       "favicon": "./assets/logo_saqr.png"
