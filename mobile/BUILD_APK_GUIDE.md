@@ -177,7 +177,7 @@ eas build --platform ios --profile production
 
 ### API URL:
 ```
-https://saqr-stream.preview.emergentagent.com
+https://eagle-reels.preview.emergentagent.com
 ```
 
 ---
