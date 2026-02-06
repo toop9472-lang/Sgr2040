@@ -234,35 +234,9 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
     setTouchStartX(null);
   };
 
-  // Counter drag handlers
-  const handleCounterTouchStart = (e) => {
-    e.stopPropagation();
-    if (!e.targetTouches?.[0]) return;
-    setIsDragging(true);
-    setDragStart({
-      x: e.targetTouches[0].clientX - counterPosition.x,
-      y: e.targetTouches[0].clientY - counterPosition.y
-    });
-  };
-
-  const handleCounterTouchMove = (e) => {
-    e.stopPropagation();
-    if (!isDragging || !e.targetTouches?.[0]) return;
-    const newX = Math.max(10, Math.min(window.innerWidth - 280, e.targetTouches[0].clientX - dragStart.x));
-    const newY = Math.max(10, Math.min(window.innerHeight - 120, e.targetTouches[0].clientY - dragStart.y));
-    setCounterPosition({ x: newX, y: newY });
-  };
-
-  const handleCounterTouchEnd = (e) => {
-    e.stopPropagation();
-    setIsDragging(false);
-  };
-
   const handleScreenTap = () => {
-    if (!isDragging) {
-      setShowControls(true);
-      setShowAdInfo(true);
-    }
+    setShowControls(true);
+    setShowAdInfo(true);
   };
 
   const handleVisitSite = (e) => {
