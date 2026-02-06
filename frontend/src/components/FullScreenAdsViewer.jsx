@@ -496,17 +496,6 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
           />
         ))}
       </div>
-
-      {/* تحذير عدم احتساب الوقت */}
-      {!isAdComplete && currentAdTime > 5 && (
-        <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-          <div className="bg-black/70 backdrop-blur-sm rounded-full px-4 py-2 border border-amber-500/30">
-            <p className="text-amber-400 text-xs text-center">
-              أكمل مشاهدة الإعلان ليُحتسب الوقت
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
