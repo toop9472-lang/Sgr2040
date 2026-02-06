@@ -436,9 +436,9 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
               </div>
               <div className="flex items-center gap-2">
                 <span className={`text-sm font-bold ${isAdComplete ? 'text-green-400' : 'text-amber-400'}`}>
-                  {currentAdTime}ث
+                  {formatTime(currentAdTime)}
                 </span>
-                <span className="text-white/40 text-xs">/ {adDuration}ث</span>
+                <span className="text-white/40 text-xs">/ {formatTime(adDuration)}</span>
               </div>
             </div>
 
@@ -446,7 +446,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
             {!isAdComplete && (
               <div className="text-center py-1">
                 <span className="text-amber-400/80 text-xs">
-                  متبقي {adRemaining} ثانية لاحتساب هذا الإعلان
+                  متبقي {formatTime(adRemaining)} لاحتساب هذا الإعلان
                 </span>
               </div>
             )}
@@ -470,7 +470,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Eye className="w-3 h-3 text-blue-400" />
                 </div>
-                <div className="text-lg font-bold text-blue-400">{totalValidTime}ث</div>
+                <div className="text-lg font-bold text-blue-400">{formatTime(totalValidTime)}</div>
                 <div className="text-[10px] text-white/40">وقت محتسب</div>
               </div>
 
@@ -479,7 +479,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Timer className="w-3 h-3 text-yellow-400" />
                 </div>
-                <div className="text-lg font-bold text-yellow-400">{timeToNextPoint}ث</div>
+                <div className="text-lg font-bold text-yellow-400">{formatTime(timeToNextPoint)}</div>
                 <div className="text-[10px] text-white/40">للنقطة التالية</div>
               </div>
 
