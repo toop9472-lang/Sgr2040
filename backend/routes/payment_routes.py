@@ -20,11 +20,12 @@ from emergentintegrations.payments.stripe.checkout import (
 router = APIRouter(prefix='/payments', tags=['Payments'])
 
 # Fixed pricing packages (NEVER accept prices from frontend)
+# 1 شهر = 1000 ريال
 PRICING_PACKAGES = {
-    "ad_1_month": {"amount": 500.00, "currency": "sar", "duration_months": 1, "description": "إعلان لمدة شهر واحد"},
-    "ad_3_months": {"amount": 1350.00, "currency": "sar", "duration_months": 3, "description": "إعلان لمدة 3 أشهر (خصم 10%)"},
-    "ad_6_months": {"amount": 2400.00, "currency": "sar", "duration_months": 6, "description": "إعلان لمدة 6 أشهر (خصم 20%)"},
-    "ad_12_months": {"amount": 4200.00, "currency": "sar", "duration_months": 12, "description": "إعلان لمدة سنة كاملة (خصم 30%)"}
+    "ad_1_month": {"amount": 1000.00, "currency": "sar", "duration_months": 1, "description": "إعلان لمدة شهر واحد"},
+    "ad_3_months": {"amount": 2700.00, "currency": "sar", "duration_months": 3, "description": "إعلان لمدة 3 أشهر (خصم 10%)"},
+    "ad_6_months": {"amount": 4800.00, "currency": "sar", "duration_months": 6, "description": "إعلان لمدة 6 أشهر (خصم 20%)"},
+    "ad_12_months": {"amount": 8400.00, "currency": "sar", "duration_months": 12, "description": "إعلان لمدة سنة كاملة (خصم 30%)"}
 }
 
 
