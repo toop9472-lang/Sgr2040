@@ -374,6 +374,10 @@ function MainApp() {
       <Route path="/payment/success" element={<PaymentSuccess />} />
       <Route path="/payment/cancel" element={<PaymentCancel />} />
       
+      {/* Privacy Policy */}
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      
       {/* User Routes */}
       <Route path="/*" element={
         <>
