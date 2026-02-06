@@ -111,9 +111,9 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
     setCurrentAdTime(0);
     if (watchTimerRef.current) clearInterval(watchTimerRef.current);
     
-    // تحديد مدة الإعلان - 30 ثانية كحد أدنى
+    // استخدام مدة الإعلان الفعلية - بدون تحديد حد أقصى أو أدنى
     const currentAd = ads[currentIndex];
-    adDurationRef.current = Math.min(currentAd?.duration || 30, 30); // 30 ثانية كحد أقصى للإعلان الواحد
+    adDurationRef.current = currentAd?.duration || 30; // المدة الافتراضية 30 ثانية إذا لم تكن محددة
     
     watchTimerRef.current = setInterval(() => {
       setCurrentAdTime(prev => {
