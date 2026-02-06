@@ -1,8 +1,7 @@
 // Saqr Mobile App - Main Entry Point
-// Optimized and lightweight structure
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text, BackHandler, Alert, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 // Screens
@@ -35,6 +34,41 @@ export default function App() {
   useEffect(() => {
     initApp();
   }, []);
+
+  // Handle back button press
+  useEffect(() => {
+    const backAction = () => {
+      if (showAIChat) {
+        setShowAIChat(false);
+        return true;
+      }
+      
+      if (showAdsViewer) {
+        setShowAdsViewer(false);
+        return true;
+      }
+
+      if (currentPage !== 'home') {
+        setCurrentPage('home');
+        return true;
+      }
+
+      // Show exit confirmation dialog
+      Alert.alert(
+        'الخروج من التطبيق',
+        'هل أنت متأكد من الخروج؟',
+        [
+          { text: 'إلغاء', style: 'cancel', onPress: () => null },
+          { text: 'خروج', style: 'destructive', onPress: () => BackHandler.exitApp() }
+        ]
+      );
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }, [showAIChat, showAdsViewer, currentPage]);
 
   const initApp = async () => {
     try {
@@ -105,7 +139,13 @@ export default function App() {
   if (isLoading) {
     return (
       <LinearGradient colors={colors.gradients.dark} style={styles.loadingContainer}>
-        <Text style={styles.loadingLogo}>🦅</Text>
+        <View style={styles.loadingLogoContainer}>
+          <Image 
+            source={require('./assets/logo_saqr.png')} 
+            style={styles.loadingLogo}
+            resizeMode="contain"
+          />
+        </View>
         <Text style={styles.loadingAppName}>صقر</Text>
         <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 20 }} />
         <Text style={styles.loadingText}>جاري التحميل...</Text>
@@ -182,11 +222,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center' 
   },
-  loadingLogo: { fontSize: 80 },
+  loadingLogoContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#0a0a0f',
+    borderWidth: 2,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  loadingLogo: { width: 96, height: 96 },
   loadingAppName: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#FFF',
+    color: '#60a5fa',
     marginTop: 16,
   },
   loadingText: { 
