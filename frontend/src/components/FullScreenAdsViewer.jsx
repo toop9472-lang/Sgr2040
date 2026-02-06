@@ -52,7 +52,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
 
   // إخفاء العناصر تلقائياً
   useEffect(() => {
-    if (showControls && !isDragging) {
+    if (showControls) {
       if (controlsTimerRef.current) clearTimeout(controlsTimerRef.current);
       controlsTimerRef.current = setTimeout(() => {
         setShowControls(false);
@@ -62,29 +62,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
     return () => {
       if (controlsTimerRef.current) clearTimeout(controlsTimerRef.current);
     };
-  }, [showControls, isDragging]);
-
-  // سحب العداد بالماوس
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (!isDragging) return;
-      const newX = Math.max(10, Math.min(window.innerWidth - 280, e.clientX - dragStart.x));
-      const newY = Math.max(10, Math.min(window.innerHeight - 120, e.clientY - dragStart.y));
-      setCounterPosition({ x: newX, y: newY });
-    };
-    
-    const handleMouseUp = () => setIsDragging(false);
-    
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-    }
-    
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, dragStart]);
+  }, [showControls]);
 
   const loadAds = async () => {
     try {
