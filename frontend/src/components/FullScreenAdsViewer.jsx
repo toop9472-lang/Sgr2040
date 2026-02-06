@@ -318,6 +318,16 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
     else if (e.deltaY < -50) goToPrevious();
   };
 
+  // دالة تنسيق الوقت
+  const formatTime = (seconds) => {
+    if (seconds >= 60) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${seconds}ث`;
+  };
+
   // حساب الأرقام للعرض
   const adDuration = adDurationRef.current;
   const adProgress = Math.min((currentAdTime / adDuration) * 100, 100);
