@@ -20,6 +20,9 @@
             "compileSdkVersion": 35,
             "targetSdkVersion": 35,
             "minSdkVersion": 24
+          },
+          "ios": {
+            "deploymentTarget": "14.0"
           }
         }
       ]
@@ -27,7 +30,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.saqr.rewards",
-      "buildNumber": "4.3.0"
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "يستخدم التطبيق الكاميرا لتحميل الصور",
+        "NSPhotoLibraryUsageDescription": "يستخدم التطبيق مكتبة الصور لتحميل الصور"
+      }
     },
     "android": {
       "adaptiveIcon": {
