@@ -19,9 +19,13 @@ TAP_API_URL = "https://api.tap.company/v2"
 TAP_TEST_URL = "https://api.tap.company/v2"  # Same URL, test mode determined by key
 
 # Fixed pricing packages (same as Stripe)
+# 1 شهر = 1000 ريال
 PRICING_PACKAGES = {
-    "ad_1_month": {"amount": 500.00, "currency": "SAR", "duration_months": 1, "description": "إعلان لمدة شهر واحد"},
-    "ad_3_months": {"amount": 1350.00, "currency": "SAR", "duration_months": 3, "description": "إعلان لمدة 3 أشهر (خصم 10%)"},
+    "ad_1_month": {"amount": 1000.00, "currency": "SAR", "duration_months": 1, "description": "إعلان لمدة شهر واحد"},
+    "ad_3_months": {"amount": 2700.00, "currency": "SAR", "duration_months": 3, "description": "إعلان لمدة 3 أشهر (خصم 10%)"},
+    "ad_6_months": {"amount": 4800.00, "currency": "SAR", "duration_months": 6, "description": "إعلان لمدة 6 أشهر (خصم 20%)"},
+    "ad_12_months": {"amount": 8400.00, "currency": "SAR", "duration_months": 12, "description": "إعلان لمدة سنة كاملة (خصم 30%)"}
+}
     "ad_6_months": {"amount": 2400.00, "currency": "SAR", "duration_months": 6, "description": "إعلان لمدة 6 أشهر (خصم 20%)"},
     "ad_12_months": {"amount": 4200.00, "currency": "SAR", "duration_months": 12, "description": "إعلان لمدة سنة كاملة (خصم 30%)"}
 }
