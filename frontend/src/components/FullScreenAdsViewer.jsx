@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Volume2, VolumeX, ExternalLink } from 'lucide-react';
+import { Volume2, VolumeX, ExternalLink, ChevronUp, ChevronDown, GripHorizontal } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -9,6 +9,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [watchTime, setWatchTime] = useState(0);
   const [totalWatchTime, setTotalWatchTime] = useState(0);
+  const [currentAdWatchTime, setCurrentAdWatchTime] = useState(0);
   const [isWatching, setIsWatching] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
@@ -21,11 +22,16 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   const [showPointsAnimation, setShowPointsAnimation] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
   const [pointsAnimationValue, setPointsAnimationValue] = useState(0);
+  const [adCompleted, setAdCompleted] = useState(false);
+  const [canNavigate, setCanNavigate] = useState(false);
   
   // عداد قابل للسحب
   const [counterPosition, setCounterPosition] = useState({ x: 16, y: 60 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  
+  // سجل الإعلانات المشاهدة بالكامل
+  const [watchedAdsSet, setWatchedAdsSet] = useState(new Set());
   
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -33,8 +39,9 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   const controlsTimerRef = useRef(null);
   const infoTimerRef = useRef(null);
 
-  const REQUIRED_WATCH_TIME = 60; // 60 ثانية = دقيقة واحدة
-  const POINTS_PER_MINUTE = 1; // نقطة واحدة لكل دقيقة
+  const REQUIRED_WATCH_TIME = 60; // 60 ثانية = دقيقة واحدة للحصول على نقطة
+  const POINTS_PER_MINUTE = 1; // نقطة واحدة لكل دقيقة مشاهدة
+  const MIN_AD_WATCH_TIME = 30; // يجب مشاهدة 30 ثانية على الأقل للانتقال
   const MIN_SWIPE_DISTANCE_Y = 50;
   const MIN_SWIPE_DISTANCE_X = 80;
 
@@ -51,6 +58,15 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   useEffect(() => {
     if (ads.length > 0) {
       startWatching();
+      // تحقق إذا كان الإعلان الحالي مشاهد مسبقاً
+      const currentAdId = ads[currentIndex]?.id;
+      if (watchedAdsSet.has(currentAdId)) {
+        setCanNavigate(true);
+        setAdCompleted(true);
+      } else {
+        setCanNavigate(false);
+        setAdCompleted(false);
+      }
     }
   }, [currentIndex, ads]);
 
@@ -84,17 +100,31 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   };
 
   const startWatching = () => {
-    setWatchTime(0);
+    setCurrentAdWatchTime(0);
     setIsWatching(true);
     
     if (watchTimerRef.current) clearInterval(watchTimerRef.current);
     
     watchTimerRef.current = setInterval(() => {
-      setWatchTime(prev => {
+      setCurrentAdWatchTime(prev => {
         const newTime = prev + 1;
-        setTotalWatchTime(t => t + 1);
         
-        // كل 60 ثانية = نقطة
+        // تحديث إجمالي وقت المشاهدة
+        setTotalWatchTime(t => t + 1);
+        setWatchTime(w => w + 1);
+        
+        // السماح بالتنقل بعد مشاهدة الحد الأدنى
+        if (newTime >= MIN_AD_WATCH_TIME && !canNavigate) {
+          setCanNavigate(true);
+          setAdCompleted(true);
+          // إضافة الإعلان لقائمة المشاهدة المكتملة
+          const currentAdId = ads[currentIndex]?.id;
+          if (currentAdId) {
+            setWatchedAdsSet(prev => new Set([...prev, currentAdId]));
+          }
+        }
+        
+        // كل 60 ثانية = نقطة واحدة
         if (newTime > 0 && newTime % REQUIRED_WATCH_TIME === 0) {
           earnPoint();
         }
@@ -212,23 +242,40 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
 
   const goToNext = () => {
     if (transitioning || currentIndex >= ads.length - 1) return;
+    
+    // يجب مشاهدة الإعلان بالكامل للتنقل
+    if (!canNavigate && currentAdWatchTime < MIN_AD_WATCH_TIME) {
+      // عرض تنبيه أنه يجب إكمال المشاهدة
+      return;
+    }
+    
     setTransitioning(true);
     if (watchTimerRef.current) clearInterval(watchTimerRef.current);
     
     setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
       setTransitioning(false);
+      setCanNavigate(false);
+      setAdCompleted(false);
     }, 300);
   };
 
   const goToPrevious = () => {
     if (transitioning || currentIndex <= 0) return;
+    
+    // يجب مشاهدة الإعلان بالكامل للتنقل
+    if (!canNavigate && currentAdWatchTime < MIN_AD_WATCH_TIME) {
+      return;
+    }
+    
     setTransitioning(true);
     if (watchTimerRef.current) clearInterval(watchTimerRef.current);
     
     setTimeout(() => {
       setCurrentIndex(prev => prev - 1);
       setTransitioning(false);
+      setCanNavigate(false);
+      setAdCompleted(false);
     }, 300);
   };
 
@@ -306,6 +353,8 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   const currentAd = ads[currentIndex];
   const progress = ((watchTime % REQUIRED_WATCH_TIME) / REQUIRED_WATCH_TIME) * 100;
   const timeToNextPoint = REQUIRED_WATCH_TIME - (watchTime % REQUIRED_WATCH_TIME);
+  const adProgress = Math.min((currentAdWatchTime / MIN_AD_WATCH_TIME) * 100, 100);
+  const timeToUnlock = Math.max(0, MIN_AD_WATCH_TIME - currentAdWatchTime);
 
   return (
     <div 
@@ -341,8 +390,16 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
         )}
       </div>
 
-      {/* Progress Bar - Top */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-white/20 z-10">
+      {/* شريط تقدم الإعلان الحالي - يجب إكماله للتنقل */}
+      <div className="absolute top-0 left-0 right-0 h-1.5 bg-white/10 z-10">
+        <div 
+          className={`h-full transition-all duration-1000 ${adCompleted ? 'bg-green-500' : 'bg-gradient-to-r from-yellow-500 to-orange-500'}`}
+          style={{ width: `${adProgress}%` }}
+        />
+      </div>
+      
+      {/* شريط تقدم النقطة التالية */}
+      <div className="absolute top-1.5 left-0 right-0 h-0.5 bg-white/5 z-10">
         <div 
           className="h-full bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] transition-all duration-1000"
           style={{ width: `${progress}%` }}
@@ -351,38 +408,57 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
 
       {/* =================== العداد الثابت القابل للتحريك =================== */}
       <div 
-        className="absolute z-30 cursor-move"
+        className="absolute z-30 cursor-move select-none"
         style={{ left: counterPosition.x, top: counterPosition.y }}
         onTouchStart={handleCounterTouchStart}
         onTouchMove={handleCounterTouchMove}
         onTouchEnd={handleCounterTouchEnd}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          setIsDragging(true);
+          setDragStart({ x: e.clientX - counterPosition.x, y: e.clientY - counterPosition.y });
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className={`bg-black/70 backdrop-blur-md rounded-2xl px-4 py-3 border ${isDragging ? 'border-[#3b82f6] scale-105' : 'border-white/20'} transition-all duration-200 shadow-lg`}>
-          {/* شريط السحب */}
+        <div className={`bg-black/80 backdrop-blur-xl rounded-2xl px-4 py-3 border-2 ${isDragging ? 'border-[#3b82f6] scale-105' : 'border-white/10'} transition-all duration-200 shadow-2xl`}>
+          {/* أيقونة السحب */}
           <div className="flex justify-center mb-2">
-            <div className="w-8 h-1 bg-white/30 rounded-full"></div>
+            <GripHorizontal className={`w-5 h-3 ${isDragging ? 'text-[#3b82f6]' : 'text-white/30'}`} />
           </div>
           
-          {/* وقت المشاهدة */}
+          {/* حالة المشاهدة */}
+          {!adCompleted && (
+            <div className="flex items-center justify-center gap-2 mb-2 px-2 py-1 bg-yellow-500/20 rounded-lg">
+              <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
+              <span className="text-yellow-400 text-xs font-medium">شاهد {timeToUnlock} ثانية للتنقل</span>
+            </div>
+          )}
+          {adCompleted && (
+            <div className="flex items-center justify-center gap-2 mb-2 px-2 py-1 bg-green-500/20 rounded-lg">
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+              <span className="text-green-400 text-xs font-medium">✓ يمكنك التنقل الآن</span>
+            </div>
+          )}
+          
+          {/* بيانات المشاهدة */}
           <div className="flex items-center gap-3 text-white">
-            <div className="text-center">
-              <div className="text-xs text-white/50 mb-1">المشاهدة</div>
-              <div className="text-lg font-bold text-[#60a5fa]">{formatTime(totalWatchTime)}</div>
+            <div className="text-center min-w-[60px]">
+              <div className="text-[10px] text-white/40 mb-0.5">المشاهدة</div>
+              <div className="text-base font-bold text-[#60a5fa]">{formatTime(totalWatchTime)}</div>
             </div>
             
-            <div className="w-px h-8 bg-white/20"></div>
+            <div className="w-px h-8 bg-white/10"></div>
             
-            <div className="text-center">
-              <div className="text-xs text-white/50 mb-1">النقطة التالية</div>
-              <div className="text-lg font-bold text-yellow-400">{timeToNextPoint}s</div>
+            <div className="text-center min-w-[60px]">
+              <div className="text-[10px] text-white/40 mb-0.5">النقطة التالية</div>
+              <div className="text-base font-bold text-yellow-400">{timeToNextPoint}ث</div>
             </div>
             
-            <div className="w-px h-8 bg-white/20"></div>
+            <div className="w-px h-8 bg-white/10"></div>
             
-            <div className="text-center">
-              <div className="text-xs text-white/50 mb-1">النقاط</div>
-              <div className="text-lg font-bold text-green-400">⭐ {earnedPoints}</div>
+            <div className="text-center min-w-[50px]">
+              <div className="text-[10px] text-white/40 mb-0.5">النقاط</div>
+              <div className="text-base font-bold text-green-400">{earnedPoints}</div>
             </div>
           </div>
         </div>
@@ -408,16 +484,23 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
         </button>
       </div>
 
-      {/* =================== أزرار التنقل بالأقواس =================== */}
+      {/* =================== أزرار التنقل بالأقواس البيضاء =================== */}
       {/* زر السابق */}
       {currentIndex > 0 && (
         <button
           onClick={(e) => { e.stopPropagation(); goToPrevious(); }}
-          className={`absolute top-1/3 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ${showControls ? 'opacity-70 hover:opacity-100' : 'opacity-0 pointer-events-none'}`}
+          disabled={!canNavigate}
+          className={`absolute top-1/4 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ${showControls ? (canNavigate ? 'opacity-90 hover:opacity-100 hover:scale-110' : 'opacity-30 cursor-not-allowed') : 'opacity-0 pointer-events-none'}`}
         >
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-white text-3xl font-light">(</span>
-            <span className="text-white/60 text-xs">السابق</span>
+          <div className="flex flex-col items-center gap-2 p-3">
+            <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
+              <ChevronUp className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-white text-2xl font-extralight tracking-widest">(</span>
+              <span className="text-white/70 text-xs">{canNavigate ? 'السابق' : 'انتظر'}</span>
+              <span className="text-white text-2xl font-extralight tracking-widest">)</span>
+            </div>
           </div>
         </button>
       )}
@@ -426,11 +509,18 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
       {currentIndex < ads.length - 1 && (
         <button
           onClick={(e) => { e.stopPropagation(); goToNext(); }}
-          className={`absolute bottom-1/3 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ${showControls && !showAdInfo ? 'opacity-70 hover:opacity-100' : 'opacity-0 pointer-events-none'}`}
+          disabled={!canNavigate}
+          className={`absolute bottom-1/4 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ${showControls ? (canNavigate ? 'opacity-90 hover:opacity-100 hover:scale-110' : 'opacity-30 cursor-not-allowed') : 'opacity-0 pointer-events-none'}`}
         >
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-white/60 text-xs">التالي</span>
-            <span className="text-white text-3xl font-light">)</span>
+          <div className="flex flex-col items-center gap-2 p-3">
+            <div className="flex items-center gap-1">
+              <span className="text-white text-2xl font-extralight tracking-widest">(</span>
+              <span className="text-white/70 text-xs">{canNavigate ? 'التالي' : 'انتظر'}</span>
+              <span className="text-white text-2xl font-extralight tracking-widest">)</span>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
+              <ChevronDown className="w-6 h-6 text-white" />
+            </div>
           </div>
         </button>
       )}
