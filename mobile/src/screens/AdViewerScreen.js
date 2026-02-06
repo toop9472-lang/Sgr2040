@@ -1,4 +1,4 @@
-// Ad Viewer Screen - Optimized full-screen video ad viewer
+// Ad Viewer Screen - نظام مشاهدة الإعلانات المحسّن مع مكافحة الغش
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import {
   View,
@@ -10,16 +10,18 @@ import {
   Vibration,
   Linking,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { Video } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import storage from '../services/storage';
 import colors from '../styles/colors';
 
 const { width, height } = Dimensions.get('window');
 
-// Demo ads - lightweight
+// إعلانات تجريبية
 const DEMO_ADS = [
   {
     id: 'demo1',
@@ -28,6 +30,7 @@ const DEMO_ADS = [
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     advertiser: 'Samsung',
     website_url: 'https://www.samsung.com/sa/',
+    duration: 60,
   },
   {
     id: 'demo2',
@@ -36,6 +39,7 @@ const DEMO_ADS = [
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     advertiser: 'Amazon',
     website_url: 'https://www.amazon.sa/',
+    duration: 45,
   },
   {
     id: 'demo3',
@@ -44,28 +48,34 @@ const DEMO_ADS = [
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
     advertiser: 'Gourmet',
     website_url: 'https://example.com/restaurant',
+    duration: 30,
   },
 ];
 
-const REQUIRED_WATCH_TIME = 30;
-const POINTS_PER_AD = 5;
+const SECONDS_PER_POINT = 60; // نقطة واحدة كل 60 ثانية
 
 const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
   const [ads, setAds] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [watchTime, setWatchTime] = useState(0);
-  const [showControls, setShowControls] = useState(false);
+  const [currentAdTime, setCurrentAdTime] = useState(0);
+  const [totalValidTime, setTotalValidTime] = useState(0);
+  const [showControls, setShowControls] = useState(true);
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [showPointsAnim, setShowPointsAnim] = useState(false);
+  const [pointsAnimValue, setPointsAnimValue] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [videoLoading, setVideoLoading] = useState(true);
+  const [completedAdsCount, setCompletedAdsCount] = useState(0);
+  const [adDuration, setAdDuration] = useState(30);
+  const [isAdComplete, setIsAdComplete] = useState(false);
   
   const videoRef = useRef(null);
   const timerRef = useRef(null);
   const controlsTimerRef = useRef(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  // Load ads on mount
+  // تحميل الإعلانات
   useEffect(() => {
     loadAds();
     return () => {
@@ -74,21 +84,21 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
     };
   }, []);
 
-  // Start timer when ad changes
+  // بدء العداد عند تغيير الإعلان
   useEffect(() => {
     if (ads.length > 0) {
-      startTimer();
+      startAdTimer();
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [currentIndex, ads.length]);
 
-  // Auto-hide controls
+  // إخفاء عناصر التحكم تلقائياً
   useEffect(() => {
     if (showControls) {
       if (controlsTimerRef.current) clearTimeout(controlsTimerRef.current);
-      controlsTimerRef.current = setTimeout(() => setShowControls(false), 2500);
+      controlsTimerRef.current = setTimeout(() => setShowControls(false), 4000);
     }
   }, [showControls]);
 
@@ -97,7 +107,13 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
       const response = await api.getAds();
       if (response.ok) {
         const data = await response.json();
-        setAds(data.length > 0 ? data : DEMO_ADS);
+        if (data.length > 0) {
+          // خلط الإعلانات عشوائياً
+          const shuffled = data.sort(() => Math.random() - 0.5);
+          setAds(shuffled);
+        } else {
+          setAds(DEMO_ADS);
+        }
       } else {
         setAds(DEMO_ADS);
       }
@@ -108,54 +124,96 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
     }
   };
 
-  const startTimer = () => {
-    setWatchTime(0);
+  const startAdTimer = () => {
+    setCurrentAdTime(0);
+    setIsAdComplete(false);
     setVideoLoading(true);
     if (timerRef.current) clearInterval(timerRef.current);
     
+    // تحديد مدة الإعلان من البيانات
+    const currentAd = ads[currentIndex];
+    const duration = currentAd?.duration || 30;
+    setAdDuration(duration);
+    
     timerRef.current = setInterval(() => {
-      setWatchTime((prev) => {
-        if (prev >= REQUIRED_WATCH_TIME) {
-          clearInterval(timerRef.current);
-          completeWatch();
-          return REQUIRED_WATCH_TIME;
+      setCurrentAdTime((prev) => {
+        const newTime = prev + 1;
+        
+        // التحقق من إكمال الإعلان
+        if (newTime >= duration) {
+          handleAdCompleted(newTime, duration);
+          return duration;
         }
-        return prev + 1;
+        
+        return newTime;
       });
     }, 1000);
   };
 
-  const completeWatch = useCallback(async () => {
-    const points = POINTS_PER_AD;
-    setEarnedPoints((prev) => prev + points);
-    
-    // Show animation
-    setShowPointsAnim(true);
-    Vibration.vibrate(100);
-    setTimeout(() => setShowPointsAnim(false), 2000);
-    
-    if (onPointsEarned) onPointsEarned(points);
-
-    // Record on server
-    const token = await storage.getToken();
-    if (token && ads[currentIndex]) {
-      try {
-        await api.recordAdView(ads[currentIndex].id, REQUIRED_WATCH_TIME, token);
-      } catch {}
+  const handleAdCompleted = async (watchedTime, duration) => {
+    // إيقاف العداد
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
     }
-  }, [currentIndex, ads, onPointsEarned]);
+    
+    setIsAdComplete(true);
+    
+    // حفظ معرف الإعلان الحالي
+    const completedAdId = ads[currentIndex]?.id;
+    
+    // إضافة وقت الإعلان للوقت الإجمالي
+    const newTotalTime = totalValidTime + watchedTime;
+    setTotalValidTime(newTotalTime);
+    setCompletedAdsCount(prev => prev + 1);
+    
+    // حساب النقاط
+    const previousPoints = Math.floor(totalValidTime / SECONDS_PER_POINT);
+    const newPoints = Math.floor(newTotalTime / SECONDS_PER_POINT);
+    
+    if (newPoints > previousPoints) {
+      const pointsEarned = newPoints - previousPoints;
+      setEarnedPoints(prev => prev + pointsEarned);
+      setPointsAnimValue(pointsEarned);
+      setShowPointsAnim(true);
+      Vibration.vibrate(100);
+      setTimeout(() => setShowPointsAnim(false), 2000);
+      
+      if (onPointsEarned) onPointsEarned(pointsEarned);
+      await recordPointsToServer(pointsEarned, completedAdId, duration);
+    }
+    
+    // الانتقال للإعلان التالي تلقائياً
+    setTimeout(() => {
+      if (currentIndex < ads.length - 1) {
+        setCurrentIndex(prev => prev + 1);
+      }
+    }, 1500);
+  };
 
+  const recordPointsToServer = async (points, adId, duration) => {
+    const token = await storage.getToken();
+    if (!token) return;
+    
+    try {
+      await api.recordAdView(adId, duration, token, points);
+    } catch (e) {
+      console.log('Failed to record points');
+    }
+  };
+
+  // التنقل - حر بدون قيود (لكن الوقت لا يُحسب إذا لم يكتمل)
   const goNext = useCallback(() => {
     if (currentIndex < ads.length - 1) {
       if (timerRef.current) clearInterval(timerRef.current);
-      setCurrentIndex((prev) => prev + 1);
+      setCurrentIndex(prev => prev + 1);
     }
   }, [currentIndex, ads.length]);
 
   const goPrev = useCallback(() => {
     if (currentIndex > 0) {
       if (timerRef.current) clearInterval(timerRef.current);
-      setCurrentIndex((prev) => prev - 1);
+      setCurrentIndex(prev => prev - 1);
     }
   }, [currentIndex]);
 
@@ -176,11 +234,26 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
     if (url) Linking.openURL(url);
   };
 
+  // دالة تنسيق الوقت
+  const formatTime = (seconds) => {
+    if (seconds >= 60) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${seconds}ث`;
+  };
+
+  // حساب الأرقام للعرض
+  const adProgress = Math.min((currentAdTime / adDuration) * 100, 100);
+  const adRemaining = Math.max(0, adDuration - currentAdTime);
+  const timeToNextPoint = SECONDS_PER_POINT - (totalValidTime % SECONDS_PER_POINT);
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>جاري تحميل الإعلانات...</Text>
+        <Image source={require('../../assets/icon.png')} style={styles.logo} />
+        <Text style={styles.loadingText}>جاري التحميل...</Text>
       </View>
     );
   }
@@ -188,29 +261,42 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
   if (ads.length === 0) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.noAdsText}>لا توجد إعلانات متاحة</Text>
-        <TouchableOpacity style={styles.backBtn} onPress={onClose}>
-          <Text style={styles.backBtnText}>العودة</Text>
+        <Text style={styles.emptyText}>لا توجد إعلانات متاحة</Text>
+        <TouchableOpacity style={styles.backButton} onPress={onClose}>
+          <Text style={styles.backButtonText}>العودة</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   const currentAd = ads[currentIndex];
-  const progress = (watchTime / REQUIRED_WATCH_TIME) * 100;
 
   return (
     <View 
       style={styles.container}
-      onTouchEnd={(e) => handleTap()}
-      onMoveShouldSetResponder={() => true}
-      onResponderRelease={(e) => {
-        const dy = e.nativeEvent.locationY - (height / 2);
-        const dx = e.nativeEvent.locationX - (width / 2);
-        // Simple swipe detection
+      onTouchStart={(e) => {
+        this.touchStartY = e.nativeEvent.pageY;
+        this.touchStartX = e.nativeEvent.pageX;
+      }}
+      onTouchEnd={(e) => {
+        const dy = e.nativeEvent.pageY - this.touchStartY;
+        const dx = e.nativeEvent.pageX - this.touchStartX;
+        if (Math.abs(dy) > 30 || Math.abs(dx) > 30) {
+          handleSwipe(dy, dx);
+        } else {
+          handleTap();
+        }
       }}
     >
-      {/* Video */}
+      {/* شريط التقدم العلوي */}
+      <View style={styles.progressBarContainer}>
+        <View style={[styles.progressBar, { 
+          width: `${adProgress}%`,
+          backgroundColor: isAdComplete ? '#22c55e' : '#f59e0b'
+        }]} />
+      </View>
+
+      {/* الفيديو أو الصورة */}
       {currentAd.video_url ? (
         <Video
           ref={videoRef}
@@ -224,161 +310,443 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
           onLoad={() => setVideoLoading(false)}
         />
       ) : (
-        <LinearGradient colors={colors.gradients.primary} style={styles.placeholder}>
-          <Text style={styles.placeholderTitle}>{currentAd.title}</Text>
-          <Text style={styles.placeholderDesc}>{currentAd.description}</Text>
-        </LinearGradient>
-      )}
-
-      {/* Video Loading Indicator */}
-      {videoLoading && (
-        <View style={styles.videoLoadingOverlay}>
-          <ActivityIndicator size="large" color="#FFF" />
+        <View style={styles.imagePlaceholder}>
+          <LinearGradient
+            colors={['#1e3a5f', '#0a1628']}
+            style={StyleSheet.absoluteFill}
+          />
         </View>
       )}
 
-      {/* Progress Bar */}
-      <View style={styles.progressBar}>
-        <View style={[styles.progressFill, { width: `${progress}%` }]} />
+      {videoLoading && (
+        <View style={styles.videoLoading}>
+          <ActivityIndicator size="large" color="#3b82f6" />
+        </View>
+      )}
+
+      {/* العداد المصغّر في الأعلى */}
+      <View style={styles.counterContainer}>
+        <View style={styles.counter}>
+          {/* وقت الإعلان الحالي */}
+          <View style={styles.counterItem}>
+            <View style={[styles.statusDot, { backgroundColor: isAdComplete ? '#22c55e' : '#f59e0b' }]} />
+            <Text style={[styles.counterValue, { color: isAdComplete ? '#22c55e' : '#f59e0b' }]}>
+              {formatTime(currentAdTime)}
+            </Text>
+            <Text style={styles.counterDivider}>/ {formatTime(adDuration)}</Text>
+          </View>
+          
+          <View style={styles.counterSeparator} />
+          
+          {/* الوقت المحتسب */}
+          <View style={styles.counterItem}>
+            <Ionicons name="eye-outline" size={12} color="#60a5fa" />
+            <Text style={[styles.counterValue, { color: '#60a5fa' }]}>
+              {formatTime(totalValidTime)}
+            </Text>
+          </View>
+          
+          <View style={styles.counterSeparator} />
+          
+          {/* للنقطة التالية */}
+          <View style={styles.counterItem}>
+            <Ionicons name="time-outline" size={12} color="#fbbf24" />
+            <Text style={[styles.counterValue, { color: '#fbbf24' }]}>
+              {formatTime(timeToNextPoint)}
+            </Text>
+          </View>
+          
+          <View style={styles.counterSeparator} />
+          
+          {/* النقاط */}
+          <View style={styles.counterItem}>
+            <Ionicons name="star" size={12} color="#22c55e" />
+            <Text style={[styles.counterValue, { color: '#22c55e' }]}>
+              {earnedPoints}
+            </Text>
+          </View>
+        </View>
       </View>
 
-      {/* Controls - Top */}
+      {/* زر الإغلاق */}
       {showControls && (
-        <View style={styles.topControls}>
-          <TouchableOpacity style={styles.controlBtn} onPress={() => setIsMuted(!isMuted)}>
-            <Text style={styles.controlText}>{isMuted ? '🔇' : '🔊'}</Text>
-          </TouchableOpacity>
-          <View style={styles.timerBadge}>
-            <Text style={styles.timerText}>
-              {watchTime >= REQUIRED_WATCH_TIME ? `✓ +${POINTS_PER_AD}` : `${REQUIRED_WATCH_TIME - watchTime}s`}
+        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <Ionicons name="close" size={24} color="#fff" />
+        </TouchableOpacity>
+      )}
+
+      {/* زر كتم الصوت */}
+      {showControls && (
+        <TouchableOpacity style={styles.muteButton} onPress={() => setIsMuted(!isMuted)}>
+          <Ionicons name={isMuted ? 'volume-mute' : 'volume-high'} size={20} color="#fff" />
+        </TouchableOpacity>
+      )}
+
+      {/* أزرار التنقل */}
+      {showControls && currentIndex > 0 && (
+        <TouchableOpacity style={styles.prevButton} onPress={goPrev}>
+          <Ionicons name="chevron-up" size={28} color="#fff" />
+          <Text style={styles.navText}>السابق</Text>
+        </TouchableOpacity>
+      )}
+
+      {showControls && currentIndex < ads.length - 1 && (
+        <TouchableOpacity style={styles.nextButton} onPress={goNext}>
+          <Text style={styles.navText}>التالي</Text>
+          <Ionicons name="chevron-down" size={28} color="#fff" />
+        </TouchableOpacity>
+      )}
+
+      {/* شريط التقدم الجانبي */}
+      <View style={styles.sideProgressContainer}>
+        <View style={styles.sideProgressBg}>
+          <View style={[styles.sideProgressFill, { 
+            height: `${((currentIndex + 1) / ads.length) * 100}%` 
+          }]} />
+        </View>
+      </View>
+
+      {/* تحذير يجب إكمال المشاهدة */}
+      {!isAdComplete && currentAdTime > 3 && (
+        <View style={styles.warningContainer}>
+          <View style={styles.warningBubble}>
+            <Text style={styles.warningText}>
+              ⏱️ أكمل مشاهدة الإعلان ({formatTime(adRemaining)} متبقي) لاحتساب الوقت
             </Text>
           </View>
         </View>
       )}
 
-      {/* Ad Info - Bottom */}
+      {/* بيانات المعلن */}
       {showControls && (
-        <View style={styles.adInfoContainer}>
-          <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={styles.adInfoGradient}>
-            {/* Advertiser */}
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.9)']}
+          style={styles.bottomGradient}
+        >
+          <View style={styles.adInfo}>
             <View style={styles.advertiserRow}>
               <View style={styles.advertiserAvatar}>
-                <Text style={styles.avatarText}>{(currentAd.advertiser || 'A')[0]}</Text>
+                <Text style={styles.avatarText}>
+                  {(currentAd.advertiser || currentAd.title)?.[0]?.toUpperCase() || 'A'}
+                </Text>
               </View>
               <View>
                 <Text style={styles.advertiserName}>{currentAd.advertiser || 'معلن'}</Text>
-                <Text style={styles.advertiserHandle}>@{(currentAd.advertiser || 'ad').toLowerCase()}</Text>
+                <Text style={styles.adCount}>إعلان {currentIndex + 1} من {ads.length}</Text>
               </View>
             </View>
-            
             <Text style={styles.adTitle}>{currentAd.title}</Text>
-            <Text style={styles.adDesc} numberOfLines={2}>{currentAd.description}</Text>
+            <Text style={styles.adDescription} numberOfLines={2}>{currentAd.description}</Text>
             
             {currentAd.website_url && (
-              <TouchableOpacity style={styles.visitBtn} onPress={visitWebsite}>
-                <Text style={styles.visitText}>🌐 زيارة الموقع</Text>
+              <TouchableOpacity style={styles.visitButton} onPress={visitWebsite}>
+                <Ionicons name="open-outline" size={18} color="#fff" />
+                <Text style={styles.visitButtonText}>زيارة الموقع</Text>
               </TouchableOpacity>
             )}
-          </LinearGradient>
-        </View>
+          </View>
+        </LinearGradient>
       )}
 
-      {/* Points Animation */}
+      {/* أنيميشن النقاط */}
       {showPointsAnim && (
         <View style={styles.pointsAnimContainer}>
-          <Text style={styles.pointsAnimText}>+{POINTS_PER_AD} ⭐</Text>
+          <View style={styles.pointsAnimBubble}>
+            <Ionicons name="star" size={32} color="#fff" />
+            <Text style={styles.pointsAnimText}>+{pointsAnimValue}</Text>
+          </View>
+          <Text style={styles.pointsAnimSubtext}>نقطة جديدة!</Text>
         </View>
       )}
-
-      {/* Earned Points Badge */}
-      {earnedPoints > 0 && !showControls && (
-        <View style={styles.earnedBadge}>
-          <Text style={styles.earnedText}>⭐ {earnedPoints}</Text>
-        </View>
-      )}
-
-      {/* Navigation Hints */}
-      <View style={styles.navHints}>
-        {currentIndex > 0 && <Text style={styles.navHint}>⬆</Text>}
-        <View style={{ flex: 1 }} />
-        {currentIndex < ads.length - 1 && <Text style={styles.navHint}>⬇</Text>}
-      </View>
-
-      {/* Swipe Buttons (for easier navigation) */}
-      <View style={styles.swipeButtons}>
-        <TouchableOpacity 
-          style={[styles.swipeBtn, currentIndex === 0 && styles.swipeBtnDisabled]} 
-          onPress={goPrev}
-          disabled={currentIndex === 0}
-        >
-          <Text style={styles.swipeBtnText}>▲</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-          <Text style={styles.closeBtnText}>✕</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.swipeBtn, currentIndex === ads.length - 1 && styles.swipeBtnDisabled]} 
-          onPress={goNext}
-          disabled={currentIndex === ads.length - 1}
-        >
-          <Text style={styles.swipeBtnText}>▼</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
-  video: { ...StyleSheet.absoluteFillObject },
-  placeholder: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  placeholderTitle: { color: '#FFF', fontSize: 28, fontWeight: 'bold', textAlign: 'center', marginBottom: 12 },
-  placeholderDesc: { color: 'rgba(255,255,255,0.8)', fontSize: 16, textAlign: 'center' },
-
-  loadingContainer: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#FFF', marginTop: 16, fontSize: 16 },
-  noAdsText: { color: '#FFF', fontSize: 18, marginBottom: 20 },
-  backBtn: { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 20 },
-  backBtnText: { color: '#FFF', fontSize: 16 },
-
-  videoLoadingOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
-
-  progressBar: { position: 'absolute', top: 0, left: 0, right: 0, height: 3, backgroundColor: 'rgba(255,255,255,0.2)' },
-  progressFill: { height: 3, backgroundColor: colors.accent },
-
-  topControls: { position: 'absolute', top: 50, left: 16, right: 16, flexDirection: 'row', justifyContent: 'space-between' },
-  controlBtn: { width: 44, height: 44, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 22, justifyContent: 'center', alignItems: 'center' },
-  controlText: { fontSize: 20 },
-  timerBadge: { backgroundColor: 'rgba(0,0,0,0.5)', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20 },
-  timerText: { color: '#FFF', fontSize: 14, fontWeight: '600' },
-
-  adInfoContainer: { position: 'absolute', bottom: 0, left: 0, right: 0 },
-  adInfoGradient: { padding: 20, paddingTop: 80, paddingBottom: 100 },
-  advertiserRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
-  advertiserAvatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center' },
-  avatarText: { color: '#FFF', fontSize: 20, fontWeight: 'bold' },
-  advertiserName: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
-  advertiserHandle: { color: 'rgba(255,255,255,0.6)', fontSize: 12 },
-  adTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold', marginBottom: 4 },
-  adDesc: { color: 'rgba(255,255,255,0.7)', fontSize: 14, marginBottom: 16 },
-  visitBtn: { backgroundColor: 'rgba(255,255,255,0.1)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', borderRadius: 12, padding: 14, alignItems: 'center' },
-  visitText: { color: '#FFF', fontSize: 16 },
-
-  pointsAnimContainer: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center' },
-  pointsAnimText: { color: colors.accent, fontSize: 56, fontWeight: 'bold' },
-
-  earnedBadge: { position: 'absolute', bottom: 24, alignSelf: 'center' },
-  earnedText: { backgroundColor: colors.accent, color: '#000', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, fontWeight: 'bold', fontSize: 16 },
-
-  navHints: { position: 'absolute', right: 16, top: '35%', bottom: '35%', justifyContent: 'space-between', alignItems: 'center' },
-  navHint: { color: 'rgba(255,255,255,0.3)', fontSize: 24 },
-
-  swipeButtons: { position: 'absolute', right: 16, top: '40%', alignItems: 'center', gap: 12 },
-  swipeBtn: { width: 40, height: 40, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-  swipeBtnDisabled: { opacity: 0.3 },
-  swipeBtnText: { color: '#FFF', fontSize: 16 },
-  closeBtn: { width: 40, height: 40, backgroundColor: 'rgba(255,0,0,0.5)', borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-  closeBtnText: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 16,
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 18,
+  },
+  emptyText: {
+    color: '#fff',
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  backButton: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 25,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  progressBarContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    zIndex: 10,
+  },
+  progressBar: {
+    height: '100%',
+  },
+  video: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  imagePlaceholder: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  videoLoading: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  // العداد المصغّر
+  counterContainer: {
+    position: 'absolute',
+    top: 10,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 30,
+  },
+  counter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  counterItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  counterValue: {
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  counterDivider: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.4)',
+  },
+  counterSeparator: {
+    width: 1,
+    height: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    marginHorizontal: 10,
+  },
+  // الأزرار
+  closeButton: {
+    position: 'absolute',
+    top: 50,
+    left: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 20,
+  },
+  muteButton: {
+    position: 'absolute',
+    top: 50,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 20,
+  },
+  prevButton: {
+    position: 'absolute',
+    top: '25%',
+    left: '50%',
+    marginLeft: -30,
+    alignItems: 'center',
+    zIndex: 20,
+  },
+  nextButton: {
+    position: 'absolute',
+    bottom: '30%',
+    left: '50%',
+    marginLeft: -30,
+    alignItems: 'center',
+    zIndex: 20,
+  },
+  navText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
+  },
+  // شريط التقدم الجانبي
+  sideProgressContainer: {
+    position: 'absolute',
+    right: 8,
+    top: '50%',
+    marginTop: -48,
+    zIndex: 10,
+  },
+  sideProgressBg: {
+    width: 2,
+    height: 96,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 1,
+    overflow: 'hidden',
+  },
+  sideProgressFill: {
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    borderRadius: 1,
+  },
+  // التحذير
+  warningContainer: {
+    position: 'absolute',
+    bottom: 140,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 20,
+  },
+  warningBubble: {
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(245,158,11,0.3)',
+  },
+  warningText: {
+    color: '#fbbf24',
+    fontSize: 11,
+    textAlign: 'center',
+  },
+  // بيانات المعلن
+  bottomGradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingTop: 60,
+    paddingBottom: 24,
+    paddingHorizontal: 16,
+    zIndex: 15,
+  },
+  adInfo: {
+    gap: 8,
+  },
+  advertiserRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  advertiserAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#3b82f6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  advertiserName: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  adCount: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 11,
+  },
+  adTitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  adDescription: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 13,
+  },
+  visitButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#3b82f6',
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  visitButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  // أنيميشن النقاط
+  pointsAnimContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 40,
+  },
+  pointsAnimBubble: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#f59e0b',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 16,
+  },
+  pointsAnimText: {
+    color: '#fff',
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
+  pointsAnimSubtext: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 14,
+    marginTop: 8,
+  },
 });
 
 export default memo(AdViewerScreen);
