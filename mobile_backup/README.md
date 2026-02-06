@@ -209,8 +209,8 @@ eas submit -p android
 
 ## 📞 الدعم والمساعدة
 
-- **الموقع:** https://saqr-stream.preview.emergentagent.com
-- **API Docs:** https://saqr-stream.preview.emergentagent.com/docs
+- **الموقع:** https://eagle-reels.preview.emergentagent.com
+- **API Docs:** https://eagle-reels.preview.emergentagent.com/docs
 
 ---
 

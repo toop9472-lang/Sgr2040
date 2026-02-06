@@ -1,5 +1,5 @@
 // API Service - Lightweight API handler
-const API_URL = 'https://saqr-stream.preview.emergentagent.com';
+const API_URL = 'https://eagle-reels.preview.emergentagent.com';
 
 export const api = {
   baseUrl: API_URL,
