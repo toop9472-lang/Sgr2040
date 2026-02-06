@@ -19,12 +19,21 @@ def get_db():
 async def get_ads():
     """
     Get all active ads (public - no auth required)
+    Combines ads from both 'ads' and 'advertiser_ads' collections
     """
     db = get_db()
-    ads = await db.ads.find({'is_active': True}, {'_id': 0}).to_list(100)
     
-    return [
-        AdResponse(
+    # Get ads from main ads collection
+    main_ads = await db.ads.find({'is_active': True}, {'_id': 0}).to_list(100)
+    
+    # Get active ads from advertiser_ads collection
+    advertiser_ads = await db.advertiser_ads.find({'status': 'active'}, {'_id': 0}).to_list(100)
+    
+    all_ads = []
+    
+    # Process main ads
+    for ad in main_ads:
+        all_ads.append(AdResponse(
             id=ad['id'],
             title=ad['title'],
             description=ad['description'],
@@ -34,9 +43,23 @@ async def get_ads():
             website_url=ad.get('website_url'),
             duration=ad['duration'],
             points=ad['points_per_minute']
-        )
-        for ad in ads
-    ]
+        ))
+    
+    # Process advertiser ads
+    for ad in advertiser_ads:
+        all_ads.append(AdResponse(
+            id=ad.get('id', ''),
+            title=ad.get('title', ''),
+            description=ad.get('description', ''),
+            video_url=ad.get('video_url', ''),
+            thumbnail_url=ad.get('thumbnail_url', ''),
+            advertiser=ad.get('advertiser', ad.get('advertiser_name', '')),
+            website_url=ad.get('website_url'),
+            duration=ad.get('duration', 30),
+            points=ad.get('points', 1)
+        ))
+    
+    return all_ads
 
 @router.get('/{ad_id}', response_model=AdResponse)
 async def get_ad(ad_id: str, user_id: str = Depends(get_current_user_id)):
