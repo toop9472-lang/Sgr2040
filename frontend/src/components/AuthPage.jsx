@@ -341,11 +341,11 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
           <div className="pt-4">
             <p className="text-center text-xs text-gray-500 leading-relaxed">
               {t('termsText')}{' '}
-              <a href="#" className="text-[#60a5fa] hover:underline">
+              <a href="/terms.html" target="_blank" className="text-[#60a5fa] hover:underline">
                 {t('termsLink')}
               </a>{' '}
               {t('and')}{' '}
-              <a href="#" className="text-[#60a5fa] hover:underline">
+              <a href="/privacy-policy.html" target="_blank" className="text-[#60a5fa] hover:underline">
                 {t('privacyLink')}
               </a>
             </p>
