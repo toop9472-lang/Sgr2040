@@ -23,14 +23,14 @@ APPLEPAY_MERCHANT_ID=
 
 ### Frontend (`/app/frontend/.env`)
 ```env
-REACT_APP_BACKEND_URL=https://eagle-reels.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://rewards-video-viewer.preview.emergentagent.com
 WDS_SOCKET_PORT=443
 ENABLE_HEALTH_CHECK=false
 ```
 
 ### Mobile (`/app/mobile/.env`)
 ```env
-API_URL=https://eagle-reels.preview.emergentagent.com
+API_URL=https://rewards-video-viewer.preview.emergentagent.com
 ```
 
 ---
@@ -177,9 +177,9 @@ API_URL=https://eagle-reels.preview.emergentagent.com
 
 | الوصف | الرابط |
 |-------|--------|
-| **الموقع** | https://eagle-reels.preview.emergentagent.com |
-| **API Docs** | https://eagle-reels.preview.emergentagent.com/docs |
-| **لوحة المدير** | https://eagle-reels.preview.emergentagent.com (سجّل دخول كمدير) |
+| **الموقع** | https://rewards-video-viewer.preview.emergentagent.com |
+| **API Docs** | https://rewards-video-viewer.preview.emergentagent.com/docs |
+| **لوحة المدير** | https://rewards-video-viewer.preview.emergentagent.com (سجّل دخول كمدير) |
 
 ---
 
@@ -189,7 +189,7 @@ API_URL=https://eagle-reels.preview.emergentagent.com
 |-------|--------|
 | **Bundle ID (iOS)** | `com.saqr.app` |
 | **Package Name (Android)** | `com.saqr.app` |
-| **API URL** | `https://eagle-reels.preview.emergentagent.com` |
+| **API URL** | `https://rewards-video-viewer.preview.emergentagent.com` |
 
 ---
 

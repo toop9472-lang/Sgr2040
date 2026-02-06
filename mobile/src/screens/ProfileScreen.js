@@ -73,7 +73,7 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
   };
 
   const handlePrivacy = () => {
-    Linking.openURL('https://eagle-reels.preview.emergentagent.com/privacy-policy.html');
+    Linking.openURL('https://rewards-video-viewer.preview.emergentagent.com/privacy-policy.html');
   };
 
   const confirmLogout = () => {
