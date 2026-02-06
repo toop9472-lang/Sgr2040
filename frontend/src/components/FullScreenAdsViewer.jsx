@@ -481,20 +481,26 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
         </div>
       )}
 
-      {/* مؤشر التقدم الجانبي - شريط رفيع وأنيق */}
-      <div className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-2">
-        {/* شريط التقدم الرأسي */}
+      {/* مؤشر التقدم الجانبي - شريط رفيع فقط */}
+      <div className="absolute right-2 top-1/2 -translate-y-1/2 z-10">
         <div className="w-0.5 h-24 bg-white/10 rounded-full overflow-hidden">
           <div 
             className="w-full bg-gradient-to-b from-white/60 to-white/30 rounded-full transition-all duration-500"
             style={{ height: `${((currentIndex + 1) / ads.length) * 100}%` }}
           />
         </div>
-        {/* رقم الإعلان */}
-        <div className="text-white/40 text-[10px] font-medium">
-          {currentIndex + 1}/{ads.length}
-        </div>
       </div>
+
+      {/* تحذير يجب مشاهدة الإعلان بالكامل */}
+      {!isAdComplete && currentAdTime > 3 && (
+        <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+          <div className="bg-black/60 backdrop-blur-sm rounded-full px-4 py-2 border border-amber-500/20">
+            <p className="text-amber-400/90 text-xs text-center">
+              ⏱️ أكمل مشاهدة الإعلان ({formatTime(adRemaining)} متبقي) لاحتساب الوقت
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
