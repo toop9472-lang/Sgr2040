@@ -401,104 +401,44 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
         />
       </div>
 
-      {/* =================== العداد المحسّن =================== */}
-      <div 
-        className="absolute z-30 cursor-move select-none"
-        style={{ left: counterPosition.x, top: counterPosition.y }}
-        onTouchStart={handleCounterTouchStart}
-        onTouchMove={handleCounterTouchMove}
-        onTouchEnd={handleCounterTouchEnd}
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          setIsDragging(true);
-          setDragStart({ x: e.clientX - counterPosition.x, y: e.clientY - counterPosition.y });
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className={`bg-gradient-to-br from-[#0f172a]/95 to-[#1e293b]/95 backdrop-blur-xl rounded-2xl border ${isDragging ? 'border-blue-500 scale-105' : 'border-white/10'} transition-all duration-200 shadow-2xl overflow-hidden`}>
-          
-          {/* شريط السحب */}
-          <div className="flex justify-center py-2 bg-white/5 border-b border-white/10">
-            <div className="flex gap-1">
-              <div className="w-1 h-1 rounded-full bg-white/40"></div>
-              <div className="w-1 h-1 rounded-full bg-white/40"></div>
-              <div className="w-1 h-1 rounded-full bg-white/40"></div>
-            </div>
-          </div>
-
-          <div className="p-4 space-y-3">
+      {/* =================== العداد المصغّر - شريط أفقي في الأعلى =================== */}
+      <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30">
+        <div className="bg-black/70 backdrop-blur-md rounded-full px-4 py-2 border border-white/10 shadow-lg">
+          <div className="flex items-center gap-4 text-xs">
             
-            {/* حالة الإعلان الحالي */}
-            <div className={`flex items-center justify-between px-3 py-2 rounded-xl ${isAdComplete ? 'bg-green-500/20' : 'bg-amber-500/10'}`}>
-              <div className="flex items-center gap-2">
-                <Timer className={`w-4 h-4 ${isAdComplete ? 'text-green-400' : 'text-amber-400'}`} />
-                <span className="text-white/70 text-xs">هذا الإعلان</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className={`text-sm font-bold ${isAdComplete ? 'text-green-400' : 'text-amber-400'}`}>
-                  {formatTime(currentAdTime)}
-                </span>
-                <span className="text-white/40 text-xs">/ {formatTime(adDuration)}</span>
-              </div>
+            {/* وقت الإعلان الحالي */}
+            <div className="flex items-center gap-1.5">
+              <div className={`w-2 h-2 rounded-full ${isAdComplete ? 'bg-green-500' : 'bg-amber-500 animate-pulse'}`}></div>
+              <span className={`font-bold ${isAdComplete ? 'text-green-400' : 'text-amber-400'}`}>
+                {formatTime(currentAdTime)}
+              </span>
+              <span className="text-white/40">/ {formatTime(adDuration)}</span>
             </div>
-
-            {/* المتبقي للإكمال */}
-            {!isAdComplete && (
-              <div className="text-center py-1">
-                <span className="text-amber-400/80 text-xs">
-                  متبقي {formatTime(adRemaining)} لاحتساب هذا الإعلان
-                </span>
-              </div>
-            )}
             
-            {isAdComplete && (
-              <div className="text-center py-1">
-                <span className="text-green-400 text-xs font-medium">
-                  ✓ تم احتساب هذا الإعلان!
-                </span>
-              </div>
-            )}
-
-            {/* الفاصل */}
-            <div className="border-t border-white/10"></div>
-
-            {/* الإحصائيات الرئيسية */}
-            <div className="grid grid-cols-3 gap-3">
-              
-              {/* الوقت المحتسب */}
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <Eye className="w-3 h-3 text-blue-400" />
-                </div>
-                <div className="text-lg font-bold text-blue-400">{formatTime(totalValidTime)}</div>
-                <div className="text-[10px] text-white/40">وقت محتسب</div>
-              </div>
-
-              {/* للنقطة التالية */}
-              <div className="text-center border-x border-white/10">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <Timer className="w-3 h-3 text-yellow-400" />
-                </div>
-                <div className="text-lg font-bold text-yellow-400">{formatTime(timeToNextPoint)}</div>
-                <div className="text-[10px] text-white/40">للنقطة التالية</div>
-              </div>
-
-              {/* النقاط */}
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <Star className="w-3 h-3 text-green-400" />
-                </div>
-                <div className="text-lg font-bold text-green-400">{earnedPoints}</div>
-                <div className="text-[10px] text-white/40">نقاط</div>
-              </div>
+            <div className="w-px h-4 bg-white/20"></div>
+            
+            {/* الوقت المحتسب */}
+            <div className="flex items-center gap-1.5">
+              <Eye className="w-3 h-3 text-blue-400" />
+              <span className="text-blue-400 font-bold">{formatTime(totalValidTime)}</span>
             </div>
-
-            {/* إعلانات مكتملة */}
-            <div className="flex items-center justify-center gap-2 pt-1 border-t border-white/10">
-              <span className="text-white/40 text-xs">إعلانات مكتملة:</span>
-              <span className="text-white font-medium text-sm">{completedAdsCount}</span>
+            
+            <div className="w-px h-4 bg-white/20"></div>
+            
+            {/* للنقطة التالية */}
+            <div className="flex items-center gap-1.5">
+              <Timer className="w-3 h-3 text-yellow-400" />
+              <span className="text-yellow-400 font-bold">{formatTime(timeToNextPoint)}</span>
             </div>
-
+            
+            <div className="w-px h-4 bg-white/20"></div>
+            
+            {/* النقاط */}
+            <div className="flex items-center gap-1.5">
+              <Star className="w-3 h-3 text-green-400 fill-green-400" />
+              <span className="text-green-400 font-bold">{earnedPoints}</span>
+            </div>
+            
           </div>
         </div>
       </div>
