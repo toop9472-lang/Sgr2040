@@ -1,4 +1,4 @@
-// Auth Screen - Login / Register / Guest
+// Auth Screen - Login / Register
 import React, { useState } from 'react';
 import {
   View,
@@ -38,15 +38,15 @@ const AuthScreen = ({ onLogin }) => {
 
     setIsLoading(true);
     try {
-      const response = mode === 'register'
-        ? await api.register(email, password, name)
-        : await api.login(email, password);
+      let response;
+      let data;
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // For registration, login after successful registration
-        if (mode === 'register' && data.success) {
+      if (mode === 'register') {
+        response = await api.register(email, password, name);
+        data = await response.json();
+        
+        if (response.ok && data.success) {
+          // Auto login after registration
           const loginResponse = await api.login(email, password);
           const loginData = await loginResponse.json();
           if (loginResponse.ok) {
@@ -56,39 +56,89 @@ const AuthScreen = ({ onLogin }) => {
           } else {
             Alert.alert('خطأ', loginData.detail || 'فشل تسجيل الدخول بعد التسجيل');
           }
+        } else if (data.detail && data.detail.includes('already')) {
+          // Email exists - try to login instead
+          Alert.alert(
+            'الحساب موجود',
+            'هذا البريد الإلكتروني مسجل مسبقاً. هل تريد تسجيل الدخول بدلاً من ذلك؟',
+            [
+              { text: 'إلغاء', style: 'cancel' },
+              { 
+                text: 'تسجيل الدخول', 
+                onPress: () => {
+                  setMode('login');
+                }
+              }
+            ]
+          );
         } else {
-          // Normal login
+          Alert.alert('خطأ', data.detail || 'فشل إنشاء الحساب');
+        }
+      } else {
+        // Login mode
+        response = await api.login(email, password);
+        data = await response.json();
+        
+        if (response.ok) {
           await storage.setToken(data.token);
           await storage.setUserData(data.user);
           onLogin(data.user);
+        } else if (data.detail && data.detail.includes('not found')) {
+          // User not found - offer to register
+          Alert.alert(
+            'الحساب غير موجود',
+            'لم يتم العثور على حساب بهذا البريد. هل تريد إنشاء حساب جديد؟',
+            [
+              { text: 'إلغاء', style: 'cancel' },
+              { 
+                text: 'إنشاء حساب', 
+                onPress: () => {
+                  setMode('register');
+                }
+              }
+            ]
+          );
+        } else {
+          Alert.alert('خطأ', data.detail || 'فشل تسجيل الدخول');
         }
-      } else {
-        Alert.alert('خطأ', data.detail || 'فشل تسجيل الدخول');
       }
     } catch (error) {
       console.log('Auth error:', error);
-      Alert.alert('خطأ', 'تحقق من اتصالك بالإنترنت');
+      Alert.alert(
+        'خطأ في الاتصال', 
+        'تحقق من اتصالك بالإنترنت وحاول مرة أخرى',
+        [
+          { text: 'حاول مرة أخرى', onPress: () => handleEmailAuth() },
+          { text: 'إلغاء', style: 'cancel' }
+        ]
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = () => {
-    const redirectUrl = 'https://saqr-stream.preview.emergentagent.com/';
-    Linking.openURL(`https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`);
+    Alert.alert(
+      'تسجيل الدخول بـ Google',
+      'سيتم فتح صفحة تسجيل الدخول في المتصفح. بعد إتمام التسجيل، يرجى العودة والدخول بالبريد الإلكتروني.',
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        { 
+          text: 'متابعة',
+          onPress: () => {
+            Linking.openURL('https://saqr-stream.preview.emergentagent.com/');
+          }
+        }
+      ]
+    );
   };
 
   const handleAppleLogin = () => {
-    Alert.alert('قريباً', 'تسجيل الدخول بـ Apple متاح فقط في تطبيق iOS على App Store');
-  };
-
-  const handleGuestMode = () => {
-    onLogin({ 
-      name: 'زائر', 
-      points: 0, 
-      isGuest: true,
-      id: 'guest_' + Date.now()
-    });
+    Alert.alert(
+      'تسجيل الدخول بـ Apple',
+      'هذه الميزة قيد التطوير. يرجى استخدام البريد الإلكتروني للتسجيل.',
+      [{ text: 'حسناً' }]
+    );
   };
 
   // Main login options
@@ -109,13 +159,21 @@ const AuthScreen = ({ onLogin }) => {
             <Text style={styles.tagline}>شاهد الإعلانات واكسب المال</Text>
 
             {/* Google Login */}
-            <TouchableOpacity style={styles.socialBtn} onPress={handleGoogleLogin}>
+            <TouchableOpacity 
+              style={styles.socialBtn} 
+              onPress={handleGoogleLogin}
+              activeOpacity={0.7}
+            >
               <Text style={styles.googleIcon}>G</Text>
               <Text style={styles.socialText}>الدخول بحساب Google</Text>
             </TouchableOpacity>
 
             {/* Apple Login */}
-            <TouchableOpacity style={[styles.socialBtn, styles.appleBtn]} onPress={handleAppleLogin}>
+            <TouchableOpacity 
+              style={[styles.socialBtn, styles.appleBtn]} 
+              onPress={handleAppleLogin}
+              activeOpacity={0.7}
+            >
               <Text style={styles.appleIcon}></Text>
               <Text style={[styles.socialText, styles.appleText]}>الدخول بحساب Apple</Text>
             </TouchableOpacity>
@@ -128,16 +186,33 @@ const AuthScreen = ({ onLogin }) => {
             </View>
 
             {/* Email Login */}
-            <TouchableOpacity style={styles.emailBtn} onPress={() => setMode('login')}>
+            <TouchableOpacity 
+              style={styles.emailBtn} 
+              onPress={() => setMode('login')}
+              activeOpacity={0.7}
+            >
               <Text style={styles.emailIcon}>✉️</Text>
               <Text style={styles.emailText}>الدخول بالبريد الإلكتروني</Text>
             </TouchableOpacity>
 
             {/* Register Link */}
-            <TouchableOpacity style={styles.registerLink} onPress={() => setMode('register')}>
+            <TouchableOpacity 
+              style={styles.registerLink} 
+              onPress={() => setMode('register')}
+              activeOpacity={0.7}
+            >
               <Text style={styles.registerText}>
                 ليس لديك حساب؟ <Text style={styles.registerBold}>سجل الآن</Text>
               </Text>
+            </TouchableOpacity>
+
+            {/* Privacy Policy Link */}
+            <TouchableOpacity 
+              style={styles.privacyLink}
+              onPress={() => Linking.openURL('https://saqr-stream.preview.emergentagent.com/privacy-policy.html')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.privacyText}>سياسة الخصوصية</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -145,17 +220,21 @@ const AuthScreen = ({ onLogin }) => {
     );
   }
 
-  // Email form (login or register)
+  // Email Login / Register Form
   return (
     <LinearGradient colors={colors.gradients.dark} style={styles.container}>
       <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-        style={styles.keyboardView}
+        style={styles.keyboardView} 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             {/* Back Button */}
-            <TouchableOpacity style={styles.backBtn} onPress={() => setMode('main')}>
+            <TouchableOpacity 
+              style={styles.backBtn} 
+              onPress={() => setMode('main')}
+              activeOpacity={0.7}
+            >
               <Text style={styles.backText}>‹ رجوع</Text>
             </TouchableOpacity>
 
@@ -171,59 +250,72 @@ const AuthScreen = ({ onLogin }) => {
               {mode === 'register' ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
             </Text>
 
-            {/* Name (register only) */}
+            {/* Name Input (Register only) */}
             {mode === 'register' && (
-              <TextInput
-                style={styles.input}
-                placeholder="الاسم الكامل"
-                placeholderTextColor="rgba(255,255,255,0.5)"
-                value={name}
-                onChangeText={setName}
-              />
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>الاسم</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="أدخل اسمك"
+                  placeholderTextColor="rgba(255,255,255,0.4)"
+                  value={name}
+                  onChangeText={setName}
+                />
+              </View>
             )}
 
-            {/* Email */}
-            <TextInput
-              style={styles.input}
-              placeholder="البريد الإلكتروني"
-              placeholderTextColor="rgba(255,255,255,0.5)"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
+            {/* Email Input */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>البريد الإلكتروني</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="example@email.com"
+                placeholderTextColor="rgba(255,255,255,0.4)"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
 
-            {/* Password */}
-            <TextInput
-              style={styles.input}
-              placeholder="كلمة المرور"
-              placeholderTextColor="rgba(255,255,255,0.5)"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
+            {/* Password Input */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>كلمة المرور</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="••••••••"
+                placeholderTextColor="rgba(255,255,255,0.4)"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+            </View>
 
             {/* Submit Button */}
-            <TouchableOpacity 
-              style={styles.submitBtn} 
+            <TouchableOpacity
+              style={[styles.submitBtn, isLoading && styles.submitBtnDisabled]}
               onPress={handleEmailAuth}
               disabled={isLoading}
+              activeOpacity={0.7}
             >
-              <LinearGradient colors={colors.gradients.primary} style={styles.submitGradient}>
-                {isLoading ? (
-                  <ActivityIndicator color="#FFF" />
-                ) : (
-                  <Text style={styles.submitText}>
-                    {mode === 'register' ? 'إنشاء الحساب' : 'دخول'}
-                  </Text>
-                )}
-              </LinearGradient>
+              {isLoading ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <Text style={styles.submitText}>
+                  {mode === 'register' ? 'إنشاء حساب' : 'دخول'}
+                </Text>
+              )}
             </TouchableOpacity>
 
             {/* Switch Mode */}
-            <TouchableOpacity onPress={() => setMode(mode === 'register' ? 'login' : 'register')}>
+            <TouchableOpacity 
+              onPress={() => setMode(mode === 'login' ? 'register' : 'login')}
+              activeOpacity={0.7}
+            >
               <Text style={styles.switchText}>
-                {mode === 'register' ? 'لديك حساب؟ سجل دخول' : 'ليس لديك حساب؟ سجل الآن'}
+                {mode === 'login' 
+                  ? 'ليس لديك حساب؟ سجل الآن' 
+                  : 'لديك حساب؟ سجل الدخول'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -274,65 +366,77 @@ const styles = StyleSheet.create({
 
   socialBtn: {
     width: '100%',
+    height: 56,
+    backgroundColor: '#FFF',
+    borderRadius: 28,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFF',
-    padding: 16,
-    borderRadius: 12,
     marginBottom: 12,
-    gap: 12,
   },
+  googleIcon: { fontSize: 24, fontWeight: 'bold', color: '#4285F4', marginRight: 12 },
+  socialText: { fontSize: 16, fontWeight: '600', color: '#333' },
   appleBtn: { backgroundColor: '#000' },
-  googleIcon: { fontSize: 20, fontWeight: 'bold', color: '#4285F4' },
-  appleIcon: { fontSize: 20, color: '#FFF' },
-  socialText: { fontSize: 16, fontWeight: '600', color: '#000' },
+  appleIcon: { fontSize: 24, color: '#FFF', marginRight: 12 },
   appleText: { color: '#FFF' },
 
-  divider: { flexDirection: 'row', alignItems: 'center', width: '100%', marginVertical: 20 },
+  divider: { flexDirection: 'row', alignItems: 'center', width: '100%', marginVertical: 24 },
   dividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.2)' },
-  dividerText: { color: 'rgba(255,255,255,0.5)', marginHorizontal: 16 },
+  dividerText: { marginHorizontal: 16, color: 'rgba(255,255,255,0.5)', fontSize: 14 },
 
   emailBtn: {
     width: '100%',
+    height: 56,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 28,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    padding: 16,
-    borderRadius: 12,
-    gap: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
-  emailIcon: { fontSize: 20 },
+  emailIcon: { fontSize: 20, marginRight: 12 },
   emailText: { fontSize: 16, color: '#FFF' },
 
-  registerLink: { marginTop: 20 },
+  registerLink: { marginTop: 24 },
   registerText: { color: 'rgba(255,255,255,0.6)', fontSize: 14 },
-  registerBold: { color: colors.primary, fontWeight: 'bold' },
+  registerBold: { color: '#60a5fa', fontWeight: 'bold' },
 
-  guestBtn: { marginTop: 16, padding: 12 },
-  guestText: { color: 'rgba(255,255,255,0.5)', fontSize: 14 },
+  privacyLink: { marginTop: 24 },
+  privacyText: { color: 'rgba(255,255,255,0.4)', fontSize: 12, textDecorationLine: 'underline' },
 
-  backBtn: { alignSelf: 'flex-start', marginBottom: 20, padding: 8 },
-  backText: { color: colors.primary, fontSize: 18 },
+  backBtn: { alignSelf: 'flex-start', marginBottom: 24 },
+  backText: { color: '#60a5fa', fontSize: 18 },
 
+  inputContainer: { width: '100%', marginBottom: 16 },
+  inputLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 14, marginBottom: 8, textAlign: 'right' },
   input: {
     width: '100%',
     height: 56,
     backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    marginBottom: 12,
-    fontSize: 16,
+    borderRadius: 16,
+    paddingHorizontal: 20,
     color: '#FFF',
+    fontSize: 16,
     textAlign: 'right',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
 
-  submitBtn: { width: '100%', marginTop: 8 },
-  submitGradient: { height: 56, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  submitBtn: {
+    width: '100%',
+    height: 56,
+    backgroundColor: '#3b82f6',
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  submitBtnDisabled: { opacity: 0.7 },
   submitText: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
 
-  switchText: { color: 'rgba(255,255,255,0.6)', marginTop: 20, fontSize: 14 },
+  switchText: { color: '#60a5fa', fontSize: 14, marginTop: 8 },
 });
 
 export default AuthScreen;
