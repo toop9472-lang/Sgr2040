@@ -240,6 +240,30 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
     setIsDragging(false);
   };
 
+  // Mouse drag handlers for desktop
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDragging) return;
+      const newX = Math.max(10, Math.min(window.innerWidth - 200, e.clientX - dragStart.x));
+      const newY = Math.max(10, Math.min(window.innerHeight - 100, e.clientY - dragStart.y));
+      setCounterPosition({ x: newX, y: newY });
+    };
+    
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+    
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, dragStart]);
+
   const goToNext = () => {
     if (transitioning || currentIndex >= ads.length - 1) return;
     
