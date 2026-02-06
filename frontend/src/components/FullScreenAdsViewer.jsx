@@ -349,7 +349,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
 
       {/* =================== العداد المصغّر - شريط أفقي في الأعلى =================== */}
       <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30">
-        <div className="bg-black/70 backdrop-blur-md rounded-full px-4 py-2 border border-white/10 shadow-lg">
+        <div className="bg-black/70 backdrop-blur-md rounded-full px-4 py-2 border border-white/10 shadow-lg" dir="rtl">
           <div className="flex items-center gap-4 text-xs">
             
             {/* وقت الإعلان الحالي */}
