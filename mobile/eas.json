@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">= 5.0.0"
+    "version": ">= 5.0.0",
+    "appVersionSource": "local"
   },
   "build": {
     "development": {
@@ -21,11 +22,18 @@
         "buildType": "app-bundle"
       },
       "ios": {
-        "distribution": "store"
+        "distribution": "store",
+        "credentialsSource": "remote"
       }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascApiKeyIssuerId": "2b3dfd1a-b44d-4cf7-94b8-6f10d64b9567",
+        "ascApiKeyId": "L598DUD53L",
+        "ascApiKeyPath": "./certificates/AuthKey_L598DUD53L.p8"
+      }
+    }
   }
 }
