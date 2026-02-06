@@ -61,7 +61,7 @@ export const api = {
   },
 
   // Record ad view
-  async recordAdView(adId, watchDuration, token) {
+  async recordAdView(adId, watchDuration, token, pointsEarned = 0) {
     return this.fetch('/api/rewarded-ads/complete', {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
@@ -70,6 +70,7 @@ export const api = {
         ad_id: adId,
         completed: true,
         watch_duration: watchDuration,
+        points_earned: pointsEarned,
       }),
     });
   },
