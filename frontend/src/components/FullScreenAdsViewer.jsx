@@ -136,6 +136,10 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
       watchTimerRef.current = null;
     }
     
+    // حفظ معرف الإعلان الحالي قبل أي تغيير
+    const completedAdId = ads[currentIndex]?.id;
+    const completedAdDuration = adDurationRef.current;
+    
     // إضافة وقت الإعلان المكتمل للوقت الإجمالي
     const newTotalTime = totalValidTime + watchedTime;
     setTotalValidTime(newTotalTime);
@@ -154,18 +158,22 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
       
       // إرسال للخادم
       if (onPointsEarned) onPointsEarned(pointsEarned);
-      await recordPointsToServer(pointsEarned);
+      await recordPointsToServer(pointsEarned, completedAdId, completedAdDuration);
     }
     
-    // الانتقال للإعلان التالي تلقائياً بعد ثانية
+    // الانتقال للإعلان التالي تلقائياً بعد ثانية ونصف
     setTimeout(() => {
       if (currentIndex < ads.length - 1) {
-        goToNext(true); // true = تلقائي بعد الإكمال
+        setTransitioning(true);
+        setTimeout(() => {
+          setCurrentIndex(prev => prev + 1);
+          setTransitioning(false);
+        }, 300);
       }
     }, 1500);
   };
 
-  const recordPointsToServer = async (points) => {
+  const recordPointsToServer = async (points, adId, duration) => {
     const token = localStorage.getItem('user_token') || localStorage.getItem('token');
     if (!token) return;
     
