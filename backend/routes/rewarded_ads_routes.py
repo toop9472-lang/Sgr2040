@@ -100,6 +100,10 @@ async def check_cooldown(db, user_id: str, cooldown_seconds: int) -> tuple:
         if isinstance(last_time, str):
             last_time = datetime.fromisoformat(last_time.replace('Z', '+00:00'))
         
+        # تأكد من أن التاريخ له timezone
+        if last_time.tzinfo is None:
+            last_time = last_time.replace(tzinfo=timezone.utc)
+        
         if last_time > cooldown_time:
             remaining = (last_time + timedelta(seconds=cooldown_seconds) - datetime.now(timezone.utc)).seconds
             return False, remaining
