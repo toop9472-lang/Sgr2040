@@ -17,25 +17,19 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   const [transitioning, setTransitioning] = useState(false);
   
   // نظام النقاط المحكم
-  const [currentAdTime, setCurrentAdTime] = useState(0); // وقت الإعلان الحالي
-  const [totalValidTime, setTotalValidTime] = useState(0); // إجمالي الوقت المحتسب (من الإعلانات المكتملة فقط)
+  const [currentAdTime, setCurrentAdTime] = useState(0);
+  const [totalValidTime, setTotalValidTime] = useState(0);
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [showPointsAnimation, setShowPointsAnimation] = useState(false);
   const [pointsAnimationValue, setPointsAnimationValue] = useState(0);
   const [completedAdsCount, setCompletedAdsCount] = useState(0);
   
-  // عداد قابل للسحب
-  const [counterPosition, setCounterPosition] = useState({ x: 16, y: 60 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const watchTimerRef = useRef(null);
   const controlsTimerRef = useRef(null);
-  const adDurationRef = useRef(30); // مدة الإعلان الافتراضية
+  const adDurationRef = useRef(30);
 
-  const POINTS_PER_MINUTE = 1;
   const SECONDS_PER_POINT = 60;
   const MIN_SWIPE_DISTANCE_Y = 50;
   const MIN_SWIPE_DISTANCE_X = 80;
