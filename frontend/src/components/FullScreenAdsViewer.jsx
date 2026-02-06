@@ -186,9 +186,9 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
         },
         body: JSON.stringify({
           ad_type: 'video',
-          ad_id: ads[currentIndex]?.id,
+          ad_id: adId,
           completed: true,
-          watch_duration: adDurationRef.current,
+          watch_duration: duration,
           points_earned: points
         })
       });
