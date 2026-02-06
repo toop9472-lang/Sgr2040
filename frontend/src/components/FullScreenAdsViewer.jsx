@@ -481,20 +481,19 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
         </div>
       )}
 
-      {/* مؤشر التنقل الجانبي */}
-      <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-1.5">
-        {ads.map((_, index) => (
-          <div
-            key={index}
-            className={`w-1.5 rounded-full transition-all duration-300 ${
-              index === currentIndex 
-                ? 'h-6 bg-[#3b82f6]' 
-                : index < currentIndex
-                  ? 'h-1.5 bg-green-500/50'
-                  : 'h-1.5 bg-white/30'
-            }`}
+      {/* مؤشر التقدم الجانبي - شريط رفيع وأنيق */}
+      <div className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-2">
+        {/* شريط التقدم الرأسي */}
+        <div className="w-0.5 h-24 bg-white/10 rounded-full overflow-hidden">
+          <div 
+            className="w-full bg-gradient-to-b from-white/60 to-white/30 rounded-full transition-all duration-500"
+            style={{ height: `${((currentIndex + 1) / ads.length) * 100}%` }}
           />
-        ))}
+        </div>
+        {/* رقم الإعلان */}
+        <div className="text-white/40 text-[10px] font-medium">
+          {currentIndex + 1}/{ads.length}
+        </div>
       </div>
     </div>
   );
