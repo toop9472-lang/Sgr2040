@@ -26,9 +26,6 @@ PRICING_PACKAGES = {
     "ad_6_months": {"amount": 4800.00, "currency": "SAR", "duration_months": 6, "description": "إعلان لمدة 6 أشهر (خصم 20%)"},
     "ad_12_months": {"amount": 8400.00, "currency": "SAR", "duration_months": 12, "description": "إعلان لمدة سنة كاملة (خصم 30%)"}
 }
-    "ad_6_months": {"amount": 2400.00, "currency": "SAR", "duration_months": 6, "description": "إعلان لمدة 6 أشهر (خصم 20%)"},
-    "ad_12_months": {"amount": 4200.00, "currency": "SAR", "duration_months": 12, "description": "إعلان لمدة سنة كاملة (خصم 30%)"}
-}
 
 
 def get_db():
