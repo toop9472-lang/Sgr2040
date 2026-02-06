@@ -215,7 +215,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   };
 
   const handleTouchEnd = () => {
-    if (!touchStartY || !touchStartX || isDragging) return;
+    if (!touchStartY || !touchStartX) return;
     
     const distanceY = touchStartY - (touchEndY || touchStartY);
     const distanceX = touchStartX - (touchEndX || touchStartX);
