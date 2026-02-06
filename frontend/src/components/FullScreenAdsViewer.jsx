@@ -8,10 +8,11 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [watchTime, setWatchTime] = useState(0);
+  const [totalWatchTime, setTotalWatchTime] = useState(0);
   const [isWatching, setIsWatching] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [showControls, setShowControls] = useState(false);
-  const [showAdInfo, setShowAdInfo] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+  const [showAdInfo, setShowAdInfo] = useState(true);
   const [touchStartY, setTouchStartY] = useState(null);
   const [touchStartX, setTouchStartX] = useState(null);
   const [touchEndY, setTouchEndY] = useState(null);
@@ -19,6 +20,12 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [showPointsAnimation, setShowPointsAnimation] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
+  const [pointsAnimationValue, setPointsAnimationValue] = useState(0);
+  
+  // عداد قابل للسحب
+  const [counterPosition, setCounterPosition] = useState({ x: 16, y: 60 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -26,8 +33,8 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   const controlsTimerRef = useRef(null);
   const infoTimerRef = useRef(null);
 
-  const REQUIRED_WATCH_TIME = 30;
-  const POINTS_PER_AD = 5;
+  const REQUIRED_WATCH_TIME = 60; // 60 ثانية = دقيقة واحدة
+  const POINTS_PER_MINUTE = 1; // نقطة واحدة لكل دقيقة
   const MIN_SWIPE_DISTANCE_Y = 50;
   const MIN_SWIPE_DISTANCE_X = 80;
 
@@ -47,38 +54,25 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
     }
   }, [currentIndex, ads]);
 
-  // Hide controls after 2 seconds
+  // Auto hide controls
   useEffect(() => {
-    if (showControls) {
+    if (showControls && !isDragging) {
       if (controlsTimerRef.current) clearTimeout(controlsTimerRef.current);
       controlsTimerRef.current = setTimeout(() => {
         setShowControls(false);
-      }, 2000);
+        setShowAdInfo(false);
+      }, 4000);
     }
     return () => {
       if (controlsTimerRef.current) clearTimeout(controlsTimerRef.current);
     };
-  }, [showControls]);
-
-  // Hide ad info after 3 seconds
-  useEffect(() => {
-    if (showAdInfo) {
-      if (infoTimerRef.current) clearTimeout(infoTimerRef.current);
-      infoTimerRef.current = setTimeout(() => {
-        setShowAdInfo(false);
-      }, 3000);
-    }
-    return () => {
-      if (infoTimerRef.current) clearTimeout(infoTimerRef.current);
-    };
-  }, [showAdInfo]);
+  }, [showControls, isDragging]);
 
   const loadAds = async () => {
     try {
       const response = await fetch(`${BACKEND_URL}/api/ads`);
       const data = await response.json();
       if (data && data.length > 0) {
-        // Shuffle ads for variety
         const shuffled = data.sort(() => Math.random() - 0.5);
         setAds(shuffled);
       }
@@ -97,24 +91,27 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
     
     watchTimerRef.current = setInterval(() => {
       setWatchTime(prev => {
-        if (prev >= REQUIRED_WATCH_TIME) {
-          clearInterval(watchTimerRef.current);
-          completeAdWatch();
-          return REQUIRED_WATCH_TIME;
+        const newTime = prev + 1;
+        setTotalWatchTime(t => t + 1);
+        
+        // كل 60 ثانية = نقطة
+        if (newTime > 0 && newTime % REQUIRED_WATCH_TIME === 0) {
+          earnPoint();
         }
-        return prev + 1;
+        
+        return newTime;
       });
     }, 1000);
   };
 
-  const completeAdWatch = async () => {
-    setIsWatching(false);
-    const points = POINTS_PER_AD;
+  const earnPoint = async () => {
+    const points = POINTS_PER_MINUTE;
     setEarnedPoints(prev => prev + points);
+    setPointsAnimationValue(points);
     
     // Show points animation
     setShowPointsAnimation(true);
-    setTimeout(() => setShowPointsAnimation(false), 2000);
+    setTimeout(() => setShowPointsAnimation(false), 1500);
     
     // Notify parent
     if (onPointsEarned) {
@@ -135,7 +132,8 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
             ad_type: 'video',
             ad_id: ads[currentIndex]?.id,
             completed: true,
-            watch_duration: REQUIRED_WATCH_TIME
+            watch_duration: REQUIRED_WATCH_TIME,
+            points_earned: points
           })
         });
       } catch (e) {
@@ -160,19 +158,16 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   };
 
   const handleTouchEnd = () => {
-    if (!touchStartY || !touchStartX) return;
+    if (!touchStartY || !touchStartX || isDragging) return;
     
     const distanceY = touchStartY - (touchEndY || touchStartY);
     const distanceX = touchStartX - (touchEndX || touchStartX);
     
-    // تحديد الاتجاه الرئيسي للسحب
     if (Math.abs(distanceX) > Math.abs(distanceY)) {
-      // سحب أفقي - للخروج
       if (Math.abs(distanceX) > MIN_SWIPE_DISTANCE_X) {
-        onClose(); // الخروج يمين أو يسار
+        onClose();
       }
     } else {
-      // سحب عمودي - للتنقل بين الإعلانات
       const isSwipeUp = distanceY > MIN_SWIPE_DISTANCE_Y;
       const isSwipeDown = distanceY < -MIN_SWIPE_DISTANCE_Y;
       
@@ -183,11 +178,36 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
       }
     }
     
-    // إعادة تعيين
     setTouchStartY(null);
     setTouchStartX(null);
     setTouchEndY(null);
     setTouchEndX(null);
+  };
+
+  // Counter drag handlers
+  const handleCounterTouchStart = (e) => {
+    e.stopPropagation();
+    if (!e.targetTouches || !e.targetTouches[0]) return;
+    setIsDragging(true);
+    setDragStart({
+      x: e.targetTouches[0].clientX - counterPosition.x,
+      y: e.targetTouches[0].clientY - counterPosition.y
+    });
+  };
+
+  const handleCounterTouchMove = (e) => {
+    e.stopPropagation();
+    if (!isDragging || !e.targetTouches || !e.targetTouches[0]) return;
+    
+    const newX = Math.max(10, Math.min(window.innerWidth - 150, e.targetTouches[0].clientX - dragStart.x));
+    const newY = Math.max(10, Math.min(window.innerHeight - 80, e.targetTouches[0].clientY - dragStart.y));
+    
+    setCounterPosition({ x: newX, y: newY });
+  };
+
+  const handleCounterTouchEnd = (e) => {
+    e.stopPropagation();
+    setIsDragging(false);
   };
 
   const goToNext = () => {
@@ -213,11 +233,12 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   };
 
   const handleScreenTap = () => {
-    setShowControls(true);
-    setShowAdInfo(true);
+    if (!isDragging) {
+      setShowControls(true);
+      setShowAdInfo(true);
+    }
   };
 
-  // فتح رابط المعلن
   const handleVisitSite = (e) => {
     e.stopPropagation();
     const currentAd = ads[currentIndex];
@@ -243,7 +264,6 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  // Scroll wheel support
   const handleWheel = (e) => {
     if (e.deltaY > 50) {
       goToNext();
@@ -252,15 +272,18 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
     }
   };
 
+  // Format time
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   if (isLoading) {
     return (
       <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
         <div className="w-20 h-20 rounded-full bg-[#0a0a0f] border-2 border-[#3b82f6]/30 flex items-center justify-center overflow-hidden mb-4 animate-pulse">
-          <img 
-            src="/logo_saqr.png" 
-            alt="صقر" 
-            className="w-16 h-16 object-contain"
-          />
+          <img src="/logo_saqr.png" alt="صقر" className="w-16 h-16 object-contain" />
         </div>
         <div className="text-white text-xl">جاري التحميل...</div>
       </div>
@@ -272,10 +295,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
       <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
         <div className="text-center text-white">
           <p className="text-xl mb-4">لا توجد إعلانات متاحة حالياً</p>
-          <button 
-            onClick={onClose}
-            className="px-6 py-3 bg-white/20 rounded-full"
-          >
+          <button onClick={onClose} className="px-6 py-3 bg-white/20 rounded-full">
             العودة
           </button>
         </div>
@@ -284,7 +304,8 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   }
 
   const currentAd = ads[currentIndex];
-  const progress = (watchTime / REQUIRED_WATCH_TIME) * 100;
+  const progress = ((watchTime % REQUIRED_WATCH_TIME) / REQUIRED_WATCH_TIME) * 100;
+  const timeToNextPoint = REQUIRED_WATCH_TIME - (watchTime % REQUIRED_WATCH_TIME);
 
   return (
     <div 
@@ -296,10 +317,8 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
       onWheel={handleWheel}
       onClick={handleScreenTap}
     >
-      {/* Video/Ad Content - Full Screen */}
-      <div 
-        className={`absolute inset-0 transition-opacity duration-300 ${transitioning ? 'opacity-0' : 'opacity-100'}`}
-      >
+      {/* Video/Ad Content */}
+      <div className={`absolute inset-0 transition-opacity duration-300 ${transitioning ? 'opacity-0' : 'opacity-100'}`}>
         {currentAd.video_url ? (
           <video
             ref={videoRef}
@@ -322,133 +341,152 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
         )}
       </div>
 
-      {/* Progress Bar - Top (رفيع جداً) */}
-      <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/10 z-10">
+      {/* Progress Bar - Top */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-white/20 z-10">
         <div 
-          className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-1000"
+          className="h-full bg-gradient-to-r from-[#3b82f6] to-[#60a5fa] transition-all duration-1000"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      {/* عداد الوقت - يظهر فقط عند اللمس */}
+      {/* =================== العداد الثابت القابل للتحريك =================== */}
       <div 
-        className={`absolute top-4 right-4 z-20 transition-all duration-500 ease-out ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}
+        className="absolute z-30 cursor-move"
+        style={{ left: counterPosition.x, top: counterPosition.y }}
+        onTouchStart={handleCounterTouchStart}
+        onTouchMove={handleCounterTouchMove}
+        onTouchEnd={handleCounterTouchEnd}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-black/40 backdrop-blur-sm rounded-full px-3 py-1.5">
-          <span className="text-white text-xs font-medium">
-            {watchTime >= REQUIRED_WATCH_TIME ? (
-              <span className="text-yellow-400">✓ +{POINTS_PER_AD}</span>
-            ) : (
-              <span>{REQUIRED_WATCH_TIME - watchTime}s</span>
-            )}
-          </span>
+        <div className={`bg-black/70 backdrop-blur-md rounded-2xl px-4 py-3 border ${isDragging ? 'border-[#3b82f6] scale-105' : 'border-white/20'} transition-all duration-200 shadow-lg`}>
+          {/* شريط السحب */}
+          <div className="flex justify-center mb-2">
+            <div className="w-8 h-1 bg-white/30 rounded-full"></div>
+          </div>
+          
+          {/* وقت المشاهدة */}
+          <div className="flex items-center gap-3 text-white">
+            <div className="text-center">
+              <div className="text-xs text-white/50 mb-1">المشاهدة</div>
+              <div className="text-lg font-bold text-[#60a5fa]">{formatTime(totalWatchTime)}</div>
+            </div>
+            
+            <div className="w-px h-8 bg-white/20"></div>
+            
+            <div className="text-center">
+              <div className="text-xs text-white/50 mb-1">النقطة التالية</div>
+              <div className="text-lg font-bold text-yellow-400">{timeToNextPoint}s</div>
+            </div>
+            
+            <div className="w-px h-8 bg-white/20"></div>
+            
+            <div className="text-center">
+              <div className="text-xs text-white/50 mb-1">النقاط</div>
+              <div className="text-lg font-bold text-green-400">⭐ {earnedPoints}</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* زر كتم الصوت - يظهر فقط عند اللمس */}
-      <div 
-        className={`absolute top-4 left-4 z-20 transition-all duration-500 ease-out ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}
-      >
+      {/* زر الإغلاق */}
+      <div className={`absolute top-4 left-4 z-20 transition-all duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <button 
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsMuted(!isMuted);
-          }}
-          className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center"
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+          className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all"
         >
-          {isMuted ? (
-            <VolumeX className="w-4 h-4 text-white" />
-          ) : (
-            <Volume2 className="w-4 h-4 text-white" />
-          )}
+          <span className="text-white text-xl font-light">✕</span>
         </button>
       </div>
 
-      {/* =================== بيانات المعلن - تظهر عند اللمس =================== */}
-      <div 
-        className={`absolute bottom-0 left-0 right-0 z-20 transition-all duration-500 ease-out ${
-          showAdInfo 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-0 translate-y-8 pointer-events-none'
-        }`}
-      >
-        <div className="bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-16 pb-20 px-5">
-          {/* اسم المعلن والأفاتار */}
+      {/* زر كتم الصوت */}
+      <div className={`absolute top-4 right-4 z-20 transition-all duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <button 
+          onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }}
+          className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all"
+        >
+          {isMuted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
+        </button>
+      </div>
+
+      {/* =================== أزرار التنقل بالأقواس =================== */}
+      {/* زر السابق */}
+      {currentIndex > 0 && (
+        <button
+          onClick={(e) => { e.stopPropagation(); goToPrevious(); }}
+          className={`absolute top-1/3 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ${showControls ? 'opacity-70 hover:opacity-100' : 'opacity-0 pointer-events-none'}`}
+        >
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-white text-3xl font-light">(</span>
+            <span className="text-white/60 text-xs">السابق</span>
+          </div>
+        </button>
+      )}
+
+      {/* زر التالي */}
+      {currentIndex < ads.length - 1 && (
+        <button
+          onClick={(e) => { e.stopPropagation(); goToNext(); }}
+          className={`absolute bottom-1/3 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ${showControls && !showAdInfo ? 'opacity-70 hover:opacity-100' : 'opacity-0 pointer-events-none'}`}
+        >
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-white/60 text-xs">التالي</span>
+            <span className="text-white text-3xl font-light">)</span>
+          </div>
+        </button>
+      )}
+
+      {/* =================== بيانات المعلن =================== */}
+      <div className={`absolute bottom-0 left-0 right-0 z-20 transition-all duration-500 ease-out ${showAdInfo ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}>
+        <div className="bg-gradient-to-t from-black/95 via-black/70 to-transparent pt-20 pb-8 px-5">
+          {/* اسم المعلن */}
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#6366f1] flex items-center justify-center text-white font-bold text-lg shadow-lg border-2 border-white/20">
               {(currentAd.advertiser || currentAd.title)?.[0]?.toUpperCase() || 'A'}
             </div>
             <div className="flex-1">
-              <p className="text-white font-bold text-base">
-                {currentAd.advertiser || 'معلن'}
-              </p>
-              <p className="text-white/60 text-xs">
-                @{(currentAd.advertiser || 'advertiser').toLowerCase().replace(/\s/g, '_')}
-              </p>
+              <p className="text-white font-bold text-base">{currentAd.advertiser || 'معلن'}</p>
+              <p className="text-white/50 text-xs">إعلان {currentIndex + 1} من {ads.length}</p>
             </div>
           </div>
 
-          {/* عنوان ووصف الإعلان */}
-          <h3 className="text-white font-bold text-lg mb-1 line-clamp-1">
-            {currentAd.title}
-          </h3>
-          <p className="text-white/70 text-sm mb-4 line-clamp-2">
-            {currentAd.description}
-          </p>
+          {/* عنوان ووصف */}
+          <h3 className="text-white font-bold text-lg mb-2">{currentAd.title}</h3>
+          <p className="text-white/60 text-sm mb-4 line-clamp-2">{currentAd.description}</p>
 
           {/* زر زيارة الموقع */}
           {currentAd.website_url && (
             <button
               onClick={handleVisitSite}
-              className="w-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-all duration-200"
+              className="w-full bg-[#3b82f6] hover:bg-[#2563eb] rounded-xl py-3.5 px-4 flex items-center justify-center gap-2 transition-all duration-200 shadow-lg"
             >
-              <ExternalLink className="w-4 h-4 text-white" />
-              <span className="text-white font-medium text-sm">زيارة الموقع</span>
+              <ExternalLink className="w-5 h-5 text-white" />
+              <span className="text-white font-semibold">زيارة الموقع</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* نقاط مكتسبة - تظهر في الوسط عند الإكمال */}
+      {/* نقاط مكتسبة - Animation */}
       {showPointsAnimation && (
-        <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
-          <div className="animate-bounce">
-            <span className="text-yellow-400 text-5xl font-bold drop-shadow-lg">+{POINTS_PER_AD}</span>
+        <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+          <div className="animate-bounce bg-yellow-500/90 rounded-full px-8 py-4 shadow-2xl">
+            <span className="text-black text-4xl font-bold">+{pointsAnimationValue} ⭐</span>
           </div>
         </div>
       )}
 
-      {/* إجمالي النقاط المكتسبة في الجلسة */}
-      {earnedPoints > 0 && !showAdInfo && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
-          <div className="bg-yellow-500/90 backdrop-blur-sm rounded-full px-4 py-1.5">
-            <span className="text-black font-bold text-sm">
-              ⭐ {earnedPoints}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* مؤشرات التنقل - تظهر فقط عند اللمس */}
-      <div 
-        className={`absolute left-1/2 -translate-x-1/2 top-12 transition-opacity duration-300 ${showControls && currentIndex > 0 ? 'opacity-50' : 'opacity-0'}`}
-      >
-        <div className="text-white text-xs">⬆</div>
-      </div>
-
-      <div 
-        className={`absolute left-1/2 -translate-x-1/2 bottom-44 transition-opacity duration-300 ${showControls && currentIndex < ads.length - 1 && !showAdInfo ? 'opacity-50' : 'opacity-0'}`}
-      >
-        <div className="text-white text-xs">⬇</div>
-      </div>
-
-      {/* تلميح الخروج - يظهر فقط عند اللمس */}
-      <div 
-        className={`absolute right-2 top-1/2 -translate-y-1/2 transition-opacity duration-300 ${showControls ? 'opacity-30' : 'opacity-0'}`}
-      >
-        <div className="text-white text-[10px] rotate-90 whitespace-nowrap">
-          ← اسحب للخروج
-        </div>
+      {/* مؤشر التنقل الجانبي */}
+      <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-1.5">
+        {ads.map((_, index) => (
+          <div
+            key={index}
+            className={`w-1.5 rounded-full transition-all duration-300 ${
+              index === currentIndex 
+                ? 'h-6 bg-[#3b82f6]' 
+                : 'h-1.5 bg-white/30'
+            }`}
+          />
+        ))}
       </div>
     </div>
   );
