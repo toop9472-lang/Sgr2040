@@ -1,4 +1,4 @@
-// Ad Viewer Screen - نظام مشاهدة الإعلانات المحسّن مع مكافحة الغش
+// Ad Viewer Screen - نظام مشاهدة الإعلانات المحسّن مع مكافحة الغش و AdMob
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import {
   View,
@@ -20,6 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import storage from '../services/storage';
 import colors from '../styles/colors';
+import admobService from '../services/admobService';
 
 const { width, height } = Dimensions.get('window');
 
