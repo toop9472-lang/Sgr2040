@@ -177,7 +177,7 @@ eas build --platform ios --profile production
 
 ### API URL:
 ```
-https://rewards-video-viewer.preview.emergentagent.com
+https://app-store-build-3.preview.emergentagent.com
 ```
 
 ---

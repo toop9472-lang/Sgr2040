@@ -1,5 +1,5 @@
 // API Service - Lightweight API handler
-const API_URL = 'https://rewards-video-viewer.preview.emergentagent.com';
+const API_URL = 'https://app-store-build-3.preview.emergentagent.com';
 
 export const api = {
   baseUrl: API_URL,

@@ -126,7 +126,7 @@ const AuthScreen = ({ onLogin }) => {
         { 
           text: 'متابعة',
           onPress: () => {
-            Linking.openURL('https://rewards-video-viewer.preview.emergentagent.com/');
+            Linking.openURL('https://app-store-build-3.preview.emergentagent.com/');
           }
         }
       ]
@@ -209,7 +209,7 @@ const AuthScreen = ({ onLogin }) => {
             {/* Privacy Policy Link */}
             <TouchableOpacity 
               style={styles.privacyLink}
-              onPress={() => Linking.openURL('https://rewards-video-viewer.preview.emergentagent.com/privacy-policy.html')}
+              onPress={() => Linking.openURL('https://app-store-build-3.preview.emergentagent.com/privacy-policy.html')}
               activeOpacity={0.7}
             >
               <Text style={styles.privacyText}>سياسة الخصوصية</Text>
