@@ -2,7 +2,7 @@
   "expo": {
     "name": "صقر",
     "slug": "saqr-app",
-    "version": "4.4.0",
+    "version": "4.5.0",
     "orientation": "portrait",
     "icon": "./assets/logo_saqr.png",
     "userInterfaceStyle": "dark",
@@ -22,15 +22,23 @@
             "minSdkVersion": 24
           },
           "ios": {
-            "deploymentTarget": "15.1"
+            "deploymentTarget": "15.1",
+            "useFrameworks": "static"
           }
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-5132559433385403~6910358704",
+          "iosAppId": "ca-app-pub-5132559433385403~6910358704"
         }
       ]
     ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.saqr.rewards",
-      "buildNumber": "3",
+      "buildNumber": "4",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "يستخدم التطبيق الكاميرا لتحميل الصور",
@@ -45,7 +53,7 @@
         "backgroundColor": "#0a0a0f"
       },
       "package": "com.saqr.rewards",
-      "versionCode": 29,
+      "versionCode": 30,
       "permissions": ["INTERNET", "VIBRATE"],
       "blockedPermissions": ["android.permission.RECORD_AUDIO"],
       "config": {
@@ -59,16 +67,6 @@
     "extra": {
       "eas": {
         "projectId": "2a08ac90-1772-4377-bf99-af5d2357db30"
-      },
-      "admob": {
-        "ios": {
-          "appId": "ca-app-pub-5132559433385403~6910358704",
-          "rewardedAdUnitId": "ca-app-pub-5132559433385403/2999033852"
-        },
-        "android": {
-          "appId": "ca-app-pub-5132559433385403~6910358704",
-          "rewardedAdUnitId": "ca-app-pub-5132559433385403/2999033852"
-        }
       }
     }
   }
