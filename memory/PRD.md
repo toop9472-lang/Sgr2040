@@ -1,294 +1,114 @@
-# صقر (Saqr) - PRD v3.2
-## آخر تحديث: فبراير 2025
+# Saqr Rewards App - PRD
 
-## نظرة عامة
-منصة إعلانية تشبه TikTok/Instagram Reels حيث يشاهد المستخدمون إعلانات فيديو ويكسبون نقاط قابلة للتحويل لأموال.
+## Original Problem Statement
+Build an application for watching rewarded video ads where users earn points.
 
----
+## Product Requirements
+1. **Point System:** 1 point for every 60 seconds of total ad watch time
+2. **Cheat Prevention:** Watch time only counted if ad is watched completely
+3. **Variable Ad Duration:** Support ads of different lengths (15s, 30s, 60s, 90s)
+4. **Login:** "Remember Me" option on login page
+5. **UI/UX:** Slim timer bar at top, vertical progress bar for navigation
+6. **Mobile Builds:** Android (.aab) and iOS (.ipa) production builds
 
-## ✅ جميع الميزات المنفذة
-
-### 1. المصادقة والمستخدمين ✅
-- [x] تسجيل الدخول بالبريد الإلكتروني
-- [x] إنشاء حساب جديد
-- [x] وضع الزائر
-- [x] لوحة تحكم أدمن منفصلة
-- [x] Google OAuth (Emergent Auth)
-- [x] Apple OAuth (UI جاهز - iOS فقط)
-- [x] **خيار "تذكرني" ✅ جديد**
-
-### 2. عارض الإعلانات بشاشة كاملة (TikTok Style) ✅
-- [x] شاشة سوداء كاملة - عرض نظيف
-- [x] **شريط تقدم للإعلان الحالي (برتقالي → أخضر عند الإكمال) ✅ محدث**
-- [x] التنقل بالسحب (أعلى/أسفل للإعلانات، يمين/يسار للخروج)
-- [x] عناصر تحكم مخفية تظهر عند اللمس
-- [x] تأثيرات النقاط عند الإكمال
-- [x] معلومات المعلن وزر زيارة الموقع
-- [x] **عداد مشاهدة قابل للسحب محسّن ✅ جديد**
-- [x] **نظام مكافحة الغش: الوقت يُحتسب فقط عند إكمال الإعلان ✅ جديد**
-- [x] **التنقل حر بدون قيود ✅ جديد**
-- [x] **نقطة واحدة كل 60 ثانية من المشاهدة المكتملة ✅ جديد**
-
-### 3. شريط التنقل ✅
-- [x] 4 أيقونات: الرئيسية، أعلن، حسابي، إعلانات
-- [x] زر إعلانات مميز باللون الأحمر
-- [x] زر AI عائم
-
-### 4. الصفحة الرئيسية ✅
-- [x] ترحيب مخصص بالمستخدم
-- [x] بطاقة الرصيد الحالي
-- [x] زر "ابدأ المشاهدة"
-- [x] إحصائيات (اليوم، المتبقي، إجمالي، معدل الكسب)
-- [x] التحدي اليومي
-- [x] نصائح متحركة
-
-### 5. إدارة الإعلانات (لوحة التحكم) ✅
-- [x] عرض جميع الإعلانات
-- [x] حذف/تفعيل/إيقاف الإعلانات
-- [x] الموافقة/رفض الإعلانات
-- [x] فلترة الإعلانات
-
-### 6. الموافقة التلقائية بالذكاء الاصطناعي ✅
-- [x] زر تفعيل/إيقاف
-- [x] إعدادات قابلة للتخصيص
-
-### 7. نظام كشف الغش ✅
-- [x] تحليل أنماط المشاهدة
-- [x] كشف التوقيت المشبوه
-- [x] نظام تحذيرات
-
-### 8. نظام السحب ✅
-- [x] طرق سحب متعددة (PayPal، STC Pay، تحويل بنكي)
-- [x] طلبات سحب تُرسل للخادم
-- [x] إدارة في لوحة التحكم
-
-### 9. نظام النقاط ✅
-- [x] **نقطة واحدة لكل 60 ثانية من المشاهدة المكتملة ✅ محدث**
-- [x] 500 نقطة = 1 دولار
-- [x] حد يومي: 50 إعلان
-- [x] **نظام مكافحة الغش: لا يُحتسب الوقت إلا عند إكمال الإعلان ✅ جديد**
-- [x] **التنقل حر - يمكن التنقل في أي وقت ✅ جديد**
-- [x] **عداد يوضح: وقت الإعلان الحالي، الوقت المحتسب، المتبقي للنقطة ✅ جديد**
-
-### 10. المساعد الذكي (Claude AI) ✅
-- [x] زر AI عائم
-- [x] دردشة للمستخدمين والزوار
-- [x] مساعد AI للأدمن
-
-### 11. صفحة المعلنين ✅
-- [x] اختيار الباقات (شهر، 3 أشهر، 6 أشهر)
-- [x] نموذج بيانات الإعلان
-- [x] إرسال للمراجعة
-
-### 12. بوابات الدفع ✅
-- [x] Stripe (عالمي)
-- [x] Tap (السعودية - mada, Apple Pay)
-- [x] Tabby (تقسيط 4 دفعات) ✅ جديد
-- [x] Tamara (تقسيط 3 دفعات) ✅ جديد
-
-### 13. شبكات الإعلانات ✅
-- [x] Google AdMob (مُعد)
-- [x] Unity Ads (تكامل كامل) ✅ جديد
-
-### 14. التقارير ✅
-- [x] تقرير مالي PDF
-- [x] تقرير أداء الإعلانات PDF
-- [x] تقرير نشاط المستخدم PDF
-
-### 15. الإشعارات ✅
-- [x] Push Notifications (Expo)
-- [x] إشعارات البريد الإلكتروني
+## User's Preferred Language
+Arabic (العربية)
 
 ---
 
-## 📱 تطبيق الموبايل v3.1.0 ✅
+## What's Been Implemented
 
-### هيكل الملفات:
-```
-/app/mobile/
-├── App.js (Main Entry - Lightweight)
-├── src/
-│   ├── screens/
-│   │   ├── AuthScreen.js
-│   │   ├── HomeScreen.js
-│   │   ├── ProfileScreen.js
-│   │   ├── AdvertiserScreen.js
-│   │   └── AdViewerScreen.js
-│   ├── components/
-│   │   ├── BottomNav.js
-│   │   ├── AIFloatingButton.js
-│   │   └── AIChatModal.js
-│   ├── services/
-│   │   ├── api.js
-│   │   └── storage.js
-│   └── styles/
-│       └── colors.js
-```
+### Completed Features ✅
+- [x] Cheat-proof point system (1 point per 60 seconds of completed ad watch)
+- [x] Ad Viewer with slim top bar timer
+- [x] Vertical progress bar for ad navigation
+- [x] Warning message for incomplete ads
+- [x] Variable ad duration support
+- [x] Remember Me feature on login
+- [x] Mobile-optimized UI
+- [x] Privacy Policy page (/privacy)
+- [x] Android build (.aab) - Successfully uploaded
+- [x] iOS build (.ipa) - Successfully uploaded to App Store Connect
+- [x] App Store metadata and screenshots prepared
+- [x] AdMob credentials configured (App ID: ca-app-pub-5132559433385403~6910358704)
 
-### 📱 رابط تحميل APK:
-**https://expo.dev/artifacts/eas/7p5MZr6QjXYLhjJ2keeg6V.apk**
+### App Store Submission ✅ (February 7, 2026)
+- iOS app submitted to App Store Connect
+- App ID: 6758868843
+- Version: 4.4.0
+- Status: Waiting for Review
 
 ---
 
-## 🔧 APIs المتوفرة
+## Pending/Upcoming Tasks
 
-### إدارة الإعلانات
-```
-GET    /api/admin/dashboard/ads/all
-DELETE /api/admin/dashboard/ads/{id}
-PUT    /api/admin/dashboard/ads/{id}/activate
-PUT    /api/admin/dashboard/ads/{id}/approve
-```
+### P0 - High Priority
+- [ ] **AdMob Integration:** Requires MacBook to build with react-native-google-mobile-ads
+  - iOS AdMob App ID: ca-app-pub-5132559433385403~6910358704
+  - Rewarded Ad Unit ID: ca-app-pub-5132559433385403/2999033852
+  - Blocked: CocoaPods requires Mac for iOS build
 
-### الإعدادات
-```
-GET /api/settings/public/rewards
-PUT /api/admin/settings/rewards
-```
+### P1 - Medium Priority
+- [ ] Test AdMob integration after Mac build
+- [ ] Submit Android app to Google Play Store
 
-### الدفع
-```
-POST /api/payments/checkout (Stripe)
-POST /api/tap/checkout (Tap)
-POST /api/tabby/checkout (Tabby BNPL)
-POST /api/tamara/checkout (Tamara BNPL)
-```
-
-### شبكات الإعلانات
-```
-GET  /api/unity-ads/status
-POST /api/unity-ads/complete
-GET  /api/unity-ads/callback (S2S)
-GET  /api/unity-ads/stats
-```
-
-### AI
-```
-POST /api/claude-ai/chat
-POST /api/claude-ai/chat/guest
-```
-
-### التقارير
-```
-GET /api/reports/financial?days=30
-GET /api/reports/ads-performance?days=30
-GET /api/reports/user/{user_id}
-GET /api/reports/my-report
-```
+### P2 - Future
+- [ ] Add more payment gateways (Tap, Tabby, Tamara need API keys)
+- [ ] Implement Unity Ads as backup ad network
 
 ---
 
-## 📊 بيانات الاختبار
+## Technical Architecture
 
-### حساب الأدمن
-- Email: sky-321@hotmail.com
-- Password: Wsxzaq123
+### Frontend (Web)
+- React with React Router
+- Tailwind CSS + Shadcn UI
+- Location: /app/frontend
 
-### حساب Expo
-- Username: ziyad333
-- Password: Edcxswqaz123
+### Backend
+- FastAPI (Python)
+- MongoDB database
+- Location: /app/backend
 
----
-
-## 🔑 تكاملات الطرف الثالث
-
-| التكامل | الحالة | ملاحظات |
-|---------|--------|---------|
-| Claude Sonnet 4 | ✅ مفعّل | Emergent Key |
-| Stripe | ✅ مفعّل | Test Key |
-| Tap Payments | ✅ جاهز | يحتاج API Key |
-| Tabby BNPL | ✅ جاهز | يحتاج API Key |
-| Tamara BNPL | ✅ جاهز | يحتاج API Key |
-| Unity Ads | ✅ جاهز | يحتاج Game ID |
-| Google Auth | ✅ مفعّل | Emergent Auth |
-| Firebase Push | ✅ مُعد | |
-| Resend Email | ✅ مفعّل | |
-| Google AdMob | ✅ مُعد | |
+### Mobile
+- React Native with Expo
+- EAS Build for production
+- Location: /app/mobile
 
 ---
 
-## 📈 التحديثات
-
-### v3.3.0 (فبراير 2025) - New
-- تحسين العداد: صغير وأنيق في أعلى الصفحة
-- إزالة النقاط الجانبية واستبدالها بشريط تقدم رفيع
-- إعادة رسالة التحذير "أكمل مشاهدة الإعلان لاحتساب الوقت"
-- نقل التحسينات لتطبيق الموبايل
-- التعرف التلقائي على مدة الإعلان من البيانات
-- دعم جميع أطوال الإعلانات (15ث، 20ث، 45ث، 60ث، 90ث، ...)
-
-### v3.2.0 (فبراير 2025)
-- إضافة خيار "تذكرني" في تسجيل الدخول
-- عداد مشاهدة قابل للسحب محسّن في عارض الإعلانات
-- **نظام مكافحة الغش المحكم:**
-  - التنقل حر بدون قيود
-  - الوقت يُحتسب فقط عند إكمال الإعلان بالكامل
-  - لا يمكن جمع ثواني من إعلانات متعددة غير مكتملة
-- دعم إعلانات بأطوال مختلفة (15ث، 20ث، 45ث، 60ث، 90ث، ...)
-- تنسيق الوقت التلقائي (ثواني للقصيرة، دقائق:ثواني للطويلة)
-- نقطة واحدة كل 60 ثانية من المشاهدة المكتملة
-- إصلاح مشكلة مقارنة التواريخ في check_cooldown
-- دمج الإعلانات من مصادر متعددة في API واحد
-
-### v3.1.0 (يناير 2025) - Final
-- إضافة تكامل Tabby للتقسيط (4 دفعات)
-- إضافة تكامل Tamara للتقسيط (3 دفعات)
-- إضافة تكامل Unity Ads
-- صفحات إدارة بوابات الدفع
-- صفحات إدارة شبكات الإعلانات
-- تقارير PDF متقدمة
-
-### v3.0.1 (يناير 2025)
-- إصلاح مسار AI Chat في الموبايل
-
-### v3.0.0 (يناير 2025)
-- إعادة هيكلة تطبيق الموبايل بالكامل
-- تقسيم الكود إلى مكونات منفصلة
-- تحسين الأداء ومنع التعليق
-- إضافة جميع الصفحات المفقودة
+## Key Files
+- `/app/frontend/src/components/AdViewer.jsx` - Web ad viewer
+- `/app/mobile/src/screens/AdViewerScreen.js` - Mobile ad viewer
+- `/app/backend/routes/rewarded_ads_routes.py` - Rewarded ads API
+- `/app/frontend/src/pages/PrivacyPolicy.jsx` - Privacy policy page
+- `/app/mobile/app.json` - Mobile app configuration with AdMob settings
 
 ---
 
-## 📋 الميزات المكتملة 100%
-
-✅ المصادقة (Email, Google, Apple, Guest)
-✅ عارض الإعلانات TikTok Style
-✅ نظام النقاط والمكافآت
-✅ لوحة تحكم الأدمن
-✅ إدارة الإعلانات
-✅ نظام السحب
-✅ بوابات الدفع (Stripe, Tap, Tabby, Tamara)
-✅ شبكات الإعلانات (AdMob, Unity)
-✅ مساعد AI
-✅ نظام الإشعارات
-✅ تقارير PDF
-✅ نظام كشف الغش
-✅ تطبيق الموبايل
+## API Endpoints
+- `GET /api/ads` - Fetch ads list
+- `POST /api/ads/watch` - Record ad watch and earn points
+- `POST /api/rewarded-ads/complete` - Complete rewarded ad view
+- `GET /api/rewarded-ads/settings` - Get rewarded ads settings
 
 ---
 
-## 🚀 للنشر
-
-### متطلبات API Keys:
-```env
-# بوابات الدفع
-STRIPE_SECRET_KEY=sk_...
-TAP_API_KEY=sk_test_...
-TABBY_API_KEY=sk_...
-TAMARA_API_KEY=...
-TAMARA_SANDBOX=true
-
-# شبكات الإعلانات
-UNITY_GAME_ID=...
-UNITY_API_KEY=...
-UNITY_S2S_SECRET=...
-
-# AI
-ANTHROPIC_API_KEY=... (or EMERGENT_LLM_KEY)
-```
+## Credentials
+- **Expo Account:** ziyad333 / Edcxswqaz123
+- **Apple Developer:** sky-321@hotmail.com
+- **Test User:** demo@saqr.com / demo123456
+- **Admin:** sky-321@hotmail.com / Wsxzaq123
 
 ---
 
-**آخر APK:** https://expo.dev/artifacts/eas/7p5MZr6QjXYLhjJ2keeg6V.apk
+## Bug Fixes Applied
+- Fixed double points issue (was giving 5 points instead of 1 per minute)
+- Added tracking prevention for duplicate rewards in AdViewer
 
-**حالة المشروع:** ✅ مكتمل - جاهز للنشر
+---
+
+## Notes for Next Session
+1. User will return with MacBook access
+2. Need to build iOS and Android with AdMob enabled
+3. Project zip available at: /app/frontend/public/mobile-project.zip
