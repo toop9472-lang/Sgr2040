@@ -70,74 +70,11 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
   const [completedAdsCount, setCompletedAdsCount] = useState(0);
   const [adDuration, setAdDuration] = useState(30);
   const [isAdComplete, setIsAdComplete] = useState(false);
-  const [adMobReady, setAdMobReady] = useState(false);
-  const [showingAdMobAd, setShowingAdMobAd] = useState(false);
   
   const videoRef = useRef(null);
   const timerRef = useRef(null);
   const controlsTimerRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  // Initialize AdMob
-  useEffect(() => {
-    if (adMobService) {
-      adMobService.setOnRewardEarned((reward) => {
-        console.log('AdMob reward earned:', reward);
-        const points = 5; // 5 points per AdMob rewarded ad
-        setEarnedPoints(prev => prev + points);
-        setPointsAnimValue(points);
-        setShowPointsAnim(true);
-        Vibration.vibrate(100);
-        setTimeout(() => setShowPointsAnim(false), 2000);
-        if (onPointsEarned) onPointsEarned(points);
-      });
-
-      adMobService.setOnAdClosed(() => {
-        setShowingAdMobAd(false);
-        setAdMobReady(false);
-        // Preload next ad
-        adMobService.loadRewardedAd();
-      });
-
-      adMobService.setOnError((error) => {
-        console.log('AdMob error:', error);
-        setShowingAdMobAd(false);
-      });
-
-      // Load first ad
-      adMobService.loadRewardedAd().then(() => {
-        setAdMobReady(adMobService.isAdReady());
-      });
-    }
-
-    return () => {
-      if (adMobService) {
-        adMobService.cleanup();
-      }
-    };
-  }, []);
-
-  // Check AdMob ready state periodically
-  useEffect(() => {
-    if (adMobService) {
-      const checkInterval = setInterval(() => {
-        setAdMobReady(adMobService.isAdReady());
-      }, 1000);
-      return () => clearInterval(checkInterval);
-    }
-  }, []);
-
-  const showAdMobRewardedAd = async () => {
-    if (!adMobService || !adMobReady) {
-      console.log('AdMob not ready');
-      return;
-    }
-    setShowingAdMobAd(true);
-    const shown = await adMobService.showRewardedAd();
-    if (!shown) {
-      setShowingAdMobAd(false);
-    }
-  };
 
   // تحميل الإعلانات
   useEffect(() => {
