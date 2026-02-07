@@ -72,11 +72,52 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
   const [completedAdsCount, setCompletedAdsCount] = useState(0);
   const [adDuration, setAdDuration] = useState(30);
   const [isAdComplete, setIsAdComplete] = useState(false);
+  const [adMobReady, setAdMobReady] = useState(false);
   
   const videoRef = useRef(null);
   const timerRef = useRef(null);
   const controlsTimerRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  // Initialize AdMob
+  useEffect(() => {
+    const initAdMob = async () => {
+      try {
+        await adMobService.initialize();
+        
+        adMobService.setOnRewardEarned((reward) => {
+          const points = reward?.amount || 5;
+          setEarnedPoints(prev => prev + points);
+          setPointsAnimValue(points);
+          setShowPointsAnim(true);
+          Vibration.vibrate(100);
+          setTimeout(() => setShowPointsAnim(false), 2000);
+          if (onPointsEarned) onPointsEarned(points);
+        });
+
+        adMobService.setOnAdClosed(() => {
+          setAdMobReady(false);
+          // Check again after preload
+          setTimeout(() => setAdMobReady(adMobService.isReady()), 2000);
+        });
+
+        await adMobService.loadRewardedAd();
+        setAdMobReady(true);
+      } catch (error) {
+        console.log('AdMob init error:', error);
+      }
+    };
+
+    initAdMob();
+  }, []);
+
+  // Show AdMob ad
+  const showAdMobAd = async () => {
+    const shown = await adMobService.showRewardedAd();
+    if (!shown) {
+      Alert.alert('انتظر', 'جاري تحميل الإعلان...');
+    }
+  };
 
   // تحميل الإعلانات
   useEffect(() => {
