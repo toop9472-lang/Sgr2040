@@ -22,16 +22,8 @@
             "minSdkVersion": 24
           },
           "ios": {
-            "deploymentTarget": "15.1",
-            "useFrameworks": "static"
+            "deploymentTarget": "15.1"
           }
-        }
-      ],
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-5132559433385403~6910358704",
-          "iosAppId": "ca-app-pub-5132559433385403~6910358704"
         }
       ]
     ],
