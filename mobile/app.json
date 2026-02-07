@@ -25,14 +25,6 @@
             "deploymentTarget": "15.1"
           }
         }
-      ],
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-5132559433385403~6910358704",
-          "iosAppId": "ca-app-pub-5132559433385403~6910358704",
-          "skAdNetworkItems": ["cstr6suwn9.skadnetwork", "4fzdc2evr5.skadnetwork", "2fnua5tdw4.skadnetwork", "ydx93a7ass.skadnetwork", "5a6flpkh64.skadnetwork", "p78axxw29g.skadnetwork", "v72qych5uu.skadnetwork", "c6k4g5qg8m.skadnetwork", "s39g8k73mm.skadnetwork", "3qy4746246.skadnetwork", "3sh42y64q3.skadnetwork", "f38h382jlk.skadnetwork", "hs6bdukanm.skadnetwork", "prcb7njmu6.skadnetwork", "wzmmz9fp6w.skadnetwork", "yclnxrl5pm.skadnetwork", "4468km3ulz.skadnetwork", "t38b2kh725.skadnetwork", "7ug5zh24hu.skadnetwork", "9rd848q2bz.skadnetwork", "n6fk4nfna4.skadnetwork", "kbd757ywx3.skadnetwork", "9t245vhmpl.skadnetwork", "av6w8kgt66.skadnetwork", "tl55sbb4fm.skadnetwork", "ppxm28t8ap.skadnetwork", "424m5254lk.skadnetwork", "uw77j35x4d.skadnetwork", "e5fvkxwrpn.skadnetwork", "zq492l623r.skadnetwork", "3rd42ekr43.skadnetwork", "u679fj5vs4.skadnetwork", "qqp299437r.skadnetwork", "gta9lk7p23.skadnetwork"]
-        }
       ]
     ],
     "ios": {
@@ -64,6 +56,16 @@
     "extra": {
       "eas": {
         "projectId": "2a08ac90-1772-4377-bf99-af5d2357db30"
+      },
+      "admob": {
+        "ios": {
+          "appId": "ca-app-pub-5132559433385403~6910358704",
+          "rewardedAdUnitId": "ca-app-pub-5132559433385403/2999033852"
+        },
+        "android": {
+          "appId": "ca-app-pub-5132559433385403~6910358704",
+          "rewardedAdUnitId": "ca-app-pub-5132559433385403/2999033852"
+        }
       }
     }
   }
