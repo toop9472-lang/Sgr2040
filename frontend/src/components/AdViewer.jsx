@@ -86,6 +86,9 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
     return () => clearInterval(interval);
   }, [currentAd, fetchViewers, startViewing]);
 
+  // Track last rewarded time to prevent double rewards
+  const lastRewardedTimeRef = useRef(0);
+
   // Watch timer with enhanced points notification
   useEffect(() => {
     if (isPlaying && !isWatched && currentAd) {
@@ -93,18 +96,24 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
         setWatchTime((prev) => {
           const newTime = prev + 1;
           
-          // Every 60 seconds = 1 point
-          if (newTime > 0 && newTime % 60 === 0 && newTime <= currentAd.duration) {
+          // Every 60 seconds = 1 point (only if not already rewarded for this minute)
+          const currentMinute = Math.floor(newTime / 60);
+          const lastRewardedMinute = Math.floor(lastRewardedTimeRef.current / 60);
+          
+          if (newTime > 0 && newTime % 60 === 0 && newTime <= currentAd.duration && currentMinute > lastRewardedMinute) {
+            lastRewardedTimeRef.current = newTime;
             onAdWatched(currentAd.id, newTime)
               .then((response) => {
-                // Show beautiful points animation
-                setEarnedPoints(response.points_earned);
-                setTotalEarnedSession(prev => prev + response.points_earned);
-                setShowPointsAnimation(true);
-                triggerConfetti();
-                
-                // Hide animation after 3 seconds
-                setTimeout(() => setShowPointsAnimation(false), 3000);
+                if (response && response.points_earned) {
+                  // Show beautiful points animation
+                  setEarnedPoints(response.points_earned);
+                  setTotalEarnedSession(prev => prev + response.points_earned);
+                  setShowPointsAnimation(true);
+                  triggerConfetti();
+                  
+                  // Hide animation after 3 seconds
+                  setTimeout(() => setShowPointsAnimation(false), 3000);
+                }
               })
               .catch(console.error);
           }
@@ -123,6 +132,7 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
   // Reset on ad change
   useEffect(() => {
     setWatchTime(0);
+    lastRewardedTimeRef.current = 0;
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
       if (isPlaying) videoRef.current.play().catch(() => {});
