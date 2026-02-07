@@ -821,6 +821,25 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
+  // زر AdMob
+  admobButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#f59e0b',
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  admobButtonDisabled: {
+    backgroundColor: 'rgba(245, 158, 11, 0.5)',
+  },
+  admobButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
   // أنيميشن النقاط
   pointsAnimContainer: {
     position: 'absolute',
