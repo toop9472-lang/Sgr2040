@@ -73,10 +73,96 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
   const [adDuration, setAdDuration] = useState(30);
   const [isAdComplete, setIsAdComplete] = useState(false);
   
+  // حالة AdMob
+  const [isAdMobReady, setIsAdMobReady] = useState(false);
+  const [showingAdMob, setShowingAdMob] = useState(false);
+  
   const videoRef = useRef(null);
   const timerRef = useRef(null);
   const controlsTimerRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  // تهيئة AdMob عند بدء الشاشة
+  useEffect(() => {
+    initAdMob();
+    return () => {
+      admobService.cleanup();
+    };
+  }, []);
+
+  const initAdMob = async () => {
+    try {
+      const initialized = await admobService.initialize();
+      if (initialized) {
+        // الاشتراك في أحداث AdMob
+        admobService.subscribe(handleAdMobEvent);
+      }
+    } catch (error) {
+      console.log('AdMob init error:', error);
+    }
+  };
+
+  // معالجة أحداث AdMob
+  const handleAdMobEvent = (event) => {
+    console.log('AdMob Event:', event.eventType);
+    
+    switch (event.eventType) {
+      case 'loaded':
+        setIsAdMobReady(true);
+        break;
+      case 'error':
+        setIsAdMobReady(false);
+        setShowingAdMob(false);
+        break;
+      case 'closed':
+        setShowingAdMob(false);
+        setIsAdMobReady(false);
+        break;
+      case 'reward':
+        // حصل المستخدم على المكافأة من AdMob
+        handleAdMobReward(event.data);
+        break;
+    }
+  };
+
+  // معالجة المكافأة من AdMob
+  const handleAdMobReward = async (reward) => {
+    const pointsEarned = reward?.amount || 1;
+    
+    setEarnedPoints(prev => prev + pointsEarned);
+    setPointsAnimValue(pointsEarned);
+    setShowPointsAnim(true);
+    Vibration.vibrate(100);
+    setTimeout(() => setShowPointsAnim(false), 2000);
+    
+    if (onPointsEarned) onPointsEarned(pointsEarned);
+    
+    // تسجيل في السيرفر
+    const token = await storage.getToken();
+    if (token) {
+      try {
+        await api.recordAdView('admob_rewarded', 30, token, pointsEarned);
+      } catch (e) {
+        console.log('Failed to record AdMob points');
+      }
+    }
+  };
+
+  // عرض إعلان AdMob
+  const showAdMobAd = async () => {
+    if (!admobService.isReady()) {
+      Alert.alert('انتظر', 'جاري تحميل الإعلان، حاول مرة أخرى بعد قليل');
+      return;
+    }
+
+    setShowingAdMob(true);
+    const result = await admobService.showRewardedAd();
+    
+    if (!result.success) {
+      setShowingAdMob(false);
+      Alert.alert('خطأ', 'فشل عرض الإعلان، حاول مرة أخرى');
+    }
+  };
 
   // تحميل الإعلانات
   useEffect(() => {
