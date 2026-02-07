@@ -533,6 +533,21 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
                 <Text style={styles.visitButtonText}>زيارة الموقع</Text>
               </TouchableOpacity>
             )}
+            
+            {/* زر إعلان AdMob المكافئ */}
+            <TouchableOpacity 
+              style={[
+                styles.admobButton, 
+                !isAdMobReady && styles.admobButtonDisabled
+              ]} 
+              onPress={showAdMobAd}
+              disabled={!isAdMobReady || showingAdMob}
+            >
+              <Ionicons name="gift" size={20} color="#fff" />
+              <Text style={styles.admobButtonText}>
+                {showingAdMob ? 'جاري العرض...' : isAdMobReady ? 'شاهد إعلان واحصل على نقاط!' : 'جاري التحميل...'}
+              </Text>
+            </TouchableOpacity>
           </View>
         </LinearGradient>
       )}
