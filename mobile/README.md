@@ -209,8 +209,8 @@ eas submit -p android
 
 ## 📞 الدعم والمساعدة
 
-- **الموقع:** https://rewards-video-viewer.preview.emergentagent.com
-- **API Docs:** https://rewards-video-viewer.preview.emergentagent.com/docs
+- **الموقع:** https://app-store-build-3.preview.emergentagent.com
+- **API Docs:** https://app-store-build-3.preview.emergentagent.com/docs
 
 ---
 

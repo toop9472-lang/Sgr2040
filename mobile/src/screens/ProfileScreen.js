@@ -73,7 +73,7 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
   };
 
   const handlePrivacy = () => {
-    Linking.openURL('https://rewards-video-viewer.preview.emergentagent.com/privacy-policy.html');
+    Linking.openURL('https://app-store-build-3.preview.emergentagent.com/privacy-policy.html');
   };
 
   const confirmLogout = () => {

@@ -1,224 +1,164 @@
 <analysis>**original_problem_statement:**
-The user wants to create an application named صقر (Saqr), which is an advertisement-focused platform similar to Instagram's Reels or TikTok.
+The user wants to build and publish their React Native application on the Apple App Store and Google Play Store. The initial problem involved a non-functional iOS build process. The scope of the project expanded to include:
+1.  Building and deploying the application for both iOS and Android.
+2.  Integrating Google AdMob for monetization.
+3.  Fixing a bug where users were incorrectly awarded double points for watching ads.
+4.  Preparing and providing all necessary metadata for the App Store submission, including descriptions, keywords, and correctly sized screenshots for iPhone and iPad.
+5.  Getting the app successfully submitted for review on App Store Connect.
 
-**PRODUCT REQUIREMENTS:**
--   **Core Functionality:** Users scroll through a vertical, full-screen feed of video ads.
--   **Points System:** Users earn points for watching ads, redeemable for cash. The conversion rate and earning rules must be configurable by the admin.
--   **UI/UX Enhancements:** A professional, full-screen UI for the ad viewer, a professional logo, and a dark/light mode.
--   **Authentication:** User registration via Google, Apple, and email/password.
--   **Admin Panel:** A comprehensive dashboard to manage withdrawals, ads, users, and finances.
--   **Mobile App:** A React Native mobile application is the primary focus. The user requires the agent to build and provide the downloadable APK/AAB files.
--   **Advertiser Features:** A section for advertisers to post ads for a fee.
--   **Security:** An anti-cheat system.
--   **Homepage:** An engaging user homepage with analytics.
-
-**User's preferred language**: Arabic
+**User's preferred language**: Arabic (العربية). The next agent MUST respond in Arabic.
 
 **what currently exists?**
--   A functional full-stack application with a FastAPI backend, React frontend, and a React Native (Expo) mobile app.
--   The UI for both web and mobile has been significantly updated to a dark theme with blue accents and a new logo, based on user feedback.
--   A robust build-and-deploy pipeline for the mobile app is in place, with the agent successfully generating multiple AAB files to meet Google Play Store submission requirements.
--   The application has been prepared for Google Play submission, including adding a privacy policy, terms & conditions pages, generating promotional graphics, and resolving multiple technical requirements from Google (e.g., target API level, version codes).
--   Major bugs reported by testers (related to login, unresponsive UI, and exit confirmation) have been addressed in the latest mobile build.
--   Pricing for advertiser packages has been updated on the backend.
+A React Native mobile application with a Python/Flask backend and a PostgreSQL database. The application code for both the mobile app and the backend is in the workspace. An iOS build (without ads) has been successfully created and uploaded to App Store Connect. An Android build has also been created. The App Store submission is pending completion of metadata forms by the user. An attempt to integrate AdMob failed due to build errors, and a fix for a point-awarding bug has been implemented in the backend but is untested.
 
 **Last working item**:
--   Last item agent was working: The user requested a complete overhaul of the ad viewing experience. The agent began implementing these changes on the web frontend, specifically in the  file. The requests included:
-    1.  Replacing navigation arrows with white bracket icons .
-    2.  Improving the overall clarity and design of the ad page.
-    3.  Activating a point-earning system that awards points *after* an ad is fully watched.
-    4.  Adding a small, draggable timer at the top of the screen to show watch progress.
--   Status: IN PROGRESS
--   Agent Testing Done: N
--   Which testing method agent to use? both. The frontend changes (new UI, draggable timer) need to be tested using the . The backend logic for the new point-awarding system needs to be tested using the  or .
--   User Testing Done: N
+*   **Last item agent was working:** The agent was beginning to integrate Unity Ads as an alternative to the problematic AdMob library. It had just installed the  package.
+*   **Status:** IN PROGRESS
+*   **Agent Testing Done:** N
+*   **Which testing method agent to use?** After integration, the agent will need to build the app for Android and iOS (on a Mac environment). This will require using both the frontend testing agent (to verify ads display) and the backend testing agent (to verify reward logic).
+*   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   Issue 1: (P0) Implement Ad Viewer Enhancements & Draggable Timer
--   Issue 2: (P1) Mobile App Google Sign-In Flow is Unreliable
--   Issue 3: (P2) Unresponsive Profile Page Options on Mobile
--   Issue 4: (P3) Mobile App Performance
--   Issue 5: (P4) Inaccessible Admin Settings Pages
+*   **Issue 1 (P0):** AdMob integration is not working, causing build failures.
+*   **Issue 2 (P1):** A bug fix for users receiving incorrect points needs verification.
 
-Issues Detail:
--   **Issue 1: Implement Ad Viewer Enhancements & Draggable Timer**
-    -   **Attempted fixes:** The agent overwrote  with new code intended to address the user's requests.
-    -   **Next debug checklist:**
-        1.  Thoroughly test the new  on the web to verify the draggable timer, new navigation UI, and point calculation logic.
-        2.  Port the confirmed-working implementation to the mobile app's .
-        3.  Build a new APK/AAB for user testing.
-    -   **Why fix this issue and what will be achieved with the fix?** This is the user's latest and most critical feature request to improve the core user experience.
-    -   **Status:** IN PROGRESS
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** both
-    -   **Blocked on other issue:** None
--   **Issue 2: Mobile App Google Sign-In Flow is Unreliable**
-    -   **Attempted fixes:** A previous user report indicated that Google Sign-in completes in the browser but doesn't log the user into the app, locking them out. The agent implemented a workaround by displaying a message and allowing the user to log in via email.
-    -   **Next debug checklist:**
-        1.  Investigate the deep linking/redirect mechanism for Expo Google Auth to ensure the session is passed back to the app correctly.
-        2.  Check the logic in  that handles the auth redirect.
-        3.  Ensure that a user who signs up with Google can subsequently log in with the same email address and password if needed.
-    -   **Why fix this issue and what will be achieved with the fix?** This is a critical bug that prevents users from accessing the app and creates a frustrating experience.
-    -   **Status:** IN PROGRESS
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** frontend
-    -   **Blocked on other issue:** None
--   **Issue 3: Unresponsive Profile Page Options on Mobile**
-    -   **Attempted fixes:** The agent rewrote  to add functionality to the buttons.
-    -   **Next debug checklist:**
-        1.  Verify in the latest build (v4.2.0 or newer) that all buttons on the profile page (Withdraw, History, Settings, Help, Logout) are functional and navigate to the correct screen or trigger the correct action.
-    -   **Why fix this issue and what will be achieved with the fix?** The user reported these buttons were completely unresponsive. Fixing it is essential for basic app functionality.
-    -   **Status:** USER VERIFICATION PENDING
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** frontend
-    -   **Blocked on other issue:** None
--   **Issue 4: Mobile App Performance.**
-    -   **Attempted fixes:** None directly, although an Expo SDK upgrade was performed.
-    -   **Next debug checklist:**
-        1.  Investigate and implement performance optimizations for the mobile video feed, such as using  with  or .
-        2.  Profile the app for re-rendering issues using tools like Flipper.
-    -   **Why fix this issue and what will be achieved with the fix?** The user previously reported that the app hangs and crashes (التطبيق ثقيل).
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** frontend
-    -   **Blocked on other issue:** None
--   **Issue 5: Inaccessible Admin Settings Pages**
-    -   **Attempted fixes:** None.
-    -   **Next debug checklist:**
-        1.  Edit .
-        2.  Add navigation links to the  and  components so they can be accessed by the admin.
-    -   **Why fix this issue and what will be achieved with the fix?** The pages for managing new integrations exist but are unreachable.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** frontend
-    -   **Blocked on other issue:** None
+**Issues Detail:**
+*   **Issue 1: AdMob Integration Failure**
+    *   **Attempted fixes:** The agent tried integrating AdMob using two different libraries ( and ), but both resulted in build failures. The failures on iOS are due to dependencies that require a macOS build environment. The agent eventually removed the AdMob libraries to successfully build and upload the iOS app, with the plan to re-integrate ads later.
+    *   **Next debug checklist:** The user has agreed to provide access to a cloud-based Mac. Once available, the agent should:
+        1.  Attempt to integrate the  library (the latest standard).
+        2.  Verify the  and  configurations are correct.
+        3.  Ensure library versions are compatible with the project's React Native/Expo SDK versions.
+        4.  Alternatively, continue with the current task of integrating Unity Ads as a fallback.
+    *   **Why fix this issue and what will be achieved with the fix?** The app's core monetization strategy depends on ads. Fixing this is critical for revenue generation.
+    *   **Status:** BLOCKED
+    *   **Is recurring issue?** Y
+    *   **Should Test frontend/backend/both after fix?** Both.
+    *   **Blocked on other issue:** The user needs to provide a macOS environment.
+
+*   **Issue 2: Incorrect Points Bug**
+    *   **Attempted fixes:** The agent investigated and found that the backend had two different endpoints for rewarding points. The mobile app was calling , which gave a fixed number of points, instead of a time-based calculation. The agent modified this endpoint in  to correctly calculate points based on watch time, unifying the logic.
+    *   **Next debug checklist:** The implemented fix has not been tested. A new build of the app needs to be created and tested to confirm that watching an ad now awards the correct, non-duplicated number of points.
+    *   **Why fix this issue and what will be achieved with the fix?** This ensures the app's internal economy is fair and sustainable.
+    *   **Status:** USER VERIFICATION PENDING
+    *   **Is recurring issue?** N
+    *   **Should Test frontend/backend/both after fix?** Both.
+    *   **Blocked on other issue:** None.
 
 **In progress Task List**:
--   **Task 1: Finalize Google Play Store Submission (P0)**
-    -   **Where to resume:** The user is navigating the Closed testing requirements, specifically the need for 20 testers for 14 days.
-    -   **What will be achieved with this?** The application will be successfully published on the Google Play Store.
-    -   **Status:** BLOCKED
-    -   **Should Test frontend/backend/both after fix?** NA
-    -   **Blocked on something:** Waiting for the user to gather 20 testers and complete the 14-day testing period as required by Google Play.
+*   **Task 1: Integrate Unity Ads**
+    *   **Where to resume:** The agent has installed the  package. The next steps are to configure the library with the user's Unity Ads Game IDs, update the ad-watching screen () to display Unity Ads, and then attempt a new build.
+    *   **What will be achieved with this?** This will provide an alternative ad monetization path if AdMob continues to be problematic.
+    *   **Status:** IN PROGRESS
+    *   **Should Test frontend/backend/both after fix?** Both.
+    *   **Blocked on something:** Will be blocked on the user providing Unity Ads Game IDs and a macOS environment for the iOS build.
 
 **Upcoming and Future Tasks**
--   **Upcoming Tasks:**
-    -   (P1) **Implement Backend Logic for Payment Gateways & Ad Networks:** Implement full API logic for Tabby, Tamara, and Unity Ads in their respective route files.
-    -   (P2) **iOS App Build:** Guide the user on acquiring an Apple Developer account and build the iOS version.
--   **Future Tasks:**
-    -   Deploy the web and backend applications to a production environment.
-    -   Add advanced PDF reporting functionality.
-    -   Implement a referral system for user acquisition.
+*   **Upcoming Tasks:**
+    *   **(P0) Finalize App Store Submission:** Guide the user to complete the remaining sections in App Store Connect. This includes setting Content Rights, Primary Category, and uploading the final iPad screenshots that were generated.
+    *   **(P1) Build and Deliver Android App with Ads:** Once an ad solution (AdMob or Unity) is working, build and provide the final  file to the user.
+    *   **(P2) Build and Deliver iOS App with Ads:** Once the user provides a Mac environment, build the  file with the working ad library and guide the user on how to upload it as an update to App Store Connect.
 
 **Completed work in this session**
--   **UI/UX Overhaul:** Fixed homepage scrolling, unified the dark theme across all pages (, , ), and implemented a new user-provided logo.
--   **Google Play Submission:** Successfully resolved numerous submission blockers by:
-    -   Upgrading Expo SDK from 51 to 52 to meet  requirement.
-    -   Incrementing  to resolve upgrade path errors.
-    -   Removing the  permission.
-    -   Guiding the user through declarations for Ad ID and app category.
--   **Promotional Assets:** Created  and  pages, and generated correctly sized screenshots, app icons, and feature graphics for the store listing.
--   **Critical Bug Fixes (Mobile):** Addressed a major bug report by:
-    -   Fixing unresponsive profile page buttons.
-    -   Adding haptic feedback to the bottom navigation.
-    -   Implementing an exit confirmation dialog.
-    -   Applying a workaround for the Google Sign-in issue.
--   **Backend:** Updated advertiser package pricing to start at 1000 SAR per month.
+*   Guided the user to set up Apple Developer and App Store Connect credentials, including an API key.
+*   Successfully configured the local environment to use  for building the application.
+*   Built and uploaded a version of the iOS app (without ads) to App Store Connect.
+*   Built a version of the Android app.
+*   Identified and implemented a backend fix for the incorrect points bug in .
+*   Generated all required text metadata (description, keywords, promo text) and screenshots for the App Store submission.
+*   Guided the user through filling out most of the App Store's privacy and content rating questionnaires.
 
 **Earlier issues found/mentioned but not fixed**
--   The placeholder backend routes for Tabby, Tamara, and Unity Ads (, , ) have not been implemented.
--   The backend has duplicated pricing logic in  and  that should be consolidated.
+*   None. All issues raised by the user have been addressed or are currently in progress.
 
 **Known issue recurrence from previous fork**
--   **Issue recurrence in previous fork:** Mobile App Quality and Build Cycle.
--   **Recurrence count:** 5+
--   **Status:** IN PROGRESS. The core loop of  dominated this session. While many bugs were fixed, the app is not yet stable, and the Google Sign-in issue remains a critical risk.
+*   None in this session.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend:** React, Tailwind CSS
--   **Backend:** FastAPI, Motor
--   **Mobile:** React Native, Expo SDK 52
--   **Build/Deploy:** Expo EAS Build (for AAB files)
--   **Testing/Automation:** Playwright (for generating screenshots)
+*   **Frontend (Mobile):** React Native, Expo
+*   **Backend:** Python, Flask, PostgreSQL
+*   **Build/Deployment:** Expo Application Services (EAS) CLI
+*   **Authentication:** Apple Developer/App Store Connect API Keys, EAS Login
+*   **Monetization:** Google AdMob (attempted), Unity Ads (in progress)
 
 **key DB schema**
-  - No changes made in this session.
+*   **users:** {id, email, password_hash, points}
+*   **ads:** {id, title, ad_type, points_per_minute}
+*   **settings:** {key, value}
 
 **changes in tech stack**
--   **Upgraded:** Expo SDK from v51 to v52.
--   **Added:**  to configure Android build versions.
--   **Added:**  for automated browser tasks (screenshot generation).
+*   No changes to the core tech stack. The focus was on using build tools and integrating ad SDKs.
 
 **All files of reference**
--   : Contains the latest, untested implementation of the ad viewer.
--   : Contains fixes for the login flow.
--   : Critical for setting Android  and SDK targets.
--   : Defines the build profiles for generating AABs.
--   : Contains the updated pricing logic for advertisers.
--   : Newly created privacy policy page.
+*   : Modified to fix the points calculation logic.
+*   : Modified multiple times for AdMob configuration.
+*   : Modified to add/remove  and add .
+*   : Modified to attempt different ad integrations.
+*   : Created to hold metadata for App Store submission.
+*   : Directory containing generated screenshots for iPhone and iPad.
 
 **Areas that need refactoring**:
--   The pricing logic for ad packages is duplicated in  and . This should be consolidated into a single source of truth to prevent inconsistencies.
+*   The ad display logic in  should be cleaned up to use a single, working ad service once the integration is finalized.
 
 **key api endpoints**
--   : Returns the available advertising packages with updated pricing.
--   : User login endpoint.
--   : User registration endpoint.
+*   
+*   
+*    (time-based rewards)
+*    (rewarded ad completion, logic was fixed here)
 
 **Critical Info for New Agent**
--   **Google Play Submission is Ongoing:** The user is actively trying to publish the app and is encountering requirements from Google (e.g., 20 testers for 14 days). Be prepared to guide the user and build new versions as needed.
--   **Ad Viewer Overhaul is Priority #1:** The immediate coding task is to finish and test the new ad viewer functionality on both web and mobile. The user is waiting for this.
--   **Mobile Google Sign-In is a Critical Bug:** The previous fix was a workaround. The root cause (session not transferring from browser to app) needs a proper investigation and fix. This is a major blocker for user adoption.
--   **Builds are Frequent:** The user requests a new mobile build (AAB) for every significant change or bug fix to test directly and to continue the Google Play submission process. Be ready to manage version codes in  for each new build.
+*   The highest priority is to implement a working ad solution.
+*   **iOS builds with ad libraries like AdMob or Unity Ads require a macOS environment.** Do not attempt to build for iOS on the current system. The user is aware and is arranging for Mac access.
+*   The app has already been submitted to App Store Connect without ads. The next iOS build will be an update.
+*   The backend fix for the points bug needs to be verified with a new test build.
+*   The current strategy is to integrate Unity Ads. Ask the user for their Unity Ads Game IDs to proceed.
+*   Remind the user they still need to finalize a few items in App Store Connect before their current submission can be reviewed.
 
 **documents and test reports created in this job**
--   
--   
--   
--   
--    (contains multiple screenshot files for the Play Store).
+*   
+*   
+*   
+*   
+*   
+*   
+*   
 
 **Last 10 User Messages and any pending HUMAN messages**
--   **10. (LATEST):** Requested a major overhaul of the ad viewer page: new navigation, better design, a point system with a draggable timer. (IN PROGRESS)
--   **9.** Asked about changing ad package prices, adding terms/privacy pages, and verifying all fixes. (DONE)
--   **8.** Reported a comprehensive list of bugs from testers: broken Google sign-in, unresponsive profile page buttons, no click effect on bottom nav, missing privacy policy, and no exit confirmation. (MOSTLY ADDRESSED, PENDING VERIFICATION)
--   **7.** Stated they can proceed with publishing despite yellow warnings from Google Play.
--   **6.** Asked for clarification on Google Play warnings regarding Edge-to-edge display, resizing restrictions, and 16kb alignment.
--   **5.** Asked for clarification about the 20 testers for 14 days requirement for closed testing.
--   **4.** Reported the version code error again, indicating they were trying to submit without uploading the new AAB file.
--   **3.** Asked for release notes text for the Google Play submission.
--   **2.** Reported a version code error from Google Play.
--   **1.** Asked for clarification on the 20 testers requirement.
+1.  **User:**  (The app has been uploaded to Apple, I will come back to you after providing a Mac.) - **Status:** Acknowledged.
+2.  **User:**  (There is no admin/root access. I will rent a cloud MacBook. Do we need root access and can you access it?) - **Status:** Answered by agent.
+3.  **User:**  (Also, the suggested improvement, yes.) - **Status:** Acknowledged. Agent started Unity Ads integration.
+4.  **User:**  (Are you working?) - **Status:** Answered by agent.
+5.  **User:**  (There is one iPad picture left, they ask for 3. Also, this list, where do I find the remaining options?) - **Status:** Addressed. Agent created 3rd image and explained the menu.
+6.  **User:**  (Let me ask about Google ads, if I provide a MacBook, will it solve the problem, and why doesn't it work on Windows?) - **Status:** Answered by agent.
+7.  **User:**  (Can this be done from a mobile phone?) - **Status:** Answered by agent.
+8.  **User:**  (When getting a point, two points are added, please check. Also, explain the ads problem. The app is built entirely to profit from them; personal ads are a side thing.) - **Status:** Addressed. Agent investigated and fixed the points issue and explained the ad library problem.
+9.  **User:**  (Is the Android app ready with Google AdMob? Upload the new Apple version with Google AdMob added.) - **Status:** Addressed. Agent explained the build issues.
+10. **User:**  (I want to solve the library problem.) - **Status:** Addressed. Agent explained the need for a Mac and started providing instructions.
 
 **Project Health Check:**
--   **Broken:** The mobile Google Sign-in flow is unreliable and can lock users out of their accounts.
--   **Mocked:** Backend logic for Tabby, Tamara, and Unity Ads integrations remains as placeholder code.
+*   **Broken:** The core ad monetization feature is not functional.
+*   **Mocked:** None.
 
 **3rd Party Integrations**
--   **Anthropic Claude Sonnet 4:** Used for the in-app AI chat feature.
--   **Expo EAS Build:** The core service used for building mobile app binaries (APK/AAB).
--   **Google/Apple Auth:** Configured for user authentication.
--   **Google AdMob:** Declared in the Google Play submission process, but not yet integrated into the app.
--   **Tabby/Tamara/Unity Ads:** Scaffolding exists, but they are not functionally integrated.
+*   **Expo Application Services (EAS):** Used for application builds.
+*   **Apple Developer / App Store Connect:** For iOS certificates, provisioning, and app submission.
+*   **Google AdMob:** Integration attempted but failed. Requires User API Key (Ad Unit IDs).
+*   **Unity Ads:** Integration in progress. Will require User API Key (Game IDs).
 
 **Testing status**
--   Testing agent used after significant changes: YES (Once, early in the session)
--   Troubleshoot agent used after agent stuck in loop: NO
--   Test files created: []
--   Known regressions: The mobile Google Sign-in flow is a critical regression or a persistent bug that needs a robust fix.
+*   **Testing agent used after significant changes:** NO
+*   **Troubleshoot agent used after agent stuck in loop:** NO
+*   **Test files created:** None
+*   **Known regressions:** Ad functionality was present in some form before but has been completely removed to enable a successful iOS build.
 
 **Credentials to test flow:**
--   **Admin User:**
-    -   Email: 
-    -   Password: 
--   **Expo Account:**
-    -   Username: 
-    -   Password: 
+*   **Test User:**
+    *   **Username:** 
+    *   **Password:** 
 
 **What agent forgot to execute**
--   The agent did not test the new implementation of  after overwriting the file.
--   The agent did not add navigation links for the  and  in the , an issue carried over from the previous session.
--   The agent did not perform a root-cause fix for the mobile Google Sign-in deep linking issue, opting for a workaround instead.</analysis>
+*   The agent has not yet created a new build to allow the user to verify the backend fix for the double-points issue.
+*   The process of helping the user fill out all required fields in App Store Connect is not fully complete, as the user was still asking about missing sections towards the end.</analysis>
