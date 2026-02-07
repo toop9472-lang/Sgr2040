@@ -12,7 +12,6 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.23.1",
     "expo": "^52.0.0",
-    "expo-ads-admob": "^13.0.0",
     "expo-av": "~15.0.2",
     "expo-blur": "~14.0.3",
     "expo-build-properties": "^1.0.10",
