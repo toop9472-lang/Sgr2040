@@ -20,14 +20,6 @@ import api from '../services/api';
 import storage from '../services/storage';
 import colors from '../styles/colors';
 
-// Try to import AdMob (may not be available in Expo Go)
-let adMobService = null;
-try {
-  adMobService = require('../services/admob').default;
-} catch (e) {
-  console.log('AdMob not available in this build');
-}
-
 const { width, height } = Dimensions.get('window');
 
 // إعلانات تجريبية
