@@ -51,12 +51,24 @@ class RefreshTokenRequest(BaseModel):
 
 
 @router.post('/signin', response_model=dict)
-async def signin(credentials: EmailLogin):
+async def signin(credentials: EmailLogin, request: Request):
     """
     Unified sign in - checks both admins and users
-    If admin credentials, returns admin role for redirect to admin dashboard
+    مع حماية من هجمات Brute Force
     """
     db = get_db()
+    
+    # الحصول على معلومات الطلب
+    client_ip = request.client.host if request.client else None
+    user_agent = request.headers.get('user-agent', '')
+    
+    # التحقق من حد المحاولات
+    allowed, error_msg, remaining = await check_login_allowed(credentials.email, client_ip)
+    if not allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=error_msg
+        )
     
     # First, check if this is an admin
     admin = await db.admins.find_one({'email': credentials.email}, {'_id': 0})
@@ -71,17 +83,21 @@ async def signin(credentials: EmailLogin):
         if password_valid:
             admin_id = admin.get('id', admin['email'])
             
+            # تسجيل محاولة ناجحة
+            await record_login_attempt(credentials.email, True, client_ip, user_agent)
+            
             # Update last login
             await db.admins.update_one(
                 {'email': credentials.email},
                 {'$set': {'last_login': datetime.utcnow()}}
             )
             
-            # Create token
-            token = create_access_token(admin_id)
+            # Create tokens
+            access_token, refresh_token = create_token_pair(admin_id, is_admin=True)
             
             return {
-                'token': token,
+                'token': access_token,
+                'refresh_token': refresh_token,
                 'role': 'admin',
                 'user': {
                     'id': admin_id,
@@ -102,9 +118,20 @@ async def signin(credentials: EmailLogin):
             password_valid = False
         
         if password_valid:
+            # التحقق من حالة الحساب
+            user_status = user.get('status', 'active')
+            if user_status == 'banned':
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail='تم إيقاف حسابك. تواصل مع الدعم الفني'
+                )
+            
+            # تسجيل محاولة ناجحة
+            await record_login_attempt(credentials.email, True, client_ip, user_agent)
+            
             # Handle both 'id' and 'user_id' fields for backward compatibility
             user_id = user.get('id') or user.get('user_id')
-            token = create_access_token(user_id)
+            access_token, refresh_token = create_token_pair(user_id)
             
             created_at = user.get('created_at')
             if isinstance(created_at, datetime):
@@ -113,7 +140,8 @@ async def signin(credentials: EmailLogin):
                 joined_date = str(created_at) if created_at else datetime.utcnow().isoformat()
             
             return {
-                'token': token,
+                'token': access_token,
+                'refresh_token': refresh_token,
                 'role': 'user',
                 'user': {
                     'id': user_id,
@@ -125,6 +153,9 @@ async def signin(credentials: EmailLogin):
                     'joined_date': joined_date
                 }
             }
+    
+    # تسجيل محاولة فاشلة
+    await record_login_attempt(credentials.email, False, client_ip, user_agent)
     
     # No user found or wrong password
     raise HTTPException(
