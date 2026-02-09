@@ -1,5 +1,5 @@
 // API Service - Lightweight API handler with enhanced security
-const API_URL = 'https://app-store-build-3.preview.emergentagent.com';
+const API_URL = 'https://react-native-admob.preview.emergentagent.com';
 
 // Token storage
 let accessToken = null;

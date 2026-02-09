@@ -177,7 +177,7 @@ eas build --platform ios --profile production
 
 ### API URL:
 ```
-https://app-store-build-3.preview.emergentagent.com
+https://react-native-admob.preview.emergentagent.com
 ```
 
 ---
