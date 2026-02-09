@@ -209,8 +209,8 @@ eas submit -p android
 
 ## 📞 الدعم والمساعدة
 
-- **الموقع:** https://app-store-build-3.preview.emergentagent.com
-- **API Docs:** https://app-store-build-3.preview.emergentagent.com/docs
+- **الموقع:** https://react-native-admob.preview.emergentagent.com
+- **API Docs:** https://react-native-admob.preview.emergentagent.com/docs
 
 ---
 
