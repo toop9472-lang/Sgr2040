@@ -65,7 +65,7 @@
         "backgroundColor": "#0a0a0f"
       },
       "package": "com.saqr.rewards",
-      "versionCode": 31,
+      "versionCode": 32,
       "permissions": ["INTERNET", "VIBRATE", "AD_ID"],
       "blockedPermissions": ["android.permission.RECORD_AUDIO"]
     },
