@@ -67,10 +67,7 @@
       "package": "com.saqr.rewards",
       "versionCode": 31,
       "permissions": ["INTERNET", "VIBRATE", "AD_ID"],
-      "blockedPermissions": ["android.permission.RECORD_AUDIO"],
-      "config": {
-        "googleMobileAdsAppId": "ca-app-pub-5132559433385403~6910358704"
-      }
+      "blockedPermissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
       "favicon": "./assets/logo_saqr.png"
