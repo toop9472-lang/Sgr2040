@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Request
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from models.user import User, UserCreate, UserResponse
-from auth.jwt_handler import create_access_token
+from auth.jwt_handler import create_access_token, create_token_pair, refresh_access_token
 from auth.dependencies import get_current_user_id
+from auth.password_utils import validate_password_strength, get_password_strength_score
+from auth.rate_limiter import check_login_allowed, record_login_attempt
 from passlib.hash import bcrypt
 from datetime import datetime
 import os
@@ -26,6 +28,26 @@ class EmailRegister(BaseModel):
     email: EmailStr
     password: str
     name: str
+    
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v):
+        is_valid, errors = validate_password_strength(v)
+        if not is_valid:
+            raise ValueError(errors[0])
+        return v
+    
+    @field_validator('name')
+    @classmethod
+    def validate_name(cls, v):
+        if len(v.strip()) < 2:
+            raise ValueError('الاسم يجب أن يكون حرفين على الأقل')
+        if len(v) > 50:
+            raise ValueError('الاسم طويل جداً')
+        return v.strip()
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
 
 
 @router.post('/signin', response_model=dict)
