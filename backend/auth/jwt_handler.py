@@ -52,6 +52,23 @@ def decode_access_token(token: str) -> Optional[dict]:
     """
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        # التحقق من نوع التوكن
+        if payload.get('type') not in ['access', 'refresh', None]:  # None للتوافق مع التوكنات القديمة
+            return None
+        return payload
+    except jwt.ExpiredSignatureError:
+        return None
+    except jwt.InvalidTokenError:
+        return None
+
+def decode_refresh_token(token: str) -> Optional[dict]:
+    """
+    Decode and verify refresh token
+    """
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        if payload.get('type') != 'refresh':
+            return None
         return payload
     except jwt.ExpiredSignatureError:
         return None
@@ -65,4 +82,21 @@ def get_user_id_from_token(token: str) -> Optional[str]:
     payload = decode_access_token(token)
     if payload:
         return payload.get('user_id')
+    return None
+
+def is_token_valid(token: str) -> bool:
+    """
+    Check if token is valid and not expired
+    """
+    return decode_access_token(token) is not None
+
+def refresh_access_token(refresh_token: str) -> Optional[str]:
+    """
+    Generate new access token using refresh token
+    """
+    payload = decode_refresh_token(refresh_token)
+    if payload:
+        user_id = payload.get('user_id')
+        if user_id:
+            return create_access_token(user_id)
     return None
