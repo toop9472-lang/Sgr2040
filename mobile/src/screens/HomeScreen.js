@@ -1,5 +1,6 @@
 // Home Screen - Dashboard with stats and quick actions
-import React, { useState, useEffect } from 'react';
+// Performance optimized with React.memo and useMemo
+import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import {
   View,
   Text,
@@ -8,6 +9,7 @@ import {
   StyleSheet,
   Dimensions,
   Image,
+  RefreshControl,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import api from '../services/api';
@@ -15,33 +17,78 @@ import colors from '../styles/colors';
 
 const { width } = Dimensions.get('window');
 
-const HomeScreen = ({ user, onNavigateToAds, settings }) => {
-  const [currentTip, setCurrentTip] = useState(0);
+// Memoized Tip Component for better performance
+const TipItem = memo(({ icon, text }) => (
+  <View style={styles.tipContent}>
+    <Text style={styles.tipIcon}>{icon}</Text>
+    <Text style={styles.tipText}>{text}</Text>
+  </View>
+));
 
-  const tips = [
+// Memoized Stats Card
+const StatsCard = memo(({ icon, value, label, color }) => (
+  <View style={styles.statCard}>
+    <Text style={styles.statIcon}>{icon}</Text>
+    <Text style={[styles.statValue, { color }]}>{value}</Text>
+    <Text style={styles.statLabel}>{label}</Text>
+  </View>
+));
+
+const HomeScreen = ({ user, onNavigateToAds, settings, onRefresh }) => {
+  const [currentTip, setCurrentTip] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Memoized tips array
+  const tips = useMemo(() => [
     { icon: '💡', text: 'شاهد 10 إعلانات = 50 نقطة!' },
     { icon: '🎯', text: 'كل 500 نقطة = 1 دولار' },
     { icon: '⚡', text: 'أكمل التحديات للمزيد!' },
     { icon: '🏆', text: 'تحدى نفسك يومياً' },
     { icon: '🎁', text: 'مكافآت يومية للنشطين' },
-  ];
+  ], []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTip((prev) => (prev + 1) % tips.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [tips.length]);
 
-  const userPoints = user?.points || 0;
-  const pointsPerDollar = settings?.points_per_dollar || 500;
-  const userBalance = (userPoints / pointsPerDollar).toFixed(2);
-  const pointsPerAd = settings?.points_per_ad || 5;
-  const dailyLimit = settings?.daily_limit || 50;
-  const watchedToday = user?.watched_today || 0;
+  // Memoized calculations
+  const userPoints = useMemo(() => user?.points || 0, [user?.points]);
+  const pointsPerDollar = useMemo(() => settings?.points_per_dollar || 500, [settings?.points_per_dollar]);
+  const userBalance = useMemo(() => (userPoints / pointsPerDollar).toFixed(2), [userPoints, pointsPerDollar]);
+  const pointsPerAd = useMemo(() => settings?.points_per_ad || 5, [settings?.points_per_ad]);
+  const dailyLimit = useMemo(() => settings?.daily_limit || 50, [settings?.daily_limit]);
+  const watchedToday = useMemo(() => user?.watched_today || 0, [user?.watched_today]);
+  const remainingAds = useMemo(() => Math.max(0, dailyLimit - watchedToday), [dailyLimit, watchedToday]);
+  const progressPercent = useMemo(() => Math.min(100, (watchedToday / dailyLimit) * 100), [watchedToday, dailyLimit]);
+
+  // Refresh handler
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    if (onRefresh) await onRefresh();
+    setRefreshing(false);
+  }, [onRefresh]);
+
+  // Navigate handler
+  const handleNavigateToAds = useCallback(() => {
+    if (onNavigateToAds) onNavigateToAds();
+  }, [onNavigateToAds]);
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView 
+      style={styles.container} 
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          tintColor={colors.primary}
+          colors={[colors.primary]}
+        />
+      }
+    >
       <View style={styles.content}>
         {/* App Logo and Name */}
         <View style={styles.logoHeader}>
