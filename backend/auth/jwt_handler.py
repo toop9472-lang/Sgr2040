@@ -1,23 +1,50 @@
-from datetime import datetime, timedelta
-from typing import Optional
+from datetime import datetime, timedelta, timezone
+from typing import Optional, Tuple
 import jwt
 import os
+import secrets
 
-JWT_SECRET = os.getenv('JWT_SECRET', 'saqr_secret_key_change_in_production')
+JWT_SECRET = os.getenv('JWT_SECRET', secrets.token_hex(32))
 JWT_ALGORITHM = 'HS256'
-JWT_EXPIRATION_HOURS = 24 * 30  # 30 days
+JWT_ACCESS_TOKEN_HOURS = 24  # 24 ساعة للـ access token
+JWT_REFRESH_TOKEN_DAYS = 30  # 30 يوم للـ refresh token
 
-def create_access_token(user_id: str) -> str:
+def create_access_token(user_id: str, is_admin: bool = False) -> str:
     """
-    Create JWT access token for user
+    Create JWT access token for user - صالح 24 ساعة
     """
-    expiration = datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS)
+    expiration = datetime.now(timezone.utc) + timedelta(hours=JWT_ACCESS_TOKEN_HOURS)
     payload = {
         'user_id': user_id,
+        'type': 'access',
+        'is_admin': is_admin,
         'exp': expiration,
-        'iat': datetime.utcnow()
+        'iat': datetime.now(timezone.utc),
+        'jti': secrets.token_hex(16)  # معرف فريد للـ token
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+def create_refresh_token(user_id: str) -> str:
+    """
+    Create JWT refresh token - صالح 30 يوم
+    """
+    expiration = datetime.now(timezone.utc) + timedelta(days=JWT_REFRESH_TOKEN_DAYS)
+    payload = {
+        'user_id': user_id,
+        'type': 'refresh',
+        'exp': expiration,
+        'iat': datetime.now(timezone.utc),
+        'jti': secrets.token_hex(16)
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+def create_token_pair(user_id: str, is_admin: bool = False) -> Tuple[str, str]:
+    """
+    Create both access and refresh tokens
+    """
+    access_token = create_access_token(user_id, is_admin)
+    refresh_token = create_refresh_token(user_id)
+    return access_token, refresh_token
 
 def decode_access_token(token: str) -> Optional[dict]:
     """
