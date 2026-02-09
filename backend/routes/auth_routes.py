@@ -165,11 +165,20 @@ async def signin(credentials: EmailLogin, request: Request):
 
 
 @router.post('/register', response_model=dict)
-async def register_email(data: EmailRegister):
+async def register_email(data: EmailRegister, request: Request):
     """
     Register new user with email/password
+    مع التحقق من قوة كلمة المرور
     """
     db = get_db()
+    
+    # التحقق من قوة كلمة المرور
+    is_valid, errors = validate_password_strength(data.password)
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=errors[0]
+        )
     
     # Check if email already exists
     existing = await db.users.find_one({'email': data.email})
@@ -193,6 +202,9 @@ async def register_email(data: EmailRegister):
     # Create user
     user_id = str(uuid.uuid4())
     
+    # الحصول على معلومات الطلب
+    client_ip = request.client.host if request.client else None
+    
     user_doc = {
         'id': user_id,
         'email': data.email,
@@ -204,6 +216,8 @@ async def register_email(data: EmailRegister):
         'points': 0,
         'total_earned': 0,
         'watched_ads': [],
+        'status': 'active',
+        'registration_ip': client_ip,
         'created_at': datetime.utcnow(),
         'updated_at': datetime.utcnow()
     }
@@ -222,11 +236,12 @@ async def register_email(data: EmailRegister):
     
     asyncio.create_task(send_welcome())
     
-    # Create token
-    token = create_access_token(user_id)
+    # Create tokens
+    access_token, refresh_token = create_token_pair(user_id)
     
     return {
-        'token': token,
+        'token': access_token,
+        'refresh_token': refresh_token,
         'role': 'user',
         'user': {
             'id': user_id,
@@ -237,6 +252,49 @@ async def register_email(data: EmailRegister):
             'total_earned': 0,
             'joined_date': user_doc['created_at'].isoformat()
         }
+    }
+
+
+@router.post('/refresh-token', response_model=dict)
+async def refresh_token_endpoint(data: RefreshTokenRequest):
+    """
+    تجديد Access Token باستخدام Refresh Token
+    """
+    new_access_token = refresh_access_token(data.refresh_token)
+    
+    if not new_access_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Refresh token غير صالح أو منتهي الصلاحية'
+        )
+    
+    return {
+        'token': new_access_token,
+        'message': 'تم تجديد التوكن بنجاح'
+    }
+
+
+@router.post('/check-password-strength', response_model=dict)
+async def check_password_strength(password: str):
+    """
+    التحقق من قوة كلمة المرور
+    """
+    is_valid, errors = validate_password_strength(password)
+    score = get_password_strength_score(password)
+    
+    strength = 'ضعيفة'
+    if score >= 80:
+        strength = 'قوية جداً'
+    elif score >= 60:
+        strength = 'قوية'
+    elif score >= 40:
+        strength = 'متوسطة'
+    
+    return {
+        'valid': is_valid,
+        'score': score,
+        'strength': strength,
+        'errors': errors
     }
 
 
