@@ -260,4 +260,4 @@ const styles = StyleSheet.create({
   infoItem: { color: colors.dark.textSecondary, fontSize: 14, marginBottom: 8 },
 });
 
-export default HomeScreen;
+export default memo(HomeScreen);
