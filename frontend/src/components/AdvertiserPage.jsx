@@ -591,7 +591,7 @@ const AdvertiserPage = ({ onNavigate }) => {
             <CardHeader>
               <CardTitle className="text-white">اختر طريقة الدفع</CardTitle>
               <CardDescription className="text-gray-400">
-                المبلغ المطلوب: <strong className="text-[#3b82f6]">{getCurrentPackage()?.amount || createdAd.payment.amount} ريال</strong>
+                المبلغ المطلوب: <strong className="text-[#3b82f6]">{getCurrentPackage()?.amount || createdAd.payment.amount} ﷼</strong>
                 {getCurrentPackage()?.duration_months > 1 && (
                   <span className="text-green-400 text-sm mr-2">
                     (خصم {getCurrentPackage()?.duration_months === 3 ? '10%' : 
