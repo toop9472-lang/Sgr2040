@@ -766,7 +766,7 @@ const AdvertiserPage = ({ onNavigate }) => {
               <div className="space-y-2 text-sm text-gray-700 text-right bg-white rounded-lg p-4 mb-6">
                 <p><strong>رقم الطلب:</strong> {createdAd?.ad?.id}</p>
                 <p><strong>العنوان:</strong> {adData.title}</p>
-                <p><strong>المبلغ:</strong> {createdAd?.payment?.amount || getCurrentPackage()?.amount} ريال</p>
+                <p><strong>المبلغ:</strong> {createdAd?.payment?.amount || getCurrentPackage()?.amount} ﷼</p>
                 <p><strong>الحالة:</strong> قيد المراجعة</p>
               </div>
               <Button
