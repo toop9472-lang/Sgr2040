@@ -18,6 +18,7 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
   const userPoints = user?.points || 0;
   const totalEarned = user?.total_earned || userPoints;
   const dollarValue = (userPoints / 500).toFixed(2);
+  const riyalValue = dollarValue; // Same value in SAR
 
   const handleWithdraw = () => {
     if (userPoints < 500) {
@@ -29,7 +30,7 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
     } else {
       Alert.alert(
         'طلب سحب',
-        `هل تريد سحب $${dollarValue}؟\nسيتم مراجعة طلبك من قبل الإدارة.`,
+        `هل تريد سحب ${riyalValue} ر.س؟\nسيتم مراجعة طلبك من قبل الإدارة.`,
         [
           { text: 'إلغاء', style: 'cancel' },
           { text: 'تأكيد السحب', onPress: () => {
@@ -115,7 +116,7 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
         {/* Balance Card */}
         <View style={styles.balanceCard}>
           <Text style={styles.balanceLabel}>رصيدك الحالي</Text>
-          <Text style={styles.balanceValue}>${dollarValue}</Text>
+          <Text style={styles.balanceValue}>{riyalValue} ر.س</Text>
           <Text style={styles.balancePoints}>{userPoints} نقطة</Text>
           <View style={styles.progressContainer}>
             <View style={[styles.progressBar, { width: `${Math.min((userPoints / 500) * 100, 100)}%` }]} />
