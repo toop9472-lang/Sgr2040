@@ -568,7 +568,7 @@ const AdvertiserPage = ({ onNavigate }) => {
 
                 <div className="bg-[#3b82f6]/10 border border-[#3b82f6]/30 rounded-xl p-4">
                   <p className="text-sm text-[#60a5fa]">
-                    <strong>المبلغ الإجمالي:</strong> {getCurrentPackage()?.amount || 500} ريال
+                    <strong>المبلغ الإجمالي:</strong> {getCurrentPackage()?.amount || 500} ﷼
                   </p>
                 </div>
 
