@@ -179,8 +179,8 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
               </div>
               <p className="text-sm text-gray-400">
                 {isRTL 
-                  ? 'اجمع 500 نقطة لاستبدالها بـ $1'
-                  : 'Collect 500 points to redeem $1'}
+                  ? 'اجمع 500 نقطة لاستبدالها بـ 1 ر.س'
+                  : 'Collect 500 points to redeem 1 SAR'}
               </p>
             </div>
             <div className="flex items-start gap-3">
