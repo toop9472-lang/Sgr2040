@@ -26,6 +26,32 @@ const AuthScreen = ({ onLogin }) => {
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Guest login - تجربة بدون حساب
+  const handleGuestLogin = async () => {
+    setIsLoading(true);
+    try {
+      // Create a guest user object
+      const guestUser = {
+        user_id: 'guest_' + Date.now(),
+        email: 'guest@saqr.app',
+        name: 'زائر',
+        points: 0,
+        total_earned: 0,
+        is_guest: true
+      };
+      
+      // Save guest data locally
+      await storage.setUserData(guestUser);
+      await storage.setToken('guest_token');
+      
+      onLogin(guestUser);
+    } catch (error) {
+      Alert.alert('خطأ', 'حدث خطأ، حاول مرة أخرى');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleEmailAuth = async () => {
     if (!email.trim() || !password.trim()) {
       Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
