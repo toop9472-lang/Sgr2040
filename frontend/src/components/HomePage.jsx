@@ -143,8 +143,8 @@ const HomePage = ({ user, onNavigateToAds }) => {
           <div className="relative z-10 flex items-center justify-between">
             <div>
               <p className="text-white/70 text-sm mb-1">رصيدك الحالي</p>
-              <p className="text-4xl font-bold text-white">{userBalance} ر.س</p>
-              <p className="text-white/60 text-xs mt-2">{userPoints} نقطة = {pointsPerDollar} نقطة/ريال</p>
+              <p className="text-4xl font-bold text-white">${userBalance}</p>
+              <p className="text-white/60 text-xs mt-2">{userPoints} نقطة = {pointsPerDollar} نقطة/دولار</p>
             </div>
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
               <TrendingUp className="w-8 h-8 text-white" />
