@@ -394,7 +394,7 @@ const AdvertiserPage = ({ onNavigate }) => {
                   
                   <div className="text-center">
                     <p className="text-sm text-gray-400 mb-2">{pkg.description}</p>
-                    <p className="text-3xl font-bold text-[#3b82f6]">${pkg.amount}</p>
+                    <p className="text-3xl font-bold text-[#3b82f6]">{pkg.amount} ﷼</p>
                     <p className="text-sm text-gray-500 mt-1">ريال سعودي</p>
                   </div>
                   
