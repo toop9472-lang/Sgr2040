@@ -41,7 +41,7 @@ const HomeScreen = ({ user, onNavigateToAds, settings, onRefresh }) => {
   // Memoized tips array
   const tips = useMemo(() => [
     { icon: '💡', text: 'شاهد 10 إعلانات = 50 نقطة!' },
-    { icon: '🎯', text: 'كل 500 نقطة = 1 دولار' },
+    { icon: '🎯', text: 'كل 500 نقطة = 1 ر.س' },
     { icon: '⚡', text: 'أكمل التحديات للمزيد!' },
     { icon: '🏆', text: 'تحدى نفسك يومياً' },
     { icon: '🎁', text: 'مكافآت يومية للنشطين' },
@@ -117,8 +117,8 @@ const HomeScreen = ({ user, onNavigateToAds, settings, onRefresh }) => {
         <LinearGradient colors={colors.gradients.primary} style={styles.balanceCard}>
           <View style={styles.balanceInfo}>
             <Text style={styles.balanceLabel}>رصيدك الحالي</Text>
-            <Text style={styles.balanceAmount}>${userBalance}</Text>
-            <Text style={styles.balancePoints}>{userPoints} نقطة • {pointsPerDollar} نقطة/دولار</Text>
+            <Text style={styles.balanceAmount}>{userBalance} ر.س</Text>
+            <Text style={styles.balancePoints}>{userPoints} نقطة • {pointsPerDollar} نقطة/ريال</Text>
           </View>
           <View style={styles.balanceIcon}>
             <Text style={styles.balanceIconText}>📈</Text>
@@ -185,7 +185,7 @@ const HomeScreen = ({ user, onNavigateToAds, settings, onRefresh }) => {
           <Text style={styles.sectionTitle}>💰 كيف تكسب؟</Text>
           <Text style={styles.infoItem}>✓ شاهد إعلان كامل = {pointsPerAd} نقاط</Text>
           <Text style={styles.infoItem}>✓ أكمل التحدي اليومي = مكافأة إضافية</Text>
-          <Text style={styles.infoItem}>✓ {pointsPerDollar} نقطة = $1 دولار</Text>
+          <Text style={styles.infoItem}>✓ {pointsPerDollar} نقطة = 1 ر.س</Text>
         </View>
       </View>
     </ScrollView>
