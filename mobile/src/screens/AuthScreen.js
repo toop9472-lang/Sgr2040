@@ -232,6 +232,16 @@ const AuthScreen = ({ onLogin }) => {
               </Text>
             </TouchableOpacity>
 
+            {/* Guest Login - تجربة بدون حساب */}
+            <TouchableOpacity 
+              style={styles.guestBtn} 
+              onPress={handleGuestLogin}
+              disabled={isLoading}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.guestText}>🎮 تجربة التطبيق بدون حساب</Text>
+            </TouchableOpacity>
+
             {/* Privacy Policy Link */}
             <TouchableOpacity 
               style={styles.privacyLink}
