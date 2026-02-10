@@ -99,7 +99,7 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
             <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-gray-400">
-                  {isRTL ? 'التقدم نحو 1 ر.س' : 'Progress to 1 SAR'}
+                  {isRTL ? 'التقدم نحو $1' : 'Progress to $1'}
                 </span>
                 <span className="text-sm font-bold text-[#60a5fa]">
                   {pointsToNextDollar} {isRTL ? 'نقطة متبقية' : 'points remaining'}
