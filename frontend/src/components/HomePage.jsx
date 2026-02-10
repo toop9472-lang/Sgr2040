@@ -271,7 +271,7 @@ const HomePage = ({ user, onNavigateToAds }) => {
           <div className="space-y-2 text-sm">
             <p className={textMutedClass}>✓ شاهد إعلان كامل = <span className="text-green-400">{pointsPerAd} نقاط</span></p>
             <p className={textMutedClass}>✓ أكمل التحدي اليومي = <span className="text-amber-400">مكافأة إضافية</span></p>
-            <p className={textMutedClass}>✓ {pointsPerDollar} نقطة = <span className="text-cyan-400">1 ر.س</span></p>
+            <p className={textMutedClass}>✓ {pointsPerDollar} نقطة = <span className="text-cyan-400">$1 دولار</span></p>
           </div>
         </div>
       </div>
