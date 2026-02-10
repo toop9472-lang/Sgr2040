@@ -438,6 +438,21 @@ const styles = StyleSheet.create({
   registerText: { color: 'rgba(255,255,255,0.6)', fontSize: 14 },
   registerBold: { color: '#60a5fa', fontWeight: 'bold' },
 
+  guestBtn: { 
+    marginTop: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: 'rgba(255,215,0,0.15)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,215,0,0.3)',
+  },
+  guestText: { 
+    color: '#FFD700', 
+    fontSize: 14, 
+    fontWeight: '600' 
+  },
+
   privacyLink: { marginTop: 24 },
   privacyText: { color: 'rgba(255,255,255,0.4)', fontSize: 12, textDecorationLine: 'underline' },
 
