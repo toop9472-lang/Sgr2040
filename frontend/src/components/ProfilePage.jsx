@@ -131,7 +131,7 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
                   <TrendingUp className="text-green-400" size={24} />
                 </div>
                 <div className="text-2xl font-bold text-white">
-                  {((user.totalEarned || user.total_earned || 0) / 500).toFixed(2)} ر.س
+                  ${((user.totalEarned || user.total_earned || 0) / 500).toFixed(2)}
                 </div>
                 <p className="text-xs text-gray-400 mt-1">{t('totalEarned')}</p>
               </div>
