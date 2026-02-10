@@ -164,7 +164,7 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
         </View>
 
         {/* App Version */}
-        <Text style={styles.versionText}>الإصدار 4.1.0</Text>
+        <Text style={styles.versionText}>الإصدار 4.8.0</Text>
       </View>
     </ScrollView>
   );
