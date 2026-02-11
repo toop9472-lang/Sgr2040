@@ -430,6 +430,11 @@ function MainApp() {
                   onNavigate={handleNavigate}
                 />
               )}
+              {currentPage === 'support' && !showFullScreenAds && (
+                <SupportPage 
+                  user={user}
+                />
+              )}
               {currentPage === 'advertiser' && !showFullScreenAds && (
                 <AdvertiserPage 
                   onNavigate={handleNavigate}
