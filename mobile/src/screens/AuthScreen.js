@@ -152,7 +152,7 @@ const AuthScreen = ({ onLogin }) => {
         { 
           text: 'متابعة',
           onPress: () => {
-            Linking.openURL('https://react-native-admob.preview.emergentagent.com/');
+            Linking.openURL('https://saqrpointscom.store/');
           }
         }
       ]
@@ -160,10 +160,15 @@ const AuthScreen = ({ onLogin }) => {
   };
 
   const handleAppleLogin = () => {
+    // Redirect to email login instead of showing error
     Alert.alert(
       'تسجيل الدخول بـ Apple',
-      'هذه الميزة قيد التطوير. يرجى استخدام البريد الإلكتروني للتسجيل.',
-      [{ text: 'حسناً' }]
+      'يرجى استخدام البريد الإلكتروني للتسجيل أو تجربة التطبيق بدون حساب.',
+      [
+        { text: 'تجربة بدون حساب', onPress: handleGuestLogin },
+        { text: 'تسجيل بالبريد', onPress: () => setMode('login') },
+        { text: 'إلغاء', style: 'cancel' }
+      ]
     );
   };
 
