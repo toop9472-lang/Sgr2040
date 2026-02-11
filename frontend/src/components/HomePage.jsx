@@ -87,233 +87,86 @@ const HomePage = ({ user, onNavigateToAds }) => {
   if (isLoading) {
     return (
       <div className={`min-h-screen ${bgClass} flex flex-col items-center justify-center relative overflow-hidden`}>
-        {/* Animated Background */}
-        <div className="absolute inset-0">
-          <motion.div 
-            className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#FFD700]/20 blur-3xl"
-            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-            transition={{ duration: 4, repeat: Infinity }}
-          />
-          <motion.div 
-            className="absolute bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#FFD700]/15 blur-3xl"
-            animate={{ scale: [1.2, 1, 1.2], opacity: [0.2, 0.4, 0.2] }}
-            transition={{ duration: 5, repeat: Infinity }}
-          />
+        <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#3b82f6]/20 blur-3xl"></div>
+        <div className="absolute bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#3b82f6]/15 blur-3xl"></div>
+        <div className="w-24 h-24 rounded-full bg-[#0a0a0f] border-2 border-[#3b82f6]/30 flex items-center justify-center overflow-hidden mb-4 animate-pulse shadow-lg shadow-[#3b82f6]/20">
+          <img src="/logo_saqr.png" alt="صقر" className="w-20 h-20 object-contain" />
         </div>
-        
-        {/* Logo with Glow */}
-        <motion.div 
-          className="relative"
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <div className="absolute inset-0 bg-[#FFD700]/30 rounded-full blur-xl" />
-          <div className="relative w-24 h-24 rounded-full bg-[#0a0a0f] border-2 border-[#FFD700]/50 flex items-center justify-center overflow-hidden shadow-lg shadow-[#FFD700]/30">
-            <img src="/logo_saqr.png" alt="صقر" className="w-20 h-20 object-contain" />
-          </div>
-        </motion.div>
-        
-        <motion.div 
-          className={`${textClass} text-lg mt-4`}
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          جاري التحميل...
-        </motion.div>
+        <div className={`${textClass} text-lg`}>جاري التحميل...</div>
       </div>
     );
   }
 
   return (
     <div className={`min-h-screen ${bgClass} pb-28 relative overflow-y-auto overflow-x-hidden`}>
-      {/* Animated Background Particles */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-[#FFD700]/40 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.2, 0.6, 0.2],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 5 + Math.random() * 5,
-              repeat: Infinity,
-              delay: Math.random() * 3,
-            }}
-          />
-        ))}
-      </div>
-      
-      {/* Decorative Glow Circles */}
-      <motion.div 
-        className="fixed top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#FFD700]/20 blur-3xl pointer-events-none"
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{ duration: 8, repeat: Infinity }}
-      />
-      <motion.div 
-        className="fixed bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#FFD700]/15 blur-3xl pointer-events-none"
-        animate={{ scale: [1.1, 1, 1.1] }}
-        transition={{ duration: 6, repeat: Infinity }}
-      />
+      {/* Decorative Blue Circles */}
+      <div className="fixed top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#3b82f6]/20 blur-3xl pointer-events-none"></div>
+      <div className="fixed bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full bg-[#3b82f6]/15 blur-3xl pointer-events-none"></div>
       
       {/* Header مع الشعار والترحيب */}
       <div className="relative z-10 pt-8 px-5 pb-6">
         {/* شعار التطبيق واسمه */}
-        <motion.div 
-          className="flex items-center justify-center mb-6"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div className="flex items-center justify-center mb-6">
           <div className="flex items-center gap-3">
-            <motion.div 
-              className="relative"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-            >
-              <div className="absolute inset-0 bg-[#FFD700]/30 rounded-full blur-md" />
-              <div className="relative w-14 h-14 rounded-full bg-[#0a0a0f] border-2 border-[#FFD700]/50 flex items-center justify-center overflow-hidden shadow-lg shadow-[#FFD700]/30">
-                <img src="/logo_saqr.png" alt="صقر" className="w-11 h-11 object-contain" />
-              </div>
-            </motion.div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#FFD700] to-[#FFA500] bg-clip-text text-transparent">صقر</h1>
+            <div className="w-14 h-14 rounded-full bg-[#0a0a0f] border-2 border-[#3b82f6]/30 flex items-center justify-center overflow-hidden shadow-lg shadow-[#3b82f6]/20">
+              <img src="/logo_saqr.png" alt="صقر" className="w-11 h-11 object-contain" />
+            </div>
+            <h1 className="text-3xl font-bold text-[#60a5fa]">صقر</h1>
           </div>
-        </motion.div>
+        </div>
         
         {/* ترحيب المستخدم */}
-        <motion.div 
-          className="flex items-center justify-between mb-6"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
+        <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className={`text-xl font-bold ${textClass}`}>مرحباً {user?.name || 'صديقي'} 👋</h2>
             <p className={`${textMutedClass} text-sm mt-1`}>جاهز لكسب المزيد اليوم؟</p>
           </div>
-          <motion.div 
-            className="flex items-center gap-2"
-            whileHover={{ scale: 1.05 }}
-          >
-            <div className="bg-[#FFD700]/20 border border-[#FFD700]/30 rounded-full px-4 py-2 shadow-lg shadow-[#FFD700]/10">
-              <span className="text-[#FFD700] font-bold">{userPoints} ⭐</span>
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* بطاقة الرصيد الرئيسية - Premium Design */}
-        <motion.div 
-          className="relative mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          whileHover={{ scale: 1.02 }}
-        >
-          {/* Glow Effect */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD700]/30 to-[#FFA500]/30 rounded-3xl blur-xl opacity-75" />
-          
-          <div className="relative bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0f] rounded-3xl p-6 border border-[#FFD700]/30 shadow-2xl overflow-hidden">
-            {/* Animated Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-[#FFD700] rounded-full -mr-20 -mt-20 blur-2xl" />
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#FFA500] rounded-full -ml-16 -mb-16 blur-2xl" />
-            </div>
-            
-            <div className="relative z-10 flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm mb-1 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#FFD700]" />
-                  رصيدك الحالي
-                </p>
-                <motion.p 
-                  className="text-5xl font-bold bg-gradient-to-r from-[#FFD700] to-[#FFA500] bg-clip-text text-transparent"
-                  animate={{ textShadow: ['0 0 10px #FFD700', '0 0 20px #FFD700', '0 0 10px #FFD700'] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  ${userBalance}
-                </motion.p>
-                <p className="text-white/50 text-xs mt-2">{userPoints} نقطة = {pointsPerDollar} نقطة/دولار</p>
-              </div>
-              <motion.div 
-                className="w-20 h-20 bg-gradient-to-br from-[#FFD700]/20 to-[#FFA500]/10 rounded-full flex items-center justify-center border border-[#FFD700]/30"
-                animate={{ rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 4, repeat: Infinity }}
-              >
-                <TrendingUp className="w-10 h-10 text-[#FFD700]" />
-              </motion.div>
+          <div className="flex items-center gap-2">
+            <div className="bg-[#3b82f6]/20 border border-[#3b82f6]/30 rounded-full px-4 py-2">
+              <span className="text-[#60a5fa] font-bold">{userPoints} ⭐</span>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* زر المشاهدة الرئيسي - Premium Animated Button */}
-        <motion.button
+        {/* بطاقة الرصيد الرئيسية */}
+        <div className="bg-gradient-to-r from-[#3b82f6] to-[#6366f1] rounded-3xl p-6 mb-6 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <p className="text-white/70 text-sm mb-1">رصيدك الحالي</p>
+              <p className="text-4xl font-bold text-white">${userBalance}</p>
+              <p className="text-white/60 text-xs mt-2">{userPoints} نقطة = {pointsPerDollar} نقطة/دولار</p>
+            </div>
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+              <TrendingUp className="w-8 h-8 text-white" />
+            </div>
+          </div>
+        </div>
+
+        {/* زر المشاهدة الرئيسي */}
+        <button
           onClick={onNavigateToAds}
-          className="w-full relative mb-6 group"
+          className="w-full bg-gradient-to-r from-[#ef4444] to-[#ec4899] hover:from-[#dc2626] hover:to-[#db2777] rounded-2xl p-5 mb-6 shadow-xl transform transition-all hover:scale-[1.02] active:scale-[0.98]"
           data-testid="start-watching-btn"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
         >
-          {/* Animated Glow */}
-          <motion.div 
-            className="absolute -inset-1 rounded-2xl opacity-75"
-            style={{ background: 'linear-gradient(135deg, #ef4444, #ec4899, #ef4444)' }}
-            animate={{ 
-              boxShadow: ['0 0 20px #ef4444', '0 0 40px #ec4899', '0 0 20px #ef4444']
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-          
-          <div className="relative bg-gradient-to-r from-[#ef4444] to-[#ec4899] rounded-2xl p-5 shadow-xl overflow-hidden">
-            {/* Shimmer Effect */}
-            <motion.div 
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-              animate={{ x: ['-200%', '200%'] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            />
-            
-            <div className="relative flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <motion.div 
-                  className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  <Play className="w-8 h-8 text-white fill-white" />
-                </motion.div>
-                <div className="text-right">
-                  <p className="text-white font-bold text-lg">ابدأ المشاهدة الآن</p>
-                  <p className="text-white/80 text-sm">اكسب {pointsPerAd} نقاط لكل إعلان ✨</p>
-                </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
+                <Play className="w-8 h-8 text-white fill-white" />
               </div>
-              <motion.div
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 1, repeat: Infinity }}
-              >
-                <ChevronRight className="w-6 h-6 text-white" />
-              </motion.div>
+              <div className="text-right">
+                <p className="text-white font-bold text-lg">ابدأ المشاهدة الآن</p>
+                <p className="text-white/80 text-sm">اكسب {pointsPerAd} نقاط لكل إعلان</p>
+              </div>
             </div>
+            <ChevronRight className="w-6 h-6 text-white" />
           </div>
-        </motion.button>
+        </button>
 
-        {/* البيانات التحليلية - Animated Cards */}
-        <motion.div 
-          className="bg-[#111118]/80 backdrop-blur-xl rounded-2xl p-5 mb-6 border border-white/10 relative overflow-hidden"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#FFD700]/5 rounded-full -mr-16 -mt-16 blur-2xl" />
-          
+        {/* البيانات التحليلية */}
+        <div className={`${cardClass} rounded-2xl p-5 mb-6 border`}>
           <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="w-5 h-5 text-[#FFD700]" />
+            <BarChart3 className="w-5 h-5 text-[#60a5fa]" />
             <h3 className={`${textClass} font-bold`}>إحصائياتك</h3>
           </div>
           
