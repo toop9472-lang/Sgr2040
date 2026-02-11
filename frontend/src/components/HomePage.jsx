@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Clock, Play, ChevronRight, BarChart3, Award, Calendar, Zap, Moon, Sun } from 'lucide-react';
+import { TrendingUp, Clock, Play, ChevronRight, BarChart3, Award, Calendar, Zap, Moon, Sun, Sparkles, Gift, Target } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
