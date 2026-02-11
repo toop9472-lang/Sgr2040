@@ -379,6 +379,9 @@ function MainApp() {
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       
+      {/* Support Page */}
+      <Route path="/support" element={<SupportPage />} />
+      
       {/* User Routes */}
       <Route path="/*" element={
         <>
