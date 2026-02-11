@@ -366,7 +366,7 @@ const HomePage = ({ user, onNavigateToAds }) => {
               <p className={`${textDimClass} text-xs`}>نقاط/إعلان</p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* التحدي اليومي */}
         {dailyChallenge && dailyChallenge.enabled && (
