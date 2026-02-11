@@ -315,6 +315,15 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
       onWheel={handleWheel}
       onClick={handleScreenTap}
     >
+      {/* زر العودة/الخروج - دائماً ظاهر */}
+      <button
+        onClick={(e) => { e.stopPropagation(); onClose(); }}
+        className="absolute top-4 right-4 z-50 w-12 h-12 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all"
+        data-testid="close-ads-btn"
+      >
+        <X className="w-6 h-6 text-white" />
+      </button>
+
       {/* محتوى الإعلان */}
       <div className={`absolute inset-0 transition-opacity duration-300 ${transitioning ? 'opacity-0' : 'opacity-100'}`}>
         {currentAd.video_url ? (
