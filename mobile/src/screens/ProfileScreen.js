@@ -91,11 +91,11 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
   };
 
   const menuItems = [
-    { id: 'withdraw', icon: '💸', label: 'سحب الأرباح', action: handleWithdraw },
-    { id: 'history', icon: '📊', label: 'سجل المعاملات', action: handleHistory },
-    { id: 'settings', icon: '⚙️', label: 'الإعدادات', action: handleSettings },
-    { id: 'help', icon: '❓', label: 'المساعدة والدعم', action: handleHelp },
-    { id: 'privacy', icon: '🔒', label: 'سياسة الخصوصية', action: handlePrivacy },
+    { id: 'withdraw', icon: 'wallet-outline', label: 'سحب الأرباح', action: handleWithdraw, color: '#22c55e' },
+    { id: 'history', icon: 'receipt-outline', label: 'سجل المعاملات', action: handleHistory, color: '#60a5fa' },
+    { id: 'settings', icon: 'settings-outline', label: 'الإعدادات', action: handleSettings, color: '#a855f7' },
+    { id: 'help', icon: 'help-circle-outline', label: 'المساعدة والدعم', action: handleHelp, color: '#fbbf24' },
+    { id: 'privacy', icon: 'shield-checkmark-outline', label: 'سياسة الخصوصية', action: handlePrivacy, color: '#6366f1' },
   ];
 
   return (
