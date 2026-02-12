@@ -499,8 +499,9 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
       {!isAdComplete && currentAdTime > 3 && (
         <View style={styles.warningContainer}>
           <View style={styles.warningBubble}>
+            <Ionicons name="timer-outline" size={14} color="#fbbf24" />
             <Text style={styles.warningText}>
-              ⏱️ أكمل مشاهدة الإعلان ({formatTime(adRemaining)} متبقي) لاحتساب الوقت
+              أكمل مشاهدة الإعلان ({formatTime(adRemaining)} متبقي) لاحتساب الوقت
             </Text>
           </View>
         </View>
