@@ -85,8 +85,8 @@ const HomeScreen = ({ user, onNavigateToAds, settings, onRefresh }) => {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={handleRefresh}
-          tintColor={colors.primary}
-          colors={[colors.primary]}
+          tintColor="#3b82f6"
+          colors={['#3b82f6']}
         />
       }
     >
@@ -106,55 +106,62 @@ const HomeScreen = ({ user, onNavigateToAds, settings, onRefresh }) => {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.welcomeText}>مرحباً {user?.name || 'صديقي'} 👋</Text>
+            <Text style={styles.welcomeText}>مرحباً {user?.name || 'صديقي'}</Text>
             <Text style={styles.subText}>جاهز لكسب المزيد اليوم؟</Text>
           </View>
           <View style={styles.pointsBadge}>
-            <Text style={styles.pointsBadgeText}>{userPoints} ⭐</Text>
+            <Ionicons name="star" size={16} color="#60a5fa" />
+            <Text style={styles.pointsBadgeText}>{userPoints}</Text>
           </View>
         </View>
 
         {/* Balance Card */}
-        <LinearGradient colors={colors.gradients.primary} style={styles.balanceCard}>
+        <LinearGradient colors={['#3b82f6', '#6366f1']} style={styles.balanceCard}>
           <View style={styles.balanceInfo}>
             <Text style={styles.balanceLabel}>رصيدك الحالي</Text>
             <Text style={styles.balanceAmount}>{userBalance} ر.س</Text>
             <Text style={styles.balancePoints}>{userPoints} نقطة • {pointsPerDollar} نقطة/ريال</Text>
           </View>
           <View style={styles.balanceIcon}>
-            <Text style={styles.balanceIconText}>📈</Text>
+            <Ionicons name="trending-up" size={28} color="#FFF" />
           </View>
         </LinearGradient>
 
         {/* Start Watching Button */}
         <TouchableOpacity onPress={onNavigateToAds} activeOpacity={0.9}>
-          <LinearGradient colors={colors.gradients.accent} style={styles.watchButton}>
+          <LinearGradient colors={['#ef4444', '#ec4899']} style={styles.watchButton}>
             <View style={styles.watchButtonLeft}>
               <View style={styles.playIcon}>
-                <Text style={styles.playIconText}>▶️</Text>
+                <Ionicons name="play" size={24} color="#FFF" />
               </View>
               <View>
                 <Text style={styles.watchButtonTitle}>ابدأ المشاهدة الآن</Text>
                 <Text style={styles.watchButtonSub}>اكسب {pointsPerAd} نقاط لكل إعلان</Text>
               </View>
             </View>
-            <Text style={styles.arrowIcon}>›</Text>
+            <Ionicons name="chevron-forward" size={24} color="#FFF" />
           </LinearGradient>
         </TouchableOpacity>
 
         {/* Stats Card */}
         <View style={styles.statsCard}>
-          <Text style={styles.sectionTitle}>📊 إحصائياتك</Text>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="bar-chart" size={18} color="#60a5fa" />
+            <Text style={styles.sectionTitle}>إحصائياتك</Text>
+          </View>
           <View style={styles.statsGrid}>
             <View style={styles.statItem}>
+              <Ionicons name="today-outline" size={18} color="#22c55e" />
               <Text style={styles.statValue}>{watchedToday}</Text>
               <Text style={styles.statLabel}>اليوم</Text>
             </View>
             <View style={styles.statItem}>
+              <Ionicons name="time-outline" size={18} color="#60a5fa" />
               <Text style={styles.statValue}>{Math.max(dailyLimit - watchedToday, 0)}</Text>
               <Text style={styles.statLabel}>المتبقي</Text>
             </View>
             <View style={styles.statItem}>
+              <Ionicons name="gift-outline" size={18} color="#fbbf24" />
               <Text style={styles.statValue}>{pointsPerAd}</Text>
               <Text style={styles.statLabel}>نقاط/إعلان</Text>
             </View>
@@ -164,7 +171,9 @@ const HomeScreen = ({ user, onNavigateToAds, settings, onRefresh }) => {
         {/* Daily Challenge */}
         <View style={styles.challengeCard}>
           <View style={styles.challengeHeader}>
-            <Text style={styles.challengeIcon}>🎯</Text>
+            <View style={styles.challengeIconContainer}>
+              <Ionicons name="trophy" size={24} color="#fbbf24" />
+            </View>
             <View>
               <Text style={styles.challengeTitle}>التحدي اليومي</Text>
               <Text style={styles.challengeName}>شاهد 5 إعلانات</Text>
@@ -173,20 +182,35 @@ const HomeScreen = ({ user, onNavigateToAds, settings, onRefresh }) => {
           <View style={styles.progressBar}>
             <View style={[styles.progressFill, { width: `${Math.min((watchedToday / 5) * 100, 100)}%` }]} />
           </View>
-          <Text style={styles.challengeReward}>المكافأة: +25 ⭐</Text>
+          <Text style={styles.challengeReward}>
+            <Ionicons name="star" size={14} color="#fbbf24" /> المكافأة: +25 نقطة
+          </Text>
         </View>
 
         {/* Tips */}
         <View style={styles.tipCard}>
-          <Text style={styles.tipText}>{tips[currentTip].icon} {tips[currentTip].text}</Text>
+          <Ionicons name={tips[currentTip].icon} size={20} color="#fbbf24" />
+          <Text style={styles.tipText}>{tips[currentTip].text}</Text>
         </View>
 
         {/* How to Earn */}
         <View style={styles.infoCard}>
-          <Text style={styles.sectionTitle}>💰 كيف تكسب؟</Text>
-          <Text style={styles.infoItem}>✓ شاهد إعلان كامل = {pointsPerAd} نقاط</Text>
-          <Text style={styles.infoItem}>✓ أكمل التحدي اليومي = مكافأة إضافية</Text>
-          <Text style={styles.infoItem}>✓ {pointsPerDollar} نقطة = 1 ر.س</Text>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="wallet" size={18} color="#22c55e" />
+            <Text style={styles.sectionTitle}>كيف تكسب؟</Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Ionicons name="checkmark-circle" size={16} color="#22c55e" />
+            <Text style={styles.infoText}>شاهد إعلان كامل = {pointsPerAd} نقاط</Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Ionicons name="checkmark-circle" size={16} color="#22c55e" />
+            <Text style={styles.infoText}>أكمل التحدي اليومي = مكافأة إضافية</Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Ionicons name="checkmark-circle" size={16} color="#22c55e" />
+            <Text style={styles.infoText}>{pointsPerDollar} نقطة = 1 ر.س</Text>
+          </View>
         </View>
       </View>
     </ScrollView>
