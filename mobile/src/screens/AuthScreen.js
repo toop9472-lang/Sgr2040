@@ -250,7 +250,7 @@ const AuthScreen = ({ onLogin }) => {
             {/* Privacy Policy Link */}
             <TouchableOpacity 
               style={styles.privacyLink}
-              onPress={() => Linking.openURL('https://react-native-admob.preview.emergentagent.com/privacy-policy.html')}
+              onPress={() => Linking.openURL('https://saqr-app-deploy.preview.emergentagent.com/privacy-policy.html')}
               activeOpacity={0.7}
             >
               <Text style={styles.privacyText}>سياسة الخصوصية</Text>
