@@ -19,9 +19,9 @@ import colors from '../styles/colors';
 
 // سيتم استبدالها بالباقات من السيرفر
 const FALLBACK_PACKAGES = [
-  { id: 'ad_1_month', description: 'شهر واحد', duration_months: 1, amount: 500, features: ['1000 مشاهدة مضمونة', 'تقرير أسبوعي'] },
-  { id: 'ad_3_months', description: '3 أشهر', duration_months: 3, amount: 1350, features: ['5000 مشاهدة مضمونة', 'تقرير يومي', 'أولوية'], popular: true },
-  { id: 'ad_6_months', description: '6 أشهر', duration_months: 6, amount: 2400, features: ['15000 مشاهدة مضمونة', 'تقرير مفصل', 'دعم مخصص'] },
+  { id: 'ad_1_month', description: 'شهر واحد', duration_months: 1, amount: 1000, features: ['1000 مشاهدة مضمونة', 'تقرير أسبوعي'] },
+  { id: 'ad_3_months', description: '3 أشهر (خصم 10%)', duration_months: 3, amount: 2700, features: ['5000 مشاهدة مضمونة', 'تقرير يومي', 'أولوية'], popular: true },
+  { id: 'ad_6_months', description: '6 أشهر (خصم 20%)', duration_months: 6, amount: 4800, features: ['15000 مشاهدة مضمونة', 'تقرير مفصل', 'دعم مخصص'] },
 ];
 
 const AdvertiserScreen = () => {
