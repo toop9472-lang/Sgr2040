@@ -110,6 +110,7 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
           <Text style={styles.email}>{user?.email || ''}</Text>
           {user?.isGuest && (
             <View style={styles.guestBadge}>
+              <Ionicons name="person-outline" size={12} color="#fbbf24" />
               <Text style={styles.guestText}>زائر</Text>
             </View>
           )}
@@ -117,6 +118,9 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
 
         {/* Balance Card */}
         <View style={styles.balanceCard}>
+          <View style={styles.balanceIcon}>
+            <Ionicons name="wallet" size={24} color="#60a5fa" />
+          </View>
           <Text style={styles.balanceLabel}>رصيدك الحالي</Text>
           <Text style={styles.balanceValue}>{riyalValue} ر.س</Text>
           <Text style={styles.balancePoints}>{userPoints} نقطة</Text>
@@ -129,10 +133,12 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
         {/* Stats */}
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
+            <Ionicons name="star" size={20} color="#fbbf24" />
             <Text style={styles.statValue}>{userPoints}</Text>
             <Text style={styles.statLabel}>نقاط حالية</Text>
           </View>
           <View style={styles.statBox}>
+            <Ionicons name="trending-up" size={20} color="#22c55e" />
             <Text style={styles.statValue}>{totalEarned}</Text>
             <Text style={styles.statLabel}>إجمالي مكتسب</Text>
           </View>
@@ -147,9 +153,11 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
               onPress={item.action}
               activeOpacity={0.6}
             >
-              <Text style={styles.menuIcon}>{item.icon}</Text>
+              <View style={[styles.menuIconContainer, { backgroundColor: `${item.color}15` }]}>
+                <Ionicons name={item.icon} size={20} color={item.color} />
+              </View>
               <Text style={styles.menuLabel}>{item.label}</Text>
-              <Text style={styles.menuArrow}>›</Text>
+              <Ionicons name="chevron-forward" size={18} color="rgba(255,255,255,0.3)" />
             </TouchableOpacity>
           ))}
           
@@ -159,14 +167,16 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
             onPress={confirmLogout}
             activeOpacity={0.6}
           >
-            <Text style={styles.menuIcon}>🚪</Text>
+            <View style={[styles.menuIconContainer, { backgroundColor: 'rgba(239,68,68,0.15)' }]}>
+              <Ionicons name="log-out-outline" size={20} color="#ef4444" />
+            </View>
             <Text style={[styles.menuLabel, styles.logoutText]}>تسجيل الخروج</Text>
-            <Text style={[styles.menuArrow, styles.logoutText]}>›</Text>
+            <Ionicons name="chevron-forward" size={18} color="#ef4444" />
           </TouchableOpacity>
         </View>
 
         {/* App Version */}
-        <Text style={styles.versionText}>الإصدار 4.8.0</Text>
+        <Text style={styles.versionText}>الإصدار 4.8.1</Text>
       </View>
     </ScrollView>
   );
