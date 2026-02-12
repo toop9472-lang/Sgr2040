@@ -1,4 +1,5 @@
 // Auth Screen - Login / Register
+// Professional Design with Ionicons
 import React, { useState } from 'react';
 import {
   View,
@@ -15,6 +16,7 @@ import {
   Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import storage from '../services/storage';
 import colors from '../styles/colors';
