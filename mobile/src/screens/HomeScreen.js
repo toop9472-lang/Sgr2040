@@ -21,7 +21,7 @@ const { width } = Dimensions.get('window');
 // Memoized Tip Component for better performance
 const TipItem = memo(({ icon, text }) => (
   <View style={styles.tipContent}>
-    <Text style={styles.tipIcon}>{icon}</Text>
+    <Ionicons name={icon} size={20} color="#fbbf24" />
     <Text style={styles.tipText}>{text}</Text>
   </View>
 ));
@@ -29,7 +29,7 @@ const TipItem = memo(({ icon, text }) => (
 // Memoized Stats Card
 const StatsCard = memo(({ icon, value, label, color }) => (
   <View style={styles.statCard}>
-    <Text style={styles.statIcon}>{icon}</Text>
+    <Ionicons name={icon} size={20} color={color} />
     <Text style={[styles.statValue, { color }]}>{value}</Text>
     <Text style={styles.statLabel}>{label}</Text>
   </View>
