@@ -116,7 +116,7 @@ const AIChatModal = ({ visible, onClose }) => {
                 onPress={sendMessage}
                 disabled={!inputText.trim() || isLoading}
               >
-                <Text style={styles.sendBtnText}>➤</Text>
+                <Ionicons name="send" size={18} color="#FFF" />
               </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
@@ -128,24 +128,23 @@ const AIChatModal = ({ visible, onClose }) => {
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  container: { backgroundColor: colors.dark.bg, borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '80%' },
+  container: { backgroundColor: '#0a0a0f', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '80%' },
   
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' },
-  closeBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
-  closeBtnText: { color: '#FFF', fontSize: 20 },
+  closeBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 20 },
+  titleContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   title: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
 
   messagesContainer: { flex: 1, padding: 16 },
   messageBubble: { maxWidth: '80%', padding: 14, borderRadius: 16, marginBottom: 8 },
-  userMessage: { alignSelf: 'flex-end', backgroundColor: colors.primary, borderBottomRightRadius: 4 },
+  userMessage: { alignSelf: 'flex-end', backgroundColor: '#3b82f6', borderBottomRightRadius: 4 },
   assistantMessage: { alignSelf: 'flex-start', backgroundColor: 'rgba(255,255,255,0.1)', borderBottomLeftRadius: 4 },
   messageText: { color: '#FFF', fontSize: 15, lineHeight: 22 },
 
   inputContainer: { flexDirection: 'row', padding: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', alignItems: 'flex-end' },
   input: { flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 12, color: '#FFF', fontSize: 16, maxHeight: 100, textAlign: 'right' },
-  sendBtn: { width: 44, height: 44, backgroundColor: colors.primary, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginLeft: 8 },
+  sendBtn: { width: 44, height: 44, backgroundColor: '#3b82f6', borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginLeft: 8 },
   sendBtnDisabled: { opacity: 0.5 },
-  sendBtnText: { color: '#FFF', fontSize: 18 },
 });
 
 export default AIChatModal;
