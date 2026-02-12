@@ -233,81 +233,130 @@ const AdvertiserScreen = () => {
           <>
             <Text style={styles.sectionTitle}>بيانات الإعلان</Text>
             <View style={styles.formCard}>
-              <Text style={styles.inputLabel}>اسمك / اسم الشركة *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="أدخل اسمك"
-                placeholderTextColor="#9ca3af"
-                value={formData.name}
-                onChangeText={(t) => setFormData({ ...formData, name: t })}
-              />
+              {/* Name */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>
+                  <Ionicons name="person-outline" size={14} color="#9ca3af" /> اسمك / اسم الشركة *
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="أدخل اسمك"
+                  placeholderTextColor="#6b7280"
+                  value={formData.name}
+                  onChangeText={(t) => setFormData({ ...formData, name: t })}
+                />
+              </View>
 
-              <Text style={styles.inputLabel}>البريد الإلكتروني *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="email@example.com"
-                placeholderTextColor="#9ca3af"
-                value={formData.email}
-                onChangeText={(t) => setFormData({ ...formData, email: t })}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+              {/* Email */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>
+                  <Ionicons name="mail-outline" size={14} color="#9ca3af" /> البريد الإلكتروني *
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="email@example.com"
+                  placeholderTextColor="#6b7280"
+                  value={formData.email}
+                  onChangeText={(t) => setFormData({ ...formData, email: t })}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
 
-              <Text style={styles.inputLabel}>رقم الهاتف</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="+966 5XX XXX XXXX"
-                placeholderTextColor="#9ca3af"
-                value={formData.phone}
-                onChangeText={(t) => setFormData({ ...formData, phone: t })}
-                keyboardType="phone-pad"
-              />
+              {/* Phone */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>
+                  <Ionicons name="call-outline" size={14} color="#9ca3af" /> رقم الهاتف
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="+966 5XX XXX XXXX"
+                  placeholderTextColor="#6b7280"
+                  value={formData.phone}
+                  onChangeText={(t) => setFormData({ ...formData, phone: t })}
+                  keyboardType="phone-pad"
+                />
+              </View>
 
-              <Text style={styles.inputLabel}>رابط الموقع</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="https://yourwebsite.com"
-                placeholderTextColor="#9ca3af"
-                value={formData.website}
-                onChangeText={(t) => setFormData({ ...formData, website: t })}
-                autoCapitalize="none"
-              />
+              {/* Website */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>
+                  <Ionicons name="globe-outline" size={14} color="#9ca3af" /> رابط الموقع
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="https://yourwebsite.com"
+                  placeholderTextColor="#6b7280"
+                  value={formData.website}
+                  onChangeText={(t) => setFormData({ ...formData, website: t })}
+                  autoCapitalize="none"
+                />
+              </View>
 
-              <Text style={styles.inputLabel}>عنوان الإعلان *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="عنوان جذاب لإعلانك"
-                placeholderTextColor="#9ca3af"
-                value={formData.title}
-                onChangeText={(t) => setFormData({ ...formData, title: t })}
-              />
+              {/* Title */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>
+                  <Ionicons name="text-outline" size={14} color="#9ca3af" /> عنوان الإعلان *
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="عنوان جذاب لإعلانك"
+                  placeholderTextColor="#6b7280"
+                  value={formData.title}
+                  onChangeText={(t) => setFormData({ ...formData, title: t })}
+                />
+              </View>
 
-              <Text style={styles.inputLabel}>وصف الإعلان *</Text>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder="اكتب وصفاً تفصيلياً"
-                placeholderTextColor="#9ca3af"
-                value={formData.description}
-                onChangeText={(t) => setFormData({ ...formData, description: t })}
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-              />
+              {/* Description */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>
+                  <Ionicons name="document-text-outline" size={14} color="#9ca3af" /> وصف الإعلان *
+                </Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="اكتب وصفاً تفصيلياً"
+                  placeholderTextColor="#6b7280"
+                  value={formData.description}
+                  onChangeText={(t) => setFormData({ ...formData, description: t })}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+              </View>
             </View>
 
+            {/* Selected Package Summary */}
+            {selectedPackage && (
+              <View style={styles.summaryCard}>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>الباقة المختارة</Text>
+                  <Text style={styles.summaryValue}>{selectedPackage.description}</Text>
+                </View>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>المبلغ الإجمالي</Text>
+                  <Text style={styles.summaryPrice}>{selectedPackage.amount} ﷼</Text>
+                </View>
+              </View>
+            )}
+
             <View style={styles.buttonRow}>
-              <TouchableOpacity style={styles.backBtn} onPress={() => setStep(1)}>
-                <Text style={styles.backBtnText}>‹ رجوع</Text>
+              <TouchableOpacity style={styles.backBtn} onPress={() => setStep(1)} activeOpacity={0.7}>
+                <Ionicons name="arrow-back" size={18} color="#FFF" />
+                <Text style={styles.backBtnText}>رجوع</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.submitBtn, isSubmitting && styles.submitBtnDisabled]}
                 onPress={handleSubmit}
                 disabled={isSubmitting}
+                activeOpacity={0.8}
               >
                 {isSubmitting ? (
-                  <ActivityIndicator color="#FFF" />
+                  <ActivityIndicator color="#FFF" size="small" />
                 ) : (
-                  <Text style={styles.submitBtnText}>إرسال الإعلان</Text>
+                  <>
+                    <Ionicons name="send" size={18} color="#FFF" />
+                    <Text style={styles.submitBtnText}>إرسال الإعلان</Text>
+                  </>
                 )}
               </TouchableOpacity>
             </View>
