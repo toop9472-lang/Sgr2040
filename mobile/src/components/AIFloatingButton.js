@@ -1,14 +1,15 @@
 // AI Floating Button - Opens AI Chat
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import colors from '../styles/colors';
 
 const AIFloatingButton = ({ onPress }) => {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.8}>
-      <LinearGradient colors={colors.gradients.primary} style={styles.button}>
-        <Text style={styles.icon}>🤖</Text>
+      <LinearGradient colors={['#3b82f6', '#6366f1']} style={styles.button}>
+        <Ionicons name="chatbubble-ellipses" size={24} color="#FFF" />
       </LinearGradient>
     </TouchableOpacity>
   );
@@ -28,12 +29,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 8,
-    shadowColor: colors.primary,
+    shadowColor: '#3b82f6',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
   },
-  icon: { fontSize: 24 },
 });
 
 export default AIFloatingButton;
