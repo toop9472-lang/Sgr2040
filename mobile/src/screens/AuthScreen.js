@@ -472,21 +472,23 @@ const styles = StyleSheet.create({
   registerBold: { color: '#60a5fa', fontWeight: 'bold' },
 
   guestBtn: { 
-    marginTop: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    backgroundColor: 'rgba(251,191,36,0.1)',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(251,191,36,0.25)',
+    marginTop: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    backgroundColor: 'rgba(251,191,36,0.15)',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: 'rgba(251,191,36,0.4)',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
+    gap: 10,
+    width: '100%',
   },
   guestText: { 
     color: '#fbbf24', 
-    fontSize: 14, 
-    fontWeight: '600' 
+    fontSize: 16, 
+    fontWeight: '700' 
   },
 
   privacyLink: { 
