@@ -74,7 +74,7 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
   };
 
   const handlePrivacy = () => {
-    Linking.openURL('https://react-native-admob.preview.emergentagent.com/privacy-policy.html');
+    Linking.openURL('https://saqr-app-deploy.preview.emergentagent.com/privacy-policy.html');
   };
 
   const confirmLogout = () => {

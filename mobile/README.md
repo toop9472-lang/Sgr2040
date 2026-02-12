@@ -209,8 +209,8 @@ eas submit -p android
 
 ## 📞 الدعم والمساعدة
 
-- **الموقع:** https://react-native-admob.preview.emergentagent.com
-- **API Docs:** https://react-native-admob.preview.emergentagent.com/docs
+- **الموقع:** https://saqr-app-deploy.preview.emergentagent.com
+- **API Docs:** https://saqr-app-deploy.preview.emergentagent.com/docs
 
 ---
 

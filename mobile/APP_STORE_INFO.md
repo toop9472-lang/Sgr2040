@@ -95,12 +95,12 @@ rewards,earn,points,ads,money,cashback,gift,withdraw,wallet,saqr
 
 ### رابط سياسة الخصوصية
 ```
-https://react-native-admob.preview.emergentagent.com/privacy
+https://saqr-app-deploy.preview.emergentagent.com/privacy
 ```
 
 ### رابط الدعم
 ```
-https://react-native-admob.preview.emergentagent.com
+https://saqr-app-deploy.preview.emergentagent.com
 ```
 
 ### البريد الإلكتروني للدعم
