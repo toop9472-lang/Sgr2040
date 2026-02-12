@@ -12,13 +12,14 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import storage from '../services/storage';
 import colors from '../styles/colors';
 
 const AIChatModal = ({ visible, onClose }) => {
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'مرحباً! أنا مساعدك الذكي في تطبيق صقر. كيف يمكنني مساعدتك اليوم؟ 🦅' }
+    { role: 'assistant', content: 'مرحباً! أنا مساعدك الذكي في تطبيق صقر. كيف يمكنني مساعدتك اليوم؟' }
   ]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -64,9 +65,12 @@ const AIChatModal = ({ visible, onClose }) => {
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-              <Text style={styles.closeBtnText}>✕</Text>
+              <Ionicons name="close" size={20} color="#FFF" />
             </TouchableOpacity>
-            <Text style={styles.title}>المساعد الذكي 🤖</Text>
+            <View style={styles.titleContainer}>
+              <Ionicons name="chatbubble-ellipses" size={20} color="#60a5fa" />
+              <Text style={styles.title}>المساعد الذكي</Text>
+            </View>
             <View style={{ width: 40 }} />
           </View>
 
