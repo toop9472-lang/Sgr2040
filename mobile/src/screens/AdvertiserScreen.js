@@ -116,7 +116,9 @@ const AdvertiserScreen = () => {
   if (step === 3) {
     return (
       <View style={styles.successPage}>
-        <Text style={styles.successIcon}>✅</Text>
+        <View style={styles.successIconContainer}>
+          <Ionicons name="checkmark-circle" size={80} color="#22c55e" />
+        </View>
         <Text style={styles.successTitle}>تم إرسال إعلانك!</Text>
         <Text style={styles.successDesc}>سيتم مراجعة إعلانك وتفعيله خلال 24 ساعة. سنتواصل معك عبر البريد الإلكتروني.</Text>
         <TouchableOpacity style={styles.successBtn} onPress={resetForm}>
@@ -126,20 +128,36 @@ const AdvertiserScreen = () => {
     );
   }
 
+  // Loading Screen
+  if (isLoadingPackages) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#3b82f6" />
+        <Text style={styles.loadingText}>جاري تحميل الباقات...</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
-        <Text style={styles.pageTitle}>أعلن معنا 📢</Text>
-        <Text style={styles.pageSubtitle}>وصل إعلانك لآلاف المستخدمين النشطين</Text>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerIcon}>
+            <Ionicons name="megaphone" size={28} color="#60a5fa" />
+          </View>
+          <Text style={styles.pageTitle}>أعلن معنا</Text>
+          <Text style={styles.pageSubtitle}>وصل إعلانك لآلاف المستخدمين النشطين</Text>
+        </View>
 
         {/* Step Indicator */}
         <View style={styles.stepIndicator}>
           <View style={[styles.stepDot, step >= 1 && styles.stepDotActive]}>
-            <Text style={styles.stepDotText}>1</Text>
+            <Ionicons name={step > 1 ? "checkmark" : "cart"} size={16} color={step >= 1 ? '#FFF' : '#666'} />
           </View>
           <View style={[styles.stepLine, step >= 2 && styles.stepLineActive]} />
           <View style={[styles.stepDot, step >= 2 && styles.stepDotActive]}>
-            <Text style={styles.stepDotText}>2</Text>
+            <Ionicons name={step > 2 ? "checkmark" : "document-text"} size={16} color={step >= 2 ? '#FFF' : '#666'} />
           </View>
         </View>
 
@@ -147,43 +165,65 @@ const AdvertiserScreen = () => {
         {step === 1 && (
           <>
             <Text style={styles.sectionTitle}>اختر الباقة المناسبة</Text>
-            {AD_PACKAGES.map((pkg) => (
+            {packages.map((pkg, index) => (
               <TouchableOpacity
                 key={pkg.id}
                 style={[
                   styles.packageCard,
                   selectedPackage?.id === pkg.id && styles.packageCardSelected,
-                  pkg.popular && styles.packageCardPopular,
                 ]}
                 onPress={() => setSelectedPackage(pkg)}
+                activeOpacity={0.7}
               >
                 {pkg.popular && (
                   <View style={styles.popularBadge}>
+                    <Ionicons name="star" size={10} color="#000" />
                     <Text style={styles.popularText}>الأكثر شعبية</Text>
                   </View>
                 )}
-                <View style={styles.packageHeader}>
-                  <Text style={styles.packageName}>{pkg.name}</Text>
-                  <Text style={styles.packagePrice}>{pkg.price} SAR</Text>
+                
+                {/* Package Icon */}
+                <View style={styles.packageIcon}>
+                  <Ionicons 
+                    name={index === 0 ? "rocket-outline" : index === 1 ? "flash-outline" : "diamond-outline"} 
+                    size={24} 
+                    color="#60a5fa" 
+                  />
                 </View>
+                
+                <View style={styles.packageHeader}>
+                  <Text style={styles.packageName}>{pkg.description}</Text>
+                  <View style={styles.priceContainer}>
+                    <Text style={styles.packagePrice}>{pkg.amount}</Text>
+                    <Text style={styles.priceCurrency}>﷼</Text>
+                  </View>
+                </View>
+                
                 <View style={styles.packageFeatures}>
                   {pkg.features.map((f, i) => (
-                    <Text key={i} style={styles.packageFeature}>✓ {f}</Text>
+                    <View key={i} style={styles.featureRow}>
+                      <Ionicons name="checkmark-circle" size={16} color="#22c55e" />
+                      <Text style={styles.packageFeature}>{f}</Text>
+                    </View>
                   ))}
                 </View>
+                
                 {selectedPackage?.id === pkg.id && (
                   <View style={styles.selectedCheck}>
-                    <Text style={styles.selectedCheckText}>✓</Text>
+                    <Ionicons name="checkmark" size={16} color="#FFF" />
                   </View>
                 )}
               </TouchableOpacity>
             ))}
+            
             <TouchableOpacity
               style={[styles.nextBtn, !selectedPackage && styles.nextBtnDisabled]}
               onPress={() => selectedPackage && setStep(2)}
               disabled={!selectedPackage}
+              activeOpacity={0.8}
             >
               <Text style={styles.nextBtnText}>التالي</Text>
+              <Ionicons name="arrow-forward" size={20} color="#FFF" />
             </TouchableOpacity>
           </>
         )}
