@@ -28,6 +28,8 @@ const AdvertiserScreen = () => {
   const [step, setStep] = useState(1); // 1: package, 2: form, 3: success
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingPackages, setIsLoadingPackages] = useState(true);
+  const [packages, setPackages] = useState(FALLBACK_PACKAGES);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -36,6 +38,37 @@ const AdvertiserScreen = () => {
     title: '',
     description: '',
   });
+
+  // جلب الباقات من السيرفر
+  useEffect(() => {
+    loadPackages();
+  }, []);
+
+  const loadPackages = async () => {
+    try {
+      const response = await api.getPackages();
+      if (response.ok) {
+        const data = await response.json();
+        if (data.packages && data.packages.length > 0) {
+          // إضافة الميزات للباقات إذا لم تكن موجودة
+          const packagesWithFeatures = data.packages.map((pkg, index) => ({
+            ...pkg,
+            features: pkg.features || [
+              `${pkg.duration_months * 1000} مشاهدة مضمونة`,
+              index > 0 ? 'تقرير يومي' : 'تقرير أسبوعي',
+              index > 1 ? 'دعم مخصص' : undefined,
+            ].filter(Boolean),
+            popular: index === 1,
+          }));
+          setPackages(packagesWithFeatures);
+        }
+      }
+    } catch (error) {
+      console.log('Using fallback packages');
+    } finally {
+      setIsLoadingPackages(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!formData.title || !formData.description || !formData.name || !formData.email) {
