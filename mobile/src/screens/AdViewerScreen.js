@@ -751,6 +751,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: 'rgba(245,158,11,0.3)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   warningText: {
     color: '#fbbf24',
