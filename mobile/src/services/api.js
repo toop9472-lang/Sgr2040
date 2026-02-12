@@ -162,6 +162,11 @@ export const api = {
     });
   },
   
+  // Get packages from server
+  async getPackages() {
+    return this.fetch('/api/payments/packages');
+  },
+  
   // Check password strength
   async checkPasswordStrength(password) {
     return this.fetch('/api/auth/check-password-strength', {
