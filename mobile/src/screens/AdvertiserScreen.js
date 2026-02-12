@@ -1,5 +1,6 @@
 // Advertiser Screen - Submit ads for advertisers
-import React, { useState } from 'react';
+// Professional Design with Dynamic Packages from Server
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,14 +12,16 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import storage from '../services/storage';
 import colors from '../styles/colors';
 
-const AD_PACKAGES = [
-  { id: 'ad_1_month', name: 'شهر واحد', duration: 1, price: 99, features: ['1000 مشاهدة مضمونة', 'تقرير أسبوعي'] },
-  { id: 'ad_3_months', name: '3 أشهر', duration: 3, price: 249, features: ['5000 مشاهدة مضمونة', 'تقرير يومي', 'أولوية'], popular: true },
-  { id: 'ad_6_months', name: '6 أشهر', duration: 6, price: 449, features: ['15000 مشاهدة مضمونة', 'تقرير مفصل', 'دعم مخصص'] },
+// سيتم استبدالها بالباقات من السيرفر
+const FALLBACK_PACKAGES = [
+  { id: 'ad_1_month', description: 'شهر واحد', duration_months: 1, amount: 500, features: ['1000 مشاهدة مضمونة', 'تقرير أسبوعي'] },
+  { id: 'ad_3_months', description: '3 أشهر', duration_months: 3, amount: 1350, features: ['5000 مشاهدة مضمونة', 'تقرير يومي', 'أولوية'], popular: true },
+  { id: 'ad_6_months', description: '6 أشهر', duration_months: 6, amount: 2400, features: ['15000 مشاهدة مضمونة', 'تقرير مفصل', 'دعم مخصص'] },
 ];
 
 const AdvertiserScreen = () => {
