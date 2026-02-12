@@ -1,5 +1,5 @@
 // Home Screen - Dashboard with stats and quick actions
-// Performance optimized with React.memo and useMemo
+// Clean Professional Design
 import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import {
   View,
@@ -12,6 +12,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import colors from '../styles/colors';
 
