@@ -368,56 +368,329 @@ const AdvertiserScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.dark.bg },
-  content: { padding: 20, paddingTop: 60, paddingBottom: 100 },
+  container: { flex: 1, backgroundColor: '#0a0a0f' },
+  content: { padding: 20, paddingTop: 50, paddingBottom: 100 },
 
-  pageTitle: { fontSize: 28, fontWeight: 'bold', color: colors.dark.text, marginBottom: 8 },
-  pageSubtitle: { fontSize: 14, color: colors.dark.textSecondary, marginBottom: 24 },
+  loadingContainer: { 
+    flex: 1, 
+    backgroundColor: '#0a0a0f', 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  loadingText: { 
+    color: 'rgba(255,255,255,0.6)', 
+    marginTop: 16, 
+    fontSize: 16 
+  },
 
-  stepIndicator: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 24 },
-  stepDot: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.1)', justifyContent: 'center', alignItems: 'center' },
-  stepDotActive: { backgroundColor: colors.primary },
-  stepDotText: { color: '#FFF', fontWeight: 'bold' },
-  stepLine: { width: 60, height: 2, backgroundColor: 'rgba(255,255,255,0.1)' },
-  stepLineActive: { backgroundColor: colors.primary },
+  header: { 
+    alignItems: 'center', 
+    marginBottom: 24 
+  },
+  headerIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  pageTitle: { 
+    fontSize: 26, 
+    fontWeight: 'bold', 
+    color: '#FFF', 
+    marginBottom: 4 
+  },
+  pageSubtitle: { 
+    fontSize: 14, 
+    color: 'rgba(255,255,255,0.5)', 
+    textAlign: 'center' 
+  },
 
-  sectionTitle: { color: colors.dark.text, fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
+  stepIndicator: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginBottom: 24 
+  },
+  stepDot: { 
+    width: 36, 
+    height: 36, 
+    borderRadius: 18, 
+    backgroundColor: 'rgba(255,255,255,0.1)', 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  stepDotActive: { 
+    backgroundColor: '#3b82f6',
+    borderColor: '#3b82f6',
+  },
+  stepLine: { 
+    width: 60, 
+    height: 2, 
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    marginHorizontal: 8,
+  },
+  stepLineActive: { 
+    backgroundColor: '#3b82f6' 
+  },
 
-  packageCard: { backgroundColor: colors.dark.card, borderRadius: 16, padding: 20, marginBottom: 12, borderWidth: 2, borderColor: 'transparent' },
-  packageCardSelected: { borderColor: colors.primary },
-  packageCardPopular: { borderColor: colors.accent },
-  popularBadge: { position: 'absolute', top: -10, right: 16, backgroundColor: colors.accent, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 },
-  popularText: { color: '#000', fontSize: 10, fontWeight: 'bold' },
-  packageHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  packageName: { color: colors.dark.text, fontSize: 18, fontWeight: 'bold' },
-  packagePrice: { color: colors.primary, fontSize: 20, fontWeight: 'bold' },
-  packageFeatures: { gap: 4 },
-  packageFeature: { color: colors.dark.textSecondary, fontSize: 14 },
-  selectedCheck: { position: 'absolute', top: 16, left: 16, width: 24, height: 24, borderRadius: 12, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center' },
-  selectedCheckText: { color: '#FFF', fontWeight: 'bold' },
+  sectionTitle: { 
+    color: '#FFF', 
+    fontSize: 18, 
+    fontWeight: 'bold', 
+    marginBottom: 16,
+    textAlign: 'center',
+  },
 
-  nextBtn: { backgroundColor: colors.primary, borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 12 },
-  nextBtnDisabled: { opacity: 0.5 },
-  nextBtnText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
+  packageCard: { 
+    backgroundColor: 'rgba(255,255,255,0.03)', 
+    borderRadius: 20, 
+    padding: 20, 
+    marginBottom: 12, 
+    borderWidth: 2, 
+    borderColor: 'rgba(255,255,255,0.1)',
+    position: 'relative',
+  },
+  packageCardSelected: { 
+    borderColor: '#3b82f6',
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+  },
+  popularBadge: { 
+    position: 'absolute', 
+    top: -12, 
+    right: 16, 
+    backgroundColor: '#fbbf24', 
+    paddingHorizontal: 12, 
+    paddingVertical: 4, 
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  popularText: { 
+    color: '#000', 
+    fontSize: 10, 
+    fontWeight: 'bold' 
+  },
+  packageIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.2)',
+  },
+  packageHeader: { 
+    alignItems: 'center', 
+    marginBottom: 16 
+  },
+  packageName: { 
+    color: '#FFF', 
+    fontSize: 16, 
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 4,
+  },
+  packagePrice: { 
+    color: '#60a5fa', 
+    fontSize: 32, 
+    fontWeight: 'bold' 
+  },
+  priceCurrency: {
+    color: '#60a5fa',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  packageFeatures: { 
+    gap: 8 
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  packageFeature: { 
+    color: 'rgba(255,255,255,0.7)', 
+    fontSize: 13 
+  },
+  selectedCheck: { 
+    position: 'absolute', 
+    top: 16, 
+    left: 16, 
+    width: 28, 
+    height: 28, 
+    borderRadius: 14, 
+    backgroundColor: '#3b82f6', 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
 
-  formCard: { backgroundColor: colors.dark.card, borderRadius: 16, padding: 20, marginBottom: 16 },
-  inputLabel: { color: colors.dark.textSecondary, fontSize: 14, marginBottom: 8 },
-  input: { backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: 16, color: '#FFF', fontSize: 16, marginBottom: 16, textAlign: 'right' },
-  textArea: { height: 100, textAlignVertical: 'top' },
+  nextBtn: { 
+    backgroundColor: '#3b82f6', 
+    borderRadius: 16, 
+    padding: 16, 
+    alignItems: 'center', 
+    marginTop: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  nextBtnDisabled: { 
+    opacity: 0.5 
+  },
+  nextBtnText: { 
+    color: '#FFF', 
+    fontSize: 16, 
+    fontWeight: 'bold' 
+  },
 
-  buttonRow: { flexDirection: 'row', gap: 12 },
-  backBtn: { flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: 16, alignItems: 'center' },
-  backBtnText: { color: '#FFF', fontSize: 16 },
-  submitBtn: { flex: 2, backgroundColor: colors.primary, borderRadius: 12, padding: 16, alignItems: 'center' },
-  submitBtnDisabled: { opacity: 0.6 },
-  submitBtnText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
+  formCard: { 
+    backgroundColor: 'rgba(255,255,255,0.03)', 
+    borderRadius: 20, 
+    padding: 20, 
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  inputLabel: { 
+    color: 'rgba(255,255,255,0.6)', 
+    fontSize: 13, 
+    marginBottom: 8 
+  },
+  input: { 
+    backgroundColor: 'rgba(255,255,255,0.05)', 
+    borderRadius: 12, 
+    padding: 14, 
+    color: '#FFF', 
+    fontSize: 15, 
+    textAlign: 'right',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  textArea: { 
+    height: 100, 
+    textAlignVertical: 'top',
+    paddingTop: 14,
+  },
 
-  successPage: { flex: 1, backgroundColor: colors.dark.bg, justifyContent: 'center', alignItems: 'center', padding: 40 },
-  successIcon: { fontSize: 80, marginBottom: 20 },
-  successTitle: { color: colors.dark.text, fontSize: 24, fontWeight: 'bold', marginBottom: 12 },
-  successDesc: { color: colors.dark.textSecondary, fontSize: 16, textAlign: 'center', marginBottom: 24 },
-  successBtn: { backgroundColor: colors.primary, paddingHorizontal: 32, paddingVertical: 16, borderRadius: 12 },
-  successBtnText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
+  summaryCard: {
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.2)',
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  summaryLabel: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 14,
+  },
+  summaryValue: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  summaryPrice: {
+    color: '#60a5fa',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+
+  buttonRow: { 
+    flexDirection: 'row', 
+    gap: 12 
+  },
+  backBtn: { 
+    flex: 1, 
+    backgroundColor: 'rgba(255,255,255,0.1)', 
+    borderRadius: 14, 
+    padding: 14, 
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  backBtnText: { 
+    color: '#FFF', 
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  submitBtn: { 
+    flex: 2, 
+    backgroundColor: '#3b82f6', 
+    borderRadius: 14, 
+    padding: 14, 
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  submitBtnDisabled: { 
+    opacity: 0.6 
+  },
+  submitBtnText: { 
+    color: '#FFF', 
+    fontSize: 15, 
+    fontWeight: 'bold' 
+  },
+
+  successPage: { 
+    flex: 1, 
+    backgroundColor: '#0a0a0f', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    padding: 40 
+  },
+  successIconContainer: {
+    marginBottom: 20,
+  },
+  successTitle: { 
+    color: '#FFF', 
+    fontSize: 24, 
+    fontWeight: 'bold', 
+    marginBottom: 12 
+  },
+  successDesc: { 
+    color: 'rgba(255,255,255,0.6)', 
+    fontSize: 15, 
+    textAlign: 'center', 
+    marginBottom: 24,
+    lineHeight: 22,
+  },
+  successBtn: { 
+    backgroundColor: '#3b82f6', 
+    paddingHorizontal: 32, 
+    paddingVertical: 16, 
+    borderRadius: 14 
+  },
+  successBtnText: { 
+    color: '#FFF', 
+    fontSize: 16, 
+    fontWeight: 'bold' 
+  },
 });
 
 export default AdvertiserScreen;
