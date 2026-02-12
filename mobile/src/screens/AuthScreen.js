@@ -177,7 +177,7 @@ const AuthScreen = ({ onLogin }) => {
   // Main login options
   if (mode === 'main') {
     return (
-      <LinearGradient colors={colors.gradients.dark} style={styles.container}>
+      <LinearGradient colors={['#0a0a0f', '#111118', '#0a0a0f']} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             {/* Logo */}
@@ -195,9 +195,11 @@ const AuthScreen = ({ onLogin }) => {
             <TouchableOpacity 
               style={styles.socialBtn} 
               onPress={handleGoogleLogin}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
             >
-              <Text style={styles.googleIcon}>G</Text>
+              <View style={styles.socialIconContainer}>
+                <Text style={styles.googleIcon}>G</Text>
+              </View>
               <Text style={styles.socialText}>الدخول بحساب Google</Text>
             </TouchableOpacity>
 
@@ -205,9 +207,11 @@ const AuthScreen = ({ onLogin }) => {
             <TouchableOpacity 
               style={[styles.socialBtn, styles.appleBtn]} 
               onPress={handleAppleLogin}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
             >
-              <Text style={styles.appleIcon}></Text>
+              <View style={styles.socialIconContainer}>
+                <Ionicons name="logo-apple" size={22} color="#FFF" />
+              </View>
               <Text style={[styles.socialText, styles.appleText]}>الدخول بحساب Apple</Text>
             </TouchableOpacity>
 
@@ -222,9 +226,9 @@ const AuthScreen = ({ onLogin }) => {
             <TouchableOpacity 
               style={styles.emailBtn} 
               onPress={() => setMode('login')}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
             >
-              <Text style={styles.emailIcon}>✉️</Text>
+              <Ionicons name="mail-outline" size={20} color="#60a5fa" />
               <Text style={styles.emailText}>الدخول بالبريد الإلكتروني</Text>
             </TouchableOpacity>
 
@@ -244,9 +248,10 @@ const AuthScreen = ({ onLogin }) => {
               style={styles.guestBtn} 
               onPress={handleGuestLogin}
               disabled={isLoading}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
             >
-              <Text style={styles.guestText}>🎮 تجربة التطبيق بدون حساب</Text>
+              <Ionicons name="game-controller-outline" size={18} color="#fbbf24" />
+              <Text style={styles.guestText}>تجربة التطبيق بدون حساب</Text>
             </TouchableOpacity>
 
             {/* Privacy Policy Link */}
@@ -255,6 +260,7 @@ const AuthScreen = ({ onLogin }) => {
               onPress={() => Linking.openURL('https://saqr-app-deploy.preview.emergentagent.com/privacy-policy.html')}
               activeOpacity={0.7}
             >
+              <Ionicons name="shield-checkmark-outline" size={14} color="rgba(255,255,255,0.4)" />
               <Text style={styles.privacyText}>سياسة الخصوصية</Text>
             </TouchableOpacity>
           </View>
