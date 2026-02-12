@@ -41,11 +41,11 @@ const HomeScreen = ({ user, onNavigateToAds, settings, onRefresh }) => {
 
   // Memoized tips array
   const tips = useMemo(() => [
-    { icon: '💡', text: 'شاهد 10 إعلانات = 50 نقطة!' },
-    { icon: '🎯', text: 'كل 500 نقطة = 1 ر.س' },
-    { icon: '⚡', text: 'أكمل التحديات للمزيد!' },
-    { icon: '🏆', text: 'تحدى نفسك يومياً' },
-    { icon: '🎁', text: 'مكافآت يومية للنشطين' },
+    { icon: 'bulb-outline', text: 'شاهد 10 إعلانات = 50 نقطة!' },
+    { icon: 'trophy-outline', text: 'كل 500 نقطة = 1 ر.س' },
+    { icon: 'flash-outline', text: 'أكمل التحديات للمزيد!' },
+    { icon: 'medal-outline', text: 'تحدى نفسك يومياً' },
+    { icon: 'gift-outline', text: 'مكافآت يومية للنشطين' },
   ], []);
 
   useEffect(() => {
