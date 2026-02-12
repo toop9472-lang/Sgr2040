@@ -271,7 +271,7 @@ const AuthScreen = ({ onLogin }) => {
 
   // Email Login / Register Form
   return (
-    <LinearGradient colors={colors.gradients.dark} style={styles.container}>
+    <LinearGradient colors={['#0a0a0f', '#111118', '#0a0a0f']} style={styles.container}>
       <KeyboardAvoidingView 
         style={styles.keyboardView} 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -284,7 +284,8 @@ const AuthScreen = ({ onLogin }) => {
               onPress={() => setMode('main')}
               activeOpacity={0.7}
             >
-              <Text style={styles.backText}>‹ رجوع</Text>
+              <Ionicons name="arrow-back" size={20} color="#60a5fa" />
+              <Text style={styles.backText}>رجوع</Text>
             </TouchableOpacity>
 
             {/* Logo */}
@@ -303,41 +304,50 @@ const AuthScreen = ({ onLogin }) => {
             {mode === 'register' && (
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>الاسم</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="أدخل اسمك"
-                  placeholderTextColor="rgba(255,255,255,0.4)"
-                  value={name}
-                  onChangeText={setName}
-                />
+                <View style={styles.inputWrapper}>
+                  <Ionicons name="person-outline" size={18} color="rgba(255,255,255,0.4)" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="أدخل اسمك"
+                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    value={name}
+                    onChangeText={setName}
+                  />
+                </View>
               </View>
             )}
 
             {/* Email Input */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>البريد الإلكتروني</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="example@email.com"
-                placeholderTextColor="rgba(255,255,255,0.4)"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+              <View style={styles.inputWrapper}>
+                <Ionicons name="mail-outline" size={18} color="rgba(255,255,255,0.4)" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="example@email.com"
+                  placeholderTextColor="rgba(255,255,255,0.3)"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
             </View>
 
             {/* Password Input */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>كلمة المرور</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="••••••••"
-                placeholderTextColor="rgba(255,255,255,0.4)"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-              />
+              <View style={styles.inputWrapper}>
+                <Ionicons name="lock-closed-outline" size={18} color="rgba(255,255,255,0.4)" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••"
+                  placeholderTextColor="rgba(255,255,255,0.3)"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                />
+              </View>
             </View>
 
             {/* Submit Button */}
@@ -345,14 +355,17 @@ const AuthScreen = ({ onLogin }) => {
               style={[styles.submitBtn, isLoading && styles.submitBtnDisabled]}
               onPress={handleEmailAuth}
               disabled={isLoading}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
             >
               {isLoading ? (
                 <ActivityIndicator color="#FFF" />
               ) : (
-                <Text style={styles.submitText}>
-                  {mode === 'register' ? 'إنشاء حساب' : 'دخول'}
-                </Text>
+                <>
+                  <Ionicons name={mode === 'register' ? "person-add-outline" : "log-in-outline"} size={20} color="#FFF" />
+                  <Text style={styles.submitText}>
+                    {mode === 'register' ? 'إنشاء حساب' : 'دخول'}
+                  </Text>
+                </>
               )}
             </TouchableOpacity>
 
