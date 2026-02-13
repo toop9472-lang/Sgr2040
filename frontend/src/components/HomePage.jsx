@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Clock, Play, ChevronRight, BarChart3, Award, Calendar, Zap, Moon, Sun } from 'lucide-react';
+import { TrendingUp, Clock, Play, ChevronRight, BarChart3, Award, Calendar, Zap, Moon, Sun, Lightbulb, Star, Target, Trophy, CheckCircle, PartyPopper } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import axios from 'axios';
 
