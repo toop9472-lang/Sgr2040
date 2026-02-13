@@ -182,7 +182,7 @@ const AIChatModal = ({ isOpen, onClose, user }) => {
           {isAvailable === false && (
             <div className="bg-orange-100 border border-orange-300 rounded-xl p-4 text-center">
               <p className="text-orange-700 text-sm">
-                ⚠️ المساعد الذكي غير متاح حالياً. سيتم تفعيله قريباً!
+                المساعد الذكي غير متاح حالياً. سيتم تفعيله قريباً!
               </p>
             </div>
           )}
