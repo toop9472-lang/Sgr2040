@@ -205,6 +205,10 @@ const AdvertiserScreen = () => {
           <View style={[styles.stepDot, step >= 2 && styles.stepDotActive]}>
             <Ionicons name={step > 2 ? "checkmark" : "document-text"} size={16} color={step >= 2 ? '#FFF' : '#666'} />
           </View>
+          <View style={[styles.stepLine, step >= 3 && styles.stepLineActive]} />
+          <View style={[styles.stepDot, step >= 3 && styles.stepDotActive]}>
+            <Ionicons name={step > 3 ? "checkmark" : "card"} size={16} color={step >= 3 ? '#FFF' : '#666'} />
+          </View>
         </View>
 
         {/* Step 1: Package Selection */}
