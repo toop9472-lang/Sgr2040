@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { Volume2, VolumeX, ExternalLink, ChevronUp, ChevronDown, Timer, Star, Eye, ArrowRight, X, MessageCircle } from 'lucide-react';
-import CommentsSection from './CommentsSection';
+
+const CommentsSection = lazy(() => import('./CommentsSection'));
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
