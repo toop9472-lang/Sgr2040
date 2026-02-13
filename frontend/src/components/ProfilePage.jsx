@@ -152,7 +152,9 @@ const ProfilePage = ({ user, onLogout, onNavigate }) => {
           <Card className="shadow-xl border border-[#3b82f6]/30 bg-[#111118]/80 backdrop-blur-xl">
             <CardContent className="pt-6">
               <div className="text-center">
-                <div className="text-4xl mb-2">🔒</div>
+                <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-[#3b82f6]/20 flex items-center justify-center">
+                  <LockKeyhole className="text-[#60a5fa]" size={32} />
+                </div>
                 <h3 className="font-bold text-lg mb-2 text-white">
                   {isRTL ? 'أنت في وضع الزائر' : "You're in Guest Mode"}
                 </h3>
