@@ -2,7 +2,7 @@
   "expo": {
     "name": "صقر",
     "slug": "saqr-app",
-    "version": "4.8.1",
+    "version": "4.9.0",
     "orientation": "portrait",
     "icon": "./assets/logo_saqr.png",
     "userInterfaceStyle": "dark",
@@ -38,7 +38,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.saqr.rewards",
-      "buildNumber": "12",
+      "buildNumber": "13",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "يستخدم التطبيق الكاميرا لتحميل الصور",
@@ -65,7 +65,7 @@
         "backgroundColor": "#0a0a0f"
       },
       "package": "com.saqr.rewards",
-      "versionCode": 33,
+      "versionCode": 34,
       "permissions": ["INTERNET", "VIBRATE", "AD_ID"],
       "blockedPermissions": ["android.permission.RECORD_AUDIO"]
     },
