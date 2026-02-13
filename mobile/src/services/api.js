@@ -201,6 +201,27 @@ export const api = {
       body: JSON.stringify({ message }),
     });
   },
+
+  // Comments API
+  async getComments(adId) {
+    return this.fetch(`/api/comments/ad/${adId}`);
+  },
+
+  async createComment(adId, content, token) {
+    return this.fetch('/api/comments/', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ ad_id: adId, content }),
+    });
+  },
+
+  async likeComment(commentId, token) {
+    return this.fetch('/api/comments/like', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ comment_id: commentId }),
+    });
+  },
 };
 
 export default api;
