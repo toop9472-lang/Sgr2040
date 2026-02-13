@@ -1,4 +1,4 @@
-// Bottom Navigation Component - TikTok Style Design (Optimized 2024-2026)
+// Bottom Navigation Component - Clean & Slim Design
 import React from 'react';
 import {
   View,
@@ -11,8 +11,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-
-// Detect if device has notch/home indicator
 const hasNotch = Platform.OS === 'ios' && SCREEN_HEIGHT >= 812;
 
 const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
@@ -31,13 +29,11 @@ const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
         onPress={() => onNavigate(item.id)}
         activeOpacity={0.7}
       >
-        <View style={[styles.iconWrapper, isActive && styles.iconWrapperActive]}>
-          <Ionicons 
-            name={isActive ? item.icon : item.iconOutline} 
-            size={26} 
-            color={isActive ? '#000' : '#888'} 
-          />
-        </View>
+        <Ionicons 
+          name={isActive ? item.icon : item.iconOutline} 
+          size={22} 
+          color={isActive ? '#60a5fa' : 'rgba(255,255,255,0.5)'} 
+        />
         <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>
           {item.label}
         </Text>
@@ -52,19 +48,14 @@ const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
           <NavButton key={item.id} item={item} />
         ))}
         
-        {/* زر المشاهدة المركزي - TikTok Style */}
+        {/* زر المشاهدة */}
         <TouchableOpacity 
           onPress={onAdsPress}
-          activeOpacity={0.85}
-          style={styles.centerButtonWrapper}
+          activeOpacity={0.8}
+          style={styles.watchButton}
         >
-          <View style={styles.centerButtonOuter}>
-            <View style={styles.centerButtonLeft} />
-            <View style={styles.centerButton}>
-              <Ionicons name="play" size={18} color="#000" />
-            </View>
-            <View style={styles.centerButtonRight} />
-          </View>
+          <Ionicons name="play-circle" size={20} color="#FFF" />
+          <Text style={styles.watchButtonText}>شاهد</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -77,80 +68,48 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(10, 10, 15, 0.98)',
     borderTopWidth: 0.5,
-    borderTopColor: '#eee',
-    paddingBottom: hasNotch ? 24 : Platform.OS === 'ios' ? 8 : 6,
-    // Shadow for elevation
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 10,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+    paddingBottom: hasNotch ? 20 : Platform.OS === 'ios' ? 6 : 4,
   },
   navContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingTop: 8,
-    paddingHorizontal: 10,
-    height: 54, // TikTok-like compact height
+    paddingTop: 6,
+    paddingHorizontal: 8,
+    height: 48,
   },
   navItem: { 
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 56,
+    minWidth: 50,
     paddingVertical: 2,
   },
-  iconWrapper: {
-    padding: 2,
-  },
-  iconWrapperActive: {
-    transform: [{ scale: 1.08 }],
-  },
   navLabel: { 
-    fontSize: 11, 
-    color: '#888', 
-    marginTop: -2,
+    fontSize: 10, 
+    color: 'rgba(255,255,255,0.5)', 
+    marginTop: 1,
     fontWeight: '500',
   },
   navLabelActive: { 
-    color: '#000', 
+    color: '#60a5fa', 
     fontWeight: '600',
   },
-  centerButtonWrapper: {
-    marginHorizontal: 4,
-  },
-  centerButtonOuter: {
+  watchButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#ef4444',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 4,
   },
-  centerButtonLeft: {
-    width: 20,
-    height: 28,
-    backgroundColor: '#25f4ee',
-    borderTopLeftRadius: 6,
-    borderBottomLeftRadius: 6,
-    marginRight: -8,
-  },
-  centerButton: {
-    width: 40,
-    height: 28,
-    borderRadius: 6,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-    borderWidth: 0.5,
-    borderColor: '#ddd',
-  },
-  centerButtonRight: {
-    width: 20,
-    height: 28,
-    backgroundColor: '#fe2c55',
-    borderTopRightRadius: 6,
-    borderBottomRightRadius: 6,
-    marginLeft: -8,
+  watchButtonText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
 
