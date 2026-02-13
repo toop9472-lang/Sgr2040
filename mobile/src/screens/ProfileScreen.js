@@ -264,7 +264,7 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
         </View>
 
         {/* App Version */}
-        <Text style={styles.versionText}>الإصدار 4.8.1</Text>
+        <Text style={styles.versionText}>الإصدار 4.9.0</Text>
       </View>
 
       {/* Change Password Modal */}
