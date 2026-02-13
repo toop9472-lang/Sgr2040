@@ -447,8 +447,10 @@ async def change_password(data: ChangePasswordRequest, user_id: str = Depends(ge
     
     # تحديث كلمة المرور
     new_password_hash = bcrypt.hash(data.new_password)
+    # استخدام الحقل المناسب للتحديث
+    update_filter = {'user_id': user_id} if user.get('user_id') else {'id': user_id}
     await db.users.update_one(
-        {'id': user_id},
+        update_filter,
         {
             '$set': {
                 'password_hash': new_password_hash,
