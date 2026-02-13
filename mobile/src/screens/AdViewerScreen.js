@@ -663,7 +663,7 @@ const CommentsModal = ({ visible, onClose, adId, user }) => {
             <Text style={commentsStyles.emptyText}>لا توجد تعليقات بعد</Text>
           </View>
         ) : (
-          <View style={commentsStyles.listContainer}>
+          <ScrollView style={commentsStyles.listContainer} showsVerticalScrollIndicator={false}>
             {comments.map((comment) => (
               <View key={comment.comment_id} style={commentsStyles.commentItem}>
                 <View style={commentsStyles.commentHeader}>
@@ -688,7 +688,7 @@ const CommentsModal = ({ visible, onClose, adId, user }) => {
                 <Text style={commentsStyles.commentText}>{comment.content}</Text>
               </View>
             ))}
-          </View>
+          </ScrollView>
         )}
 
         {/* إدخال تعليق جديد */}
