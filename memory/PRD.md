@@ -11,82 +11,164 @@ Arabic (العربية)
 ## What's Been Implemented
 
 ### Core Features ✅
-- [x] Cheat-proof point system (1 point per 60 seconds of completed ad watch)
-- [x] Ad Viewer with slim top bar timer
-- [x] Vertical progress bar for ad navigation
-- [x] Warning message for incomplete ads
-- [x] Variable ad duration support
-- [x] Remember Me feature on login
+- [x] Cheat-proof point system (1 point per 60 seconds)
+- [x] Ad Viewer with timer
+- [x] Guest mode
+- [x] Remember Me feature
 - [x] Mobile-optimized UI
-- [x] Privacy Policy page (/privacy)
+- [x] Privacy Policy page
 
 ### Mobile Builds ✅
-- [x] Android build (.aab) - Successfully uploaded
-- [x] iOS build (.ipa) - Successfully uploaded to App Store Connect
-- [x] AdMob credentials configured (App ID: ca-app-pub-5132559433385403~6910358704)
+- [x] Android build (.aab)
+- [x] iOS build (.ipa)
+- [x] AdMob configured
 
 ### Security Features ✅
-- [x] CORS policy configured with allowlist
+- [x] CORS policy with allowlist
 - [x] Security headers middleware
-- [x] Rate limiting on login endpoint
+- [x] Rate limiting on login
 - [x] Password strength validation
-- [x] JWT refresh token support
-- [x] Account lockout after failed attempts
-- [x] POST /api/auth/change-password endpoint
+- [x] JWT refresh tokens
+- [x] Account lockout
+- [x] Change password API
 
-### UI/UX Updates ✅ (February 13, 2026)
-- [x] **Slim Bottom Tab Bar** - Clean, minimal design (48px height)
-- [x] **Professional Icons** - All emojis replaced with Lucide/Ionicons
-- [x] **Enhanced Profile Page** - Menu items, referral code, transaction history
-- [x] **Clean Toasts** - Removed all emojis from toast messages
-- [x] **Git Cleanup** - Removed temp files (.gitconfig, test_result.md, mobile_backup/)
+### NEW FEATURES (February 13, 2026) ✅
+
+#### 1. Support Tickets System
+- [x] POST /api/support/tickets - Create ticket
+- [x] GET /api/support/tickets - Get user tickets
+- [x] GET /api/support/tickets/{id} - Get ticket details
+- [x] POST /api/support/tickets/{id}/reply - Reply to ticket
+- [x] POST /api/support/tickets/{id}/close - Close ticket
+- [x] SupportTicketsPage.jsx component
+
+#### 2. Two-Factor Authentication (2FA)
+- [x] POST /api/2fa/enable - Enable 2FA
+- [x] POST /api/2fa/verify - Verify and activate
+- [x] POST /api/2fa/disable - Disable 2FA
+- [x] POST /api/2fa/send-code - Send login code
+- [x] POST /api/2fa/validate - Validate code
+- [x] GET /api/2fa/status - Check status
+- [x] Backup codes support
+- [x] TwoFactorSettings.jsx component
+
+#### 3. Comments System (Social)
+- [x] POST /api/comments/ - Create comment
+- [x] GET /api/comments/ad/{id} - Get ad comments
+- [x] POST /api/comments/like - Like/unlike comment
+- [x] DELETE /api/comments/{id} - Delete comment
+- [x] Replies support
+- [x] CommentsSection.jsx component
+
+#### 4. Dark Mode
+- [x] ThemeContext.js with dark/light/system modes
+- [x] CSS variables for theming
+- [x] Persistent preference in localStorage
+
+#### 5. Multi-Language Support
+- [x] Arabic (ar) - RTL
+- [x] English (en)
+- [x] French (fr)
+- [x] Turkish (tr)
+- [x] Updated translations.js
+- [x] Language selector in settings
+
+#### 6. Settings Page
+- [x] SettingsPage.jsx component
+- [x] Language selection
+- [x] Theme selection
+- [x] 2FA settings link
+- [x] Notifications settings
+
+### UI/UX Updates ✅
+- [x] Slim Bottom Tab Bar
+- [x] Professional icons (Lucide/Ionicons)
+- [x] Clean toasts without emojis
+- [x] Git cleanup completed
 
 ---
 
 ## App Versions
-- **Current Version:** 4.9.0
-- **iOS Build Number:** 13
-- **Android Version Code:** 34
+- **Current Version:** 5.0.0
+- **iOS Build Number:** 14
+- **Android Version Code:** 35
 
 ---
 
 ## Technical Architecture
 
 ### Frontend (Web)
-- React with React Router
-- Tailwind CSS + Shadcn UI
-- Lucide React icons
-- Location: /app/frontend
+- React + Tailwind CSS + Shadcn UI
+- ThemeContext for dark/light modes
+- LanguageContext for i18n
 
 ### Backend
-- FastAPI (Python)
-- MongoDB database
-- Location: /app/backend
+- FastAPI (Python) + MongoDB
+- New routes: support, 2fa, comments
 
 ### Mobile
-- React Native with Expo
-- Ionicons for icons
-- EAS Build for production
-- Location: /app/mobile
+- React Native + Expo
+- Ionicons
 
 ---
 
-## Key Files
-- `/app/frontend/src/components/BottomNav.jsx` - Slim web nav
-- `/app/mobile/src/components/BottomNav.js` - Slim mobile nav
-- `/app/frontend/src/components/ProfilePage.jsx` - Enhanced profile
-- `/app/backend/routes/auth_routes.py` - Auth APIs
-- `/app/.gitignore` - Updated to exclude temp files
+## New API Endpoints (v5.0.0)
+
+### Support
+- `POST /api/support/tickets` - Create ticket
+- `GET /api/support/tickets` - List tickets
+- `POST /api/support/tickets/{id}/reply` - Reply
+
+### 2FA
+- `POST /api/2fa/enable` - Enable
+- `POST /api/2fa/verify` - Verify
+- `GET /api/2fa/status` - Status
+
+### Comments
+- `POST /api/comments/` - Create
+- `GET /api/comments/ad/{ad_id}` - List
+- `POST /api/comments/like` - Like
 
 ---
 
-## API Endpoints
-- `POST /api/auth/change-password` - Change password
-- `POST /api/auth/signin` - Login
-- `POST /api/auth/register` - Register
-- `POST /api/auth/refresh-token` - Refresh token
-- `GET /api/payments/packages` - Get ad packages
-- `POST /api/ads/watch` - Record ad watch
+## Pending Tasks
+
+### P0 - Critical
+- [ ] **Server Always-On:** Upgrade hosting plan
+
+### P1 - High Priority  
+- [ ] Build new iOS version (v5.0.0, build 14)
+- [ ] Submit to Apple App Store
+- [ ] Build new Android version
+
+### P2 - Medium Priority
+- [ ] "Add Personal Ad/Packages" feature
+- [ ] Email notifications for 2FA
+- [ ] Analytics dashboard
+
+### P3 - Future
+- [ ] Update iOS SDK to v26
+- [ ] Terms of Use page
+
+---
+
+## Files Created/Modified
+
+### New Files
+- `/app/backend/routes/support_routes.py`
+- `/app/backend/routes/two_factor_routes.py`
+- `/app/backend/routes/comments_routes.py`
+- `/app/frontend/src/context/ThemeContext.js`
+- `/app/frontend/src/components/SupportTicketsPage.jsx`
+- `/app/frontend/src/components/TwoFactorSettings.jsx`
+- `/app/frontend/src/components/CommentsSection.jsx`
+- `/app/frontend/src/components/SettingsPage.jsx`
+
+### Modified Files
+- `/app/backend/server.py` - Added new routers
+- `/app/frontend/src/i18n/translations.js` - 4 languages
+- `/app/frontend/src/i18n/LanguageContext.js` - Multi-lang support
+- `/app/mobile/app.json` - Version bump to 5.0.0
 
 ---
 
@@ -96,36 +178,7 @@ Arabic (العربية)
 
 ---
 
-## Pending Tasks
-
-### P0 - Critical
-- [ ] **Server Always-On:** Upgrade Emergent hosting plan to prevent sleep mode
-
-### P1 - High Priority
-- [ ] Build new iOS version (v4.9.0, build 13)
-- [ ] Submit to Apple App Store
-
-### P2 - Medium Priority
-- [ ] Implement "Add Personal Ad/Packages" feature
-- [ ] Address Android compatibility warnings
-
-### P3 - Future
-- [ ] Update iOS SDK to version 26 (deadline: April 2026)
-- [ ] Create "Terms of Use" page
-- [ ] Dark Mode support
-- [ ] Social interaction features
-- [ ] Sign in with Apple integration
-
----
-
-## Recent Changes (February 13, 2026)
-1. Reverted Bottom Tab Bar from TikTok-style to slim clean design
-2. Replaced all UI emojis with professional Lucide/Ionicons
-3. Cleaned git repository from temporary files
-4. Updated .gitignore to prevent junk files
-
----
-
-## Testing
-- **Last Test Date:** February 13, 2026
-- **Test Reports:** /app/test_reports/iteration_9.json
+## Testing Status
+- Backend APIs: Working
+- Frontend Components: Created
+- Mobile: Ready for build
