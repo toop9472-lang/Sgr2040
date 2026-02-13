@@ -198,6 +198,16 @@ export default function App() {
         {currentPage === 'advertiser' && (
           <AdvertiserScreen />
         )}
+        {currentPage === 'advertiser-dashboard' && (
+          <AdvertiserDashboardScreen 
+            navigation={{ navigate: setCurrentPage }}
+          />
+        )}
+        {currentPage === 'support' && (
+          <SupportScreen 
+            navigation={{ navigate: setCurrentPage }}
+          />
+        )}
       </LinearGradient>
 
       {/* AI Floating Button */}
