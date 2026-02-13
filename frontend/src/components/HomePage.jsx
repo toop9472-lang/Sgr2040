@@ -225,7 +225,9 @@ const HomePage = ({ user, onNavigateToAds }) => {
         {dailyChallenge && dailyChallenge.enabled && (
           <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-2xl p-5 mb-6">
             <div className="flex items-center gap-3 mb-3">
-              <span className="text-2xl">{dailyChallenge.icon}</span>
+              <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-amber-400" />
+              </div>
               <div>
                 <p className="text-amber-400 font-bold">التحدي اليومي</p>
                 <p className={`${textMutedClass} text-sm`}>{dailyChallenge.title}</p>
@@ -239,10 +241,16 @@ const HomePage = ({ user, onNavigateToAds }) => {
                   style={{ width: `${Math.min((watchedToday / dailyChallenge.target) * 100, 100)}%` }}
                 />
               </div>
-              <span className="text-amber-400 text-sm font-bold">+{dailyChallenge.reward} ⭐</span>
+              <span className="text-amber-400 text-sm font-bold flex items-center gap-1">
+                <Star className="w-3 h-3" /> +{dailyChallenge.reward}
+              </span>
             </div>
-            <p className={`${textDimClass} text-xs mt-2 text-center`}>
-              {watchedToday >= dailyChallenge.target ? '🎉 أحسنت! أكملت التحدي' : `${watchedToday}/${dailyChallenge.target}`}
+            <p className={`${textDimClass} text-xs mt-2 text-center flex items-center justify-center gap-1`}>
+              {watchedToday >= dailyChallenge.target ? (
+                <><CheckCircle className="w-3 h-3 text-green-400" /> أحسنت! أكملت التحدي</>
+              ) : (
+                `${watchedToday}/${dailyChallenge.target}`
+              )}
             </p>
           </div>
         )}
