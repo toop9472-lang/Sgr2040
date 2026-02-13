@@ -9,8 +9,10 @@ import AuthScreen from './src/screens/AuthScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import AdvertiserScreen from './src/screens/AdvertiserScreen';
+import AdvertiserDashboardScreen from './src/screens/AdvertiserDashboardScreen';
 import AdViewerScreen from './src/screens/AdViewerScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import SupportScreen from './src/screens/SupportScreen';
 
 // Components
 import BottomNav from './src/components/BottomNav';
