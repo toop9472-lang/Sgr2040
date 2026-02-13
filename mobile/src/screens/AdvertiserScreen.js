@@ -87,25 +87,65 @@ const AdvertiserScreen = () => {
 
     setIsSubmitting(true);
     try {
-      const token = await storage.getToken();
-      const response = await api.submitAdvertiserAd({
-        advertiser_name: formData.name,
-        advertiser_email: formData.email,
-        advertiser_phone: formData.phone,
-        website_url: formData.website,
-        title: formData.title,
-        description: formData.description,
-        package_id: selectedPackage.id,
-        duration_months: selectedPackage.duration,
-      }, token);
+      const response = await fetch(`${API_URL}/api/advertiser/ads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          advertiser_name: formData.name,
+          advertiser_email: formData.email,
+          advertiser_phone: formData.phone,
+          website_url: formData.website,
+          title: formData.title,
+          description: formData.description,
+          video_url: formData.video_url,
+          duration_months: selectedPackage.duration_months,
+        }),
+      });
 
       if (response.ok) {
-        setStep(3);
+        const data = await response.json();
+        setCreatedAd(data);
+        setStep(3); // Go to payment step
       } else {
-        Alert.alert('خطأ', 'فشل إرسال الإعلان');
+        Alert.alert('خطأ', 'فشل إنشاء الإعلان');
       }
     } catch (error) {
       Alert.alert('خطأ', 'حدث خطأ في الاتصال');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle Stripe Payment
+  const handleStripePayment = async () => {
+    if (!createdAd?.ad?.id) {
+      Alert.alert('خطأ', 'يرجى إنشاء الإعلان أولاً');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`${API_URL}/api/payments/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          package_id: selectedPackage.id,
+          ad_id: createdAd.ad.id,
+          origin_url: API_URL,
+          advertiser_email: formData.email,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Open Stripe checkout in browser
+        await Linking.openURL(data.checkout_url);
+        setStep(4); // Go to success
+      } else {
+        Alert.alert('خطأ', 'فشل إنشاء جلسة الدفع');
+      }
+    } catch (error) {
+      Alert.alert('خطأ', 'حدث خطأ في الدفع');
     } finally {
       setIsSubmitting(false);
     }
