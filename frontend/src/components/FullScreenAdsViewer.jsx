@@ -460,6 +460,14 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
               <p className="text-white font-bold text-base">{currentAd.advertiser || 'معلن'}</p>
               <p className="text-white/50 text-xs">إعلان {currentIndex + 1} من {ads.length}</p>
             </div>
+            {/* زر التعليقات */}
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowComments(true); }}
+              className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all"
+              data-testid="comments-btn"
+            >
+              <MessageCircle className="w-5 h-5 text-white" />
+            </button>
           </div>
 
           <h3 className="text-white font-bold text-lg mb-2">{currentAd.title}</h3>
@@ -476,6 +484,30 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
           )}
         </div>
       </div>
+
+      {/* نافذة التعليقات */}
+      {showComments && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end justify-center"
+          onClick={() => setShowComments(false)}
+        >
+          <div 
+            className="w-full max-w-lg max-h-[70vh] overflow-y-auto rounded-t-3xl bg-[#0a0a0f] p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white font-bold text-lg">التعليقات</h3>
+              <button
+                onClick={() => setShowComments(false)}
+                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+            <CommentsSection adId={currentAd?.id} user={user} />
+          </div>
+        </div>
+      )}
 
       {/* نقاط مكتسبة - Animation */}
       {showPointsAnimation && (
