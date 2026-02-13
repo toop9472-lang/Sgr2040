@@ -697,15 +697,13 @@ const CommentsModal = ({ visible, onClose, adId, user }) => {
             <Text style={commentsStyles.guestText}>سجل الدخول للتعليق</Text>
           ) : (
             <View style={commentsStyles.inputRow}>
-              <View style={commentsStyles.textInputContainer}>
-                <Text
-                  style={commentsStyles.textInput}
-                  value={newComment}
-                  onChangeText={setNewComment}
-                  placeholder="اكتب تعليقك..."
-                  placeholderTextColor="rgba(255,255,255,0.4)"
-                />
-              </View>
+              <TextInput
+                style={commentsStyles.textInput}
+                value={newComment}
+                onChangeText={setNewComment}
+                placeholder="اكتب تعليقك..."
+                placeholderTextColor="rgba(255,255,255,0.4)"
+              />
               <TouchableOpacity 
                 style={[commentsStyles.sendBtn, (!newComment.trim() || isSubmitting) && commentsStyles.sendBtnDisabled]}
                 onPress={handleSubmit}
