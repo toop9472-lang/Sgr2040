@@ -401,7 +401,7 @@ const AuthPage = ({ onLogin, onGuestMode, onAdminLogin }) => {
           <div className="pt-4">
             <p className="text-center text-xs text-gray-500 leading-relaxed">
               {t('termsText')}{' '}
-              <a href="/terms.html" target="_blank" className="text-[#60a5fa] hover:underline">
+              <a href="/terms" target="_blank" className="text-[#60a5fa] hover:underline">
                 {t('termsLink')}
               </a>{' '}
               {t('and')}{' '}
