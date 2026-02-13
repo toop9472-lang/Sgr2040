@@ -6,14 +6,16 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
-  Animated,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// Detect if device has notch/home indicator
+const hasNotch = Platform.OS === 'ios' && SCREEN_HEIGHT >= 812;
 
 const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
-  const insets = useSafeAreaInsets();
-  
   const navItems = [
     { id: 'home', label: 'الرئيسية', icon: 'home', iconOutline: 'home-outline' },
     { id: 'advertiser', label: 'أعلن', icon: 'megaphone', iconOutline: 'megaphone-outline' },
@@ -28,7 +30,6 @@ const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
         style={styles.navItem}
         onPress={() => onNavigate(item.id)}
         activeOpacity={0.7}
-        data-testid={`nav-${item.id}`}
       >
         <View style={[styles.iconWrapper, isActive && styles.iconWrapperActive]}>
           <Ionicons 
@@ -44,11 +45,8 @@ const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
     );
   };
 
-  // Calculate bottom padding for safe area
-  const bottomPadding = Math.max(insets.bottom, Platform.OS === 'ios' ? 20 : 8);
-
   return (
-    <View style={[styles.container, { paddingBottom: bottomPadding }]}>
+    <View style={styles.container}>
       <View style={styles.navContent}>
         {navItems.map((item) => (
           <NavButton key={item.id} item={item} />
@@ -59,7 +57,6 @@ const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
           onPress={onAdsPress}
           activeOpacity={0.85}
           style={styles.centerButtonWrapper}
-          data-testid="nav-watch-ads"
         >
           <View style={styles.centerButtonOuter}>
             <View style={styles.centerButtonLeft} />
@@ -83,6 +80,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 0.5,
     borderTopColor: '#eee',
+    paddingBottom: hasNotch ? 24 : Platform.OS === 'ios' ? 8 : 6,
     // Shadow for elevation
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
@@ -96,7 +94,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingTop: 8,
     paddingHorizontal: 10,
-    height: 56,
+    height: 54, // TikTok-like compact height
   },
   navItem: { 
     alignItems: 'center',
