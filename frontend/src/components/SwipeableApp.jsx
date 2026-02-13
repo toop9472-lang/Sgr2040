@@ -19,6 +19,7 @@ const SwipeableApp = ({
   const { t } = useLanguage();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [isInAdsViewer, setIsInAdsViewer] = useState(false);
+  const [isInSettings, setIsInSettings] = useState(false);
   const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
   const [touchEnd, setTouchEnd] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
