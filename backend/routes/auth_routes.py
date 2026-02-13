@@ -437,13 +437,14 @@ async def change_password(data: ChangePasswordRequest, user_id: str = Depends(ge
     # التأكد من أن كلمة المرور الجديدة مختلفة عن الحالية
     try:
         same_password = bcrypt.verify(data.new_password, user['password_hash'])
-        if same_password:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='كلمة المرور الجديدة يجب أن تكون مختلفة عن الحالية'
-            )
     except Exception:
-        pass
+        same_password = False
+    
+    if same_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='كلمة المرور الجديدة يجب أن تكون مختلفة عن الحالية'
+        )
     
     # تحديث كلمة المرور
     new_password_hash = bcrypt.hash(data.new_password)
