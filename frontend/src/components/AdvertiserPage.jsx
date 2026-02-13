@@ -674,8 +674,8 @@ const AdvertiserPage = ({ onNavigate }) => {
                   <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
                     <div className="space-y-3">
                       {[
-                        { id: 'bank', name: 'تحويل بنكي', icon: '🏦' },
-                        { id: 'stcpay', name: 'STC Pay', icon: '📱' }
+                        { id: 'bank', name: 'تحويل بنكي', icon: 'bank' },
+                        { id: 'stcpay', name: 'STC Pay', icon: 'phone' }
                       ].map((method) => (
                         <div
                           key={method.id}
