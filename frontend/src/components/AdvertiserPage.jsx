@@ -87,7 +87,7 @@ const AdvertiserPage = ({ onNavigate }) => {
 
     if (attempts >= maxAttempts) {
       toast({
-        title: '⚠️ انتهت المهلة',
+        title: 'انتهت المهلة',
         description: 'يرجى التحقق من بريدك الإلكتروني للتأكيد',
         variant: 'destructive'
       });
@@ -102,7 +102,7 @@ const AdvertiserPage = ({ onNavigate }) => {
         setStep(4);
         setCreatedAd({ ad: { id: data.ad_id } });
         toast({
-          title: '✅ تم الدفع بنجاح!',
+          title: 'تم الدفع بنجاح!',
           description: 'سيتم مراجعة إعلانك وتفعيله قريباً',
         });
         // Clear URL params
@@ -110,7 +110,7 @@ const AdvertiserPage = ({ onNavigate }) => {
         return;
       } else if (data.status === 'expired') {
         toast({
-          title: '❌ انتهت صلاحية جلسة الدفع',
+          title: 'انتهت صلاحية جلسة الدفع',
           description: 'يرجى المحاولة مرة أخرى',
           variant: 'destructive'
         });
@@ -133,7 +133,7 @@ const AdvertiserPage = ({ onNavigate }) => {
 
     if (attempts >= maxAttempts) {
       toast({
-        title: '⚠️ انتهت المهلة',
+        title: 'انتهت المهلة',
         description: 'يرجى التحقق من بريدك الإلكتروني للتأكيد',
         variant: 'destructive'
       });
