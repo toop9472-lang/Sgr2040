@@ -7,7 +7,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from auth.dependencies import get_current_user_id
 
-router = APIRouter(prefix="/api/comments", tags=["Comments"])
+router = APIRouter(prefix="/comments", tags=["Comments"])
 
 def get_db():
     """Get database connection"""
