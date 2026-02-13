@@ -236,7 +236,9 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white">
         <div className="text-center">
-          <div className="text-6xl mb-4 animate-bounce">📺</div>
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center animate-bounce">
+            <Play className="w-10 h-10 text-gray-400" />
+          </div>
           <p className="text-xl opacity-80">{isRTL ? 'لا توجد إعلانات متاحة' : 'No ads available'}</p>
         </div>
       </div>
