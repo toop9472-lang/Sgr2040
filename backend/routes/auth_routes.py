@@ -395,8 +395,13 @@ async def change_password(data: ChangePasswordRequest, user_id: str = Depends(ge
     """
     db = get_db()
     
-    # البحث عن المستخدم
-    user = await db.users.find_one({'id': user_id})
+    # البحث عن المستخدم - دعم كلا الحقلين id و user_id
+    user = await db.users.find_one({
+        '$or': [
+            {'id': user_id},
+            {'user_id': user_id}
+        ]
+    })
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
