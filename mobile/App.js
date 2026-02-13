@@ -188,6 +188,11 @@ export default function App() {
             onNavigate={setCurrentPage}
           />
         )}
+        {currentPage === 'settings' && (
+          <SettingsScreen 
+            onBack={() => setCurrentPage('profile')}
+          />
+        )}
         {currentPage === 'advertiser' && (
           <AdvertiserScreen />
         )}
