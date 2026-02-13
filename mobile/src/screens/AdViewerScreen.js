@@ -13,6 +13,8 @@ import {
   Animated,
   Platform,
   Alert,
+  TextInput,
+  ScrollView,
 } from 'react-native';
 import { Video } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
