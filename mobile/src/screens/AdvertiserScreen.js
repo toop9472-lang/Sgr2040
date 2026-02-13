@@ -154,18 +154,19 @@ const AdvertiserScreen = () => {
   const resetForm = () => {
     setStep(1);
     setSelectedPackage(null);
-    setFormData({ name: '', email: '', phone: '', website: '', title: '', description: '' });
+    setCreatedAd(null);
+    setFormData({ name: '', email: '', phone: '', website: '', title: '', description: '', video_url: '' });
   };
 
   // Success Screen
-  if (step === 3) {
+  if (step === 4) {
     return (
       <View style={styles.successPage}>
         <View style={styles.successIconContainer}>
           <Ionicons name="checkmark-circle" size={80} color="#22c55e" />
         </View>
         <Text style={styles.successTitle}>تم إرسال إعلانك!</Text>
-        <Text style={styles.successDesc}>سيتم مراجعة إعلانك وتفعيله خلال 24 ساعة. سنتواصل معك عبر البريد الإلكتروني.</Text>
+        <Text style={styles.successDesc}>سيتم مراجعة إعلانك وتفعيله خلال 24 ساعة بعد تأكيد الدفع.</Text>
         <TouchableOpacity style={styles.successBtn} onPress={resetForm}>
           <Text style={styles.successBtnText}>إنشاء إعلان جديد</Text>
         </TouchableOpacity>
