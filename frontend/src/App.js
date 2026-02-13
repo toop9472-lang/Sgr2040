@@ -16,6 +16,7 @@ import PaymentCancel from "./components/PaymentCancel";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import SupportPage from "./components/SupportPage";
+import SettingsPage from "./components/SettingsPage";
 import BottomNav from "./components/BottomNav";
 import { Toaster } from "./components/ui/toaster";
 import { toast } from "./hooks/use-toast";
