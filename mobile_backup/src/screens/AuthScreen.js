@@ -34,7 +34,7 @@ const AuthScreen = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const redirectUrl = 'https://mobile-redesign-13.preview.emergentagent.com/';
+      const redirectUrl = 'https://saqr-app-refresh.preview.emergentagent.com/';
       const authUrl = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
       
       const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);

@@ -142,7 +142,7 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
   };
 
   const handlePrivacy = () => {
-    Linking.openURL('https://mobile-redesign-13.preview.emergentagent.com/privacy-policy.html');
+    Linking.openURL('https://saqr-app-refresh.preview.emergentagent.com/privacy-policy.html');
   };
 
   const confirmLogout = () => {
