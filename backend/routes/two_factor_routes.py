@@ -9,7 +9,7 @@ import hashlib
 import os
 from auth.dependencies import get_current_user_id
 
-router = APIRouter(prefix="/api/2fa", tags=["Two-Factor Auth"])
+router = APIRouter(prefix="/2fa", tags=["Two-Factor Auth"])
 
 def get_db():
     """Get database connection"""
@@ -34,6 +34,56 @@ def generate_2fa_code():
 def hash_code(code: str) -> str:
     """تشفير الرمز"""
     return hashlib.sha256(code.encode()).hexdigest()
+
+async def send_2fa_email(email: str, code: str, user_name: str = "المستخدم"):
+    """إرسال رمز 2FA عبر البريد الإلكتروني"""
+    try:
+        from services.email_service import send_email, get_email_settings
+        
+        settings = await get_email_settings()
+        if not settings or not settings.get('email_enabled'):
+            print(f"Email disabled, 2FA code for {email}: {code}")
+            return False
+        
+        subject = "رمز التحقق - صقر"
+        html = f"""
+        <div style="direction: rtl; font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #3b82f6; margin: 0;">صقر</h1>
+                <p style="color: #666;">رمز التحقق بخطوتين</p>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); padding: 30px; border-radius: 16px; text-align: center; margin-bottom: 20px;">
+                <p style="color: rgba(255,255,255,0.8); margin: 0 0 10px 0; font-size: 14px;">رمز التحقق الخاص بك</p>
+                <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 12px; display: inline-block;">
+                    <span style="font-size: 36px; font-weight: bold; color: white; letter-spacing: 8px;">{code}</span>
+                </div>
+            </div>
+            
+            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                <p style="margin: 0; color: #374151;">مرحباً {user_name}،</p>
+                <p style="margin: 10px 0 0 0; color: #6b7280;">
+                    استخدم هذا الرمز لإكمال عملية تسجيل الدخول. الرمز صالح لمدة 10 دقائق فقط.
+                </p>
+            </div>
+            
+            <div style="text-align: center; padding: 20px; background: #fef3c7; border-radius: 12px;">
+                <p style="margin: 0; color: #92400e; font-size: 13px;">
+                    ⚠️ إذا لم تطلب هذا الرمز، يرجى تجاهل هذا البريد وتغيير كلمة المرور فوراً.
+                </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px; color: #9ca3af; font-size: 12px;">
+                <p>© 2025 صقر - جميع الحقوق محفوظة</p>
+            </div>
+        </div>
+        """
+        
+        result = await send_email(email, subject, html)
+        return result.get('success', False)
+    except Exception as e:
+        print(f"Failed to send 2FA email: {e}")
+        return False
 
 @router.post('/enable', response_model=dict)
 async def enable_2fa(data: Enable2FARequest, user_id: str = Depends(get_current_user_id)):
