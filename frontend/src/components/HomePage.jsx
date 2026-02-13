@@ -118,12 +118,13 @@ const HomePage = ({ user, onNavigateToAds }) => {
         {/* ترحيب المستخدم */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className={`text-xl font-bold ${textClass}`}>مرحباً {user?.name || 'صديقي'} 👋</h2>
+            <h2 className={`text-xl font-bold ${textClass}`}>مرحباً {user?.name || 'صديقي'}</h2>
             <p className={`${textMutedClass} text-sm mt-1`}>جاهز لكسب المزيد اليوم؟</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="bg-[#3b82f6]/20 border border-[#3b82f6]/30 rounded-full px-4 py-2">
-              <span className="text-[#60a5fa] font-bold">{userPoints} ⭐</span>
+            <div className="bg-[#3b82f6]/20 border border-[#3b82f6]/30 rounded-full px-4 py-2 flex items-center gap-1">
+              <Star className="w-4 h-4 text-[#60a5fa]" />
+              <span className="text-[#60a5fa] font-bold">{userPoints}</span>
             </div>
           </div>
         </div>
