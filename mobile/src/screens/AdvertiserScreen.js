@@ -404,8 +404,91 @@ const AdvertiserScreen = () => {
                   <ActivityIndicator color="#FFF" size="small" />
                 ) : (
                   <>
-                    <Ionicons name="send" size={18} color="#FFF" />
-                    <Text style={styles.submitBtnText}>إرسال الإعلان</Text>
+                    <Ionicons name="arrow-forward" size={18} color="#FFF" />
+                    <Text style={styles.submitBtnText}>متابعة للدفع</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+
+        {/* Step 3: Payment */}
+        {step === 3 && createdAd && (
+          <>
+            <Text style={styles.sectionTitle}>اختر طريقة الدفع</Text>
+            
+            {/* Payment Summary */}
+            <View style={styles.paymentSummary}>
+              <View style={styles.paymentSummaryRow}>
+                <Text style={styles.paymentSummaryLabel}>الباقة</Text>
+                <Text style={styles.paymentSummaryValue}>{selectedPackage?.description}</Text>
+              </View>
+              <View style={styles.paymentSummaryRow}>
+                <Text style={styles.paymentSummaryLabel}>المبلغ</Text>
+                <Text style={styles.paymentSummaryPrice}>{selectedPackage?.amount} ﷼</Text>
+              </View>
+            </View>
+
+            {/* Stripe Payment */}
+            <TouchableOpacity
+              style={styles.paymentOption}
+              onPress={handleStripePayment}
+              disabled={isSubmitting}
+              activeOpacity={0.8}
+            >
+              <View style={styles.paymentOptionIcon}>
+                <Ionicons name="card" size={28} color="#6366f1" />
+              </View>
+              <View style={styles.paymentOptionContent}>
+                <Text style={styles.paymentOptionTitle}>الدفع ببطاقة الائتمان</Text>
+                <Text style={styles.paymentOptionDesc}>Visa, Mastercard, Apple Pay</Text>
+              </View>
+              <View style={styles.paymentOptionBadge}>
+                <Text style={styles.paymentOptionBadgeText}>آمن</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Bank Transfer Info */}
+            <View style={styles.bankInfoCard}>
+              <View style={styles.bankInfoHeader}>
+                <Ionicons name="business" size={20} color="#60a5fa" />
+                <Text style={styles.bankInfoTitle}>أو التحويل البنكي</Text>
+              </View>
+              <View style={styles.bankInfoRow}>
+                <Text style={styles.bankInfoLabel}>البنك:</Text>
+                <Text style={styles.bankInfoValue}>الراجحي</Text>
+              </View>
+              <View style={styles.bankInfoRow}>
+                <Text style={styles.bankInfoLabel}>رقم الحساب:</Text>
+                <Text style={styles.bankInfoValue}>SA1234567890</Text>
+              </View>
+              <View style={styles.bankInfoRow}>
+                <Text style={styles.bankInfoLabel}>اسم المستفيد:</Text>
+                <Text style={styles.bankInfoValue}>شركة صقر</Text>
+              </View>
+              <Text style={styles.bankInfoNote}>
+                بعد التحويل، أرسل إيصال التحويل على البريد: support@saqr.app
+              </Text>
+            </View>
+
+            <View style={styles.buttonRow}>
+              <TouchableOpacity style={styles.backBtn} onPress={() => setStep(2)} activeOpacity={0.7}>
+                <Ionicons name="arrow-back" size={18} color="#FFF" />
+                <Text style={styles.backBtnText}>رجوع</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.stripeBtn, isSubmitting && styles.submitBtnDisabled]}
+                onPress={handleStripePayment}
+                disabled={isSubmitting}
+                activeOpacity={0.8}
+              >
+                {isSubmitting ? (
+                  <ActivityIndicator color="#FFF" size="small" />
+                ) : (
+                  <>
+                    <Ionicons name="card" size={18} color="#FFF" />
+                    <Text style={styles.submitBtnText}>ادفع الآن</Text>
                   </>
                 )}
               </TouchableOpacity>
