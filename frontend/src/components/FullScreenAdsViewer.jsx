@@ -507,7 +507,9 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
                 <X className="w-4 h-4 text-white" />
               </button>
             </div>
-            <CommentsSection adId={currentAd?.id} user={user} />
+            <Suspense fallback={<div className="text-center text-gray-400 py-8">جاري التحميل...</div>}>
+              <CommentsSection adId={currentAd?.id} user={user} />
+            </Suspense>
           </div>
         </div>
       )}
