@@ -3,11 +3,17 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
-from bson import ObjectId
-from database import get_db
+from motor.motor_asyncio import AsyncIOMotorClient
+import os
 from auth.dependencies import get_current_user_id
 
 router = APIRouter(prefix="/api/support", tags=["Support"])
+
+def get_db():
+    """Get database connection"""
+    mongo_url = os.environ['MONGO_URL']
+    client = AsyncIOMotorClient(mongo_url)
+    return client[os.environ['DB_NAME']]
 
 class TicketCreate(BaseModel):
     subject: str
