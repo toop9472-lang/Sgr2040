@@ -224,8 +224,9 @@ class TestAuthenticatedTwoFactorAPIs:
     @pytest.fixture
     def auth_token(self):
         """Get authentication token using demo account"""
+        # Use /api/auth/signin for email/password login
         response = requests.post(
-            f"{BASE_URL}/api/auth/login",
+            f"{BASE_URL}/api/auth/signin",
             json={
                 "email": "demo@saqr.app",
                 "password": "Demo123456"
@@ -233,7 +234,7 @@ class TestAuthenticatedTwoFactorAPIs:
         )
         
         if response.status_code != 200:
-            pytest.skip("Could not authenticate with demo account")
+            pytest.skip(f"Could not authenticate with demo account: {response.status_code} - {response.text}")
         
         data = response.json()
         return data.get('token')
