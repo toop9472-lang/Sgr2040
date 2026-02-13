@@ -259,7 +259,7 @@ const HomePage = ({ user, onNavigateToAds }) => {
         {tips.length > 0 && (
           <div className={`${cardClass} rounded-2xl p-4 border`}>
             <div className="flex items-center gap-3">
-              <span className="text-2xl animate-bounce">{tips[currentTip % tips.length]?.icon || '💡'}</span>
+              <Lightbulb className="w-5 h-5 text-amber-400 animate-pulse" />
               <p className={`${textMutedClass} text-sm`}>{tips[currentTip % tips.length]?.text || ''}</p>
             </div>
           </div>
