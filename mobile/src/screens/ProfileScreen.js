@@ -142,11 +142,11 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
   };
 
   const handlePrivacy = () => {
-    Linking.openURL('https://app-security-fix-1.preview.emergentagent.com/privacy');
+    Linking.openURL('https://mobile-verify-9.preview.emergentagent.com/privacy');
   };
 
   const handleTerms = () => {
-    Linking.openURL('https://app-security-fix-1.preview.emergentagent.com/terms');
+    Linking.openURL('https://mobile-verify-9.preview.emergentagent.com/terms');
   };
 
   const handleSettings = () => {

@@ -18,7 +18,7 @@ import api from '../services/api';
 import storage from '../services/storage';
 import colors from '../styles/colors';
 
-const API_URL = 'https://app-security-fix-1.preview.emergentagent.com';
+const API_URL = 'https://mobile-verify-9.preview.emergentagent.com';
 
 // سيتم استبدالها بالباقات من السيرفر
 const FALLBACK_PACKAGES = [

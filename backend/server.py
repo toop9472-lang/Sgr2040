@@ -71,7 +71,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 
 # CORS Configuration - Secure Origins
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "").split(",") if os.environ.get("ALLOWED_ORIGINS") else [
-    "https://app-security-fix-1.preview.emergentagent.com",
+    "https://mobile-verify-9.preview.emergentagent.com",
     "https://saqrpointscom.store",
     "http://localhost:3000",
     "http://localhost:19006",

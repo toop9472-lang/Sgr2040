@@ -177,7 +177,7 @@ eas build --platform ios --profile production
 
 ### API URL:
 ```
-https://app-security-fix-1.preview.emergentagent.com
+https://mobile-verify-9.preview.emergentagent.com
 ```
 
 ---
