@@ -175,7 +175,7 @@ Arabic (العربية)
 - [ ] Build new Android version
 
 ### P2 - Medium Priority
-- [ ] "Add Personal Ad/Packages" feature
+- [x] ~~"Add Personal Ad/Packages" feature~~ ✅ تم التحقق والتأكد من عمله
 - [ ] Email notifications for 2FA
 - [ ] Analytics dashboard
 
