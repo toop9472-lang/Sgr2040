@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Volume2, VolumeX, ExternalLink, ChevronUp, ChevronDown, Timer, Star, Eye, ArrowRight, X } from 'lucide-react';
+import { Volume2, VolumeX, ExternalLink, ChevronUp, ChevronDown, Timer, Star, Eye, ArrowRight, X, MessageCircle } from 'lucide-react';
+import CommentsSection from './CommentsSection';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -10,6 +11,7 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [showAdInfo, setShowAdInfo] = useState(true);
+  const [showComments, setShowComments] = useState(false);
   const [touchStartY, setTouchStartY] = useState(null);
   const [touchStartX, setTouchStartX] = useState(null);
   const [touchEndY, setTouchEndY] = useState(null);
