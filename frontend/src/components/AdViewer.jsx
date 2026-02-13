@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Volume2, VolumeX, Play, Eye, Sparkles, Gift, ChevronUp, ChevronDown } from 'lucide-react';
+import { Volume2, VolumeX, Play, Eye, Sparkles, Gift, ChevronUp, ChevronDown, Zap } from 'lucide-react';
 import { toast } from '../hooks/use-toast';
 import { useLanguage } from '../i18n/LanguageContext';
 import confetti from 'canvas-confetti';
