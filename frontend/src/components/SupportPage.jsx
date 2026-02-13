@@ -128,7 +128,7 @@ const SupportPage = ({ user, isRTL = true }) => {
             className="text-center mb-8"
           >
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#FFD700]/20 to-[#FFD700]/5 border border-[#FFD700]/30 mb-4">
-              <span className="text-4xl">🤖</span>
+              <Bot className="w-10 h-10 text-[#FFD700]" />
             </div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-[#FFD700] to-[#FFA500] bg-clip-text text-transparent">
               مركز الدعم الذكي
