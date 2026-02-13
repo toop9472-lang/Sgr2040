@@ -175,21 +175,26 @@ Arabic (العربية)
 ## Pending Tasks
 
 ### P0 - Critical
-- [ ] **Server Always-On:** Upgrade hosting plan (سبب رفض Apple)
+- [ ] **Server Always-On:** Upgrade hosting plan (سبب رفض Apple) - يجب إبلاغ المستخدم
 
 ### P1 - High Priority  
 - [ ] Build new iOS version (v5.0.0, build 14)
 - [ ] Submit to Apple App Store
 - [ ] Build new Android version
+- [ ] Update Android SDK target version
 
 ### P2 - Medium Priority
 - [x] ~~"Add Personal Ad/Packages" feature~~ ✅ تم التحقق والتأكد من عمله
 - [x] ~~Email notifications for 2FA~~ ✅ تم التنفيذ
 - [x] ~~Analytics dashboard~~ ✅ موجود ويعمل
+- [x] ~~لوحة تحكم المعلن~~ ✅ تم إنشاء `AdvertiserDashboardScreen.js`
+- [x] ~~شاشة الدعم الفني~~ ✅ تم إنشاء `SupportScreen.js`
+- [x] ~~README.md~~ ✅ تم كتابة توثيق كامل
 
 ### P3 - Future
 - [x] ~~Update iOS SDK to v26~~ (يتم عند البناء)
 - [x] ~~Terms of Use page~~ ✅ تم إنشاء `/terms`
+- [x] ~~تنظيف الملفات المؤقتة~~ ✅ تم حذف mobile_backup
 
 ---
 
