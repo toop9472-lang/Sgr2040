@@ -1,6 +1,6 @@
 /**
  * Translations for Saqr App
- * Supports Arabic (ar) and English (en)
+ * Supports Arabic (ar), English (en), French (fr), Turkish (tr)
  */
 
 export const translations = {
@@ -16,7 +16,7 @@ export const translations = {
     loginWithGoogle: 'تسجيل الدخول بواسطة Google',
     loginWithApple: 'تسجيل الدخول بواسطة Apple',
     loginWithEmail: 'تسجيل بالبريد الإلكتروني',
-    guestMode: 'زيارة (تصفح بدون تسجيل)',
+    guestMode: 'تجربة التطبيق بدون حساب',
     email: 'البريد الإلكتروني',
     password: 'كلمة المرور',
     name: 'الاسم',
@@ -33,9 +33,10 @@ export const translations = {
     home: 'الرئيسية',
     profile: 'حسابي',
     advertiser: 'أضف إعلانك',
-    advertiseNow: 'أعلن الآن',
+    advertiseNow: 'أعلن',
     notifications: 'الإشعارات',
     withdraw: 'سحب الرصيد',
+    watch: 'شاهد',
     
     // Home/Ads
     yourPoints: 'نقاطك',
@@ -44,6 +45,8 @@ export const translations = {
     noAds: 'لا توجد إعلانات حالياً',
     refresh: 'تحديث',
     loadingAds: 'جاري تحميل الإعلانات...',
+    startWatching: 'ابدأ المشاهدة الآن',
+    earnPerAd: 'اكسب 5 نقاط لكل إعلان',
     
     // Profile
     currentPoints: 'نقاطك الحالية',
@@ -60,6 +63,64 @@ export const translations = {
     guestModeLabel: 'وضع الزائر',
     backToLogin: 'العودة لتسجيل الدخول',
     version: 'الإصدار',
+    changePassword: 'تغيير كلمة المرور',
+    transactionHistory: 'سجل المعاملات',
+    shareApp: 'شارك التطبيق',
+    privacyPolicy: 'سياسة الخصوصية',
+    referralCode: 'كود الإحالة',
+    copyCode: 'انسخ الكود',
+    codeCopied: 'تم نسخ الكود',
+    
+    // 2FA
+    twoFactorAuth: 'التحقق بخطوتين',
+    enable2FA: 'تفعيل التحقق بخطوتين',
+    disable2FA: 'إلغاء التحقق بخطوتين',
+    verificationCode: 'رمز التحقق',
+    enterCode: 'أدخل الرمز المرسل',
+    codeExpires: 'ينتهي الرمز خلال',
+    backupCodes: 'رموز الاسترداد',
+    saveBackupCodes: 'احفظ هذه الرموز في مكان آمن',
+    
+    // Support Tickets
+    supportTickets: 'تذاكر الدعم',
+    createTicket: 'إنشاء تذكرة',
+    myTickets: 'تذاكري',
+    ticketSubject: 'موضوع التذكرة',
+    ticketMessage: 'رسالتك',
+    ticketCategory: 'التصنيف',
+    categoryGeneral: 'استفسار عام',
+    categoryTechnical: 'مشكلة تقنية',
+    categoryPayment: 'الدفع والسحب',
+    categoryAccount: 'حسابي',
+    ticketStatus: 'حالة التذكرة',
+    statusOpen: 'مفتوحة',
+    statusInProgress: 'قيد المعالجة',
+    statusResolved: 'تم الحل',
+    statusClosed: 'مغلقة',
+    replyToTicket: 'الرد على التذكرة',
+    closeTicket: 'إغلاق التذكرة',
+    
+    // Comments
+    comments: 'التعليقات',
+    addComment: 'أضف تعليق',
+    writeComment: 'اكتب تعليقك...',
+    reply: 'رد',
+    like: 'إعجاب',
+    noComments: 'لا توجد تعليقات بعد',
+    deleteComment: 'حذف التعليق',
+    
+    // Dark Mode
+    darkMode: 'الوضع الداكن',
+    lightMode: 'الوضع الفاتح',
+    systemMode: 'حسب النظام',
+    appearance: 'المظهر',
+    
+    // Language
+    language: 'اللغة',
+    arabic: 'العربية',
+    english: 'English',
+    french: 'Français',
+    turkish: 'Türkçe',
     
     // Withdraw
     withdrawTitle: 'سحب الرصيد',
@@ -90,66 +151,20 @@ export const translations = {
     continueToPayment: 'متابعة للدفع',
     selectPaymentMethod: 'اختر طريقة الدفع',
     amountRequired: 'المبلغ المطلوب',
-    creditCardPayment: 'الدفع ببطاقة الائتمان (عالمي)',
-    localPayment: 'الدفع المحلي (السعودية)',
     payNow: 'ادفع الآن',
-    payViaStripe: 'ادفع الآن عبر Stripe',
-    payViaTap: 'ادفع الآن عبر Tap',
-    bankTransferOrStc: 'التحويل البنكي أو STC Pay',
-    transferProof: 'رقم التحويل أو إثبات الدفع',
-    transferInfo: 'معلومات التحويل',
-    bank: 'البنك',
-    beneficiary: 'اسم المستفيد',
-    sendProof: 'إرسال إثبات الدفع',
-    instant: 'فوري',
-    local: 'محلي',
     
     // Payment
     paymentSuccess: 'تم الدفع بنجاح!',
     paymentSuccessMsg: 'سيتم مراجعة إعلانك وتفعيله قريباً',
     paymentCancelled: 'تم إلغاء الدفع',
-    paymentCancelledMsg: 'تم إلغاء عملية الدفع. يمكنك المحاولة مرة أخرى في أي وقت.',
+    paymentCancelledMsg: 'تم إلغاء عملية الدفع',
     retry: 'إعادة المحاولة',
     backToHome: 'العودة للرئيسية',
-    checkingPayment: 'جاري التحقق من الدفع...',
-    pleaseWait: 'يرجى الانتظار',
     
-    // Success messages
+    // Success/Error messages
     success: 'تم بنجاح!',
-    adCreated: 'تم إنشاء الإعلان',
-    requestSent: 'تم إرسال الطلب',
-    proofSent: 'تم إرسال إثبات الدفع',
-    adReviewMsg: 'سيتم مراجعة إعلانك والموافقة عليه خلال 24 ساعة',
-    
-    // Errors
     error: 'خطأ',
-    createAdFirst: 'يرجى إنشاء الإعلان أولاً',
-    paymentError: 'خطأ في الدفع',
-    failedCreateSession: 'فشل إنشاء جلسة الدفع',
     fillAllFields: 'أكمل جميع الحقول المطلوبة',
-    
-    // Admin
-    adminPanel: 'لوحة التحكم',
-    welcome: 'مرحباً',
-    totalRevenue: 'إجمالي الإيرادات',
-    userPayouts: 'المدفوعات للمستخدمين',
-    netProfit: 'صافي الربح',
-    totalUsers: 'إجمالي المستخدمين',
-    withdrawRequests: 'طلبات السحب',
-    adRequests: 'طلبات الإعلانات',
-    noPendingWithdrawals: 'لا توجد طلبات سحب معلقة',
-    noPendingAds: 'لا توجد طلبات إعلانات معلقة',
-    approve: 'موافقة',
-    reject: 'رفض',
-    approveAndActivate: 'موافقة وتفعيل',
-    amount: 'المبلغ',
-    points: 'النقاط',
-    method: 'الطريقة',
-    duration: 'المدة',
-    month: 'شهر',
-    months: 'أشهر',
-    year: 'سنة',
-    discount: 'خصم',
     
     // Misc
     back: 'رجوع',
@@ -158,21 +173,15 @@ export const translations = {
     save: 'حفظ',
     delete: 'حذف',
     edit: 'تعديل',
-    view: 'عرض',
-    status: 'الحالة',
-    pending: 'قيد المراجعة',
-    approved: 'مُعتمد',
-    rejected: 'مرفوض',
-    paid: 'مدفوع',
-    sar: 'ريال',
-    usd: '$',
-    comingSoon: 'قريباً',
-    
-    // Packages
-    oneMonth: 'إعلان لمدة شهر واحد',
-    threeMonths: 'إعلان لمدة 3 أشهر',
-    sixMonths: 'إعلان لمدة 6 أشهر',
-    twelveMonths: 'إعلان لمدة سنة كاملة',
+    send: 'إرسال',
+    close: 'إغلاق',
+    points: 'النقاط',
+    today: 'اليوم',
+    available: 'المتاح',
+    remaining: 'المتبقي',
+    earnRate: 'معدل الكسب',
+    totalPoints: 'إجمالي النقاط',
+    currentBalance: 'الرصيد الحالي',
   },
   
   en: {
@@ -187,7 +196,7 @@ export const translations = {
     loginWithGoogle: 'Login with Google',
     loginWithApple: 'Login with Apple',
     loginWithEmail: 'Login with Email',
-    guestMode: 'Guest Mode (Browse without login)',
+    guestMode: 'Try app without account',
     email: 'Email',
     password: 'Password',
     name: 'Name',
@@ -207,6 +216,7 @@ export const translations = {
     advertiseNow: 'Advertise',
     notifications: 'Notifications',
     withdraw: 'Withdraw',
+    watch: 'Watch',
     
     // Home/Ads
     yourPoints: 'Your Points',
@@ -215,6 +225,8 @@ export const translations = {
     noAds: 'No ads available',
     refresh: 'Refresh',
     loadingAds: 'Loading ads...',
+    startWatching: 'Start Watching Now',
+    earnPerAd: 'Earn 5 points per ad',
     
     // Profile
     currentPoints: 'Current Points',
@@ -231,6 +243,64 @@ export const translations = {
     guestModeLabel: 'Guest Mode',
     backToLogin: 'Back to Login',
     version: 'Version',
+    changePassword: 'Change Password',
+    transactionHistory: 'Transaction History',
+    shareApp: 'Share App',
+    privacyPolicy: 'Privacy Policy',
+    referralCode: 'Referral Code',
+    copyCode: 'Copy Code',
+    codeCopied: 'Code Copied',
+    
+    // 2FA
+    twoFactorAuth: 'Two-Factor Authentication',
+    enable2FA: 'Enable 2FA',
+    disable2FA: 'Disable 2FA',
+    verificationCode: 'Verification Code',
+    enterCode: 'Enter the code sent',
+    codeExpires: 'Code expires in',
+    backupCodes: 'Backup Codes',
+    saveBackupCodes: 'Save these codes in a safe place',
+    
+    // Support Tickets
+    supportTickets: 'Support Tickets',
+    createTicket: 'Create Ticket',
+    myTickets: 'My Tickets',
+    ticketSubject: 'Subject',
+    ticketMessage: 'Your Message',
+    ticketCategory: 'Category',
+    categoryGeneral: 'General Inquiry',
+    categoryTechnical: 'Technical Issue',
+    categoryPayment: 'Payment & Withdrawal',
+    categoryAccount: 'My Account',
+    ticketStatus: 'Status',
+    statusOpen: 'Open',
+    statusInProgress: 'In Progress',
+    statusResolved: 'Resolved',
+    statusClosed: 'Closed',
+    replyToTicket: 'Reply',
+    closeTicket: 'Close Ticket',
+    
+    // Comments
+    comments: 'Comments',
+    addComment: 'Add Comment',
+    writeComment: 'Write your comment...',
+    reply: 'Reply',
+    like: 'Like',
+    noComments: 'No comments yet',
+    deleteComment: 'Delete Comment',
+    
+    // Dark Mode
+    darkMode: 'Dark Mode',
+    lightMode: 'Light Mode',
+    systemMode: 'System Default',
+    appearance: 'Appearance',
+    
+    // Language
+    language: 'Language',
+    arabic: 'العربية',
+    english: 'English',
+    french: 'Français',
+    turkish: 'Türkçe',
     
     // Withdraw
     withdrawTitle: 'Withdraw Balance',
@@ -261,66 +331,20 @@ export const translations = {
     continueToPayment: 'Continue to Payment',
     selectPaymentMethod: 'Select Payment Method',
     amountRequired: 'Amount Required',
-    creditCardPayment: 'Credit Card Payment (International)',
-    localPayment: 'Local Payment (Saudi Arabia)',
     payNow: 'Pay Now',
-    payViaStripe: 'Pay via Stripe',
-    payViaTap: 'Pay via Tap',
-    bankTransferOrStc: 'Bank Transfer or STC Pay',
-    transferProof: 'Transfer number or payment proof',
-    transferInfo: 'Transfer Information',
-    bank: 'Bank',
-    beneficiary: 'Beneficiary',
-    sendProof: 'Send Payment Proof',
-    instant: 'Instant',
-    local: 'Local',
     
     // Payment
     paymentSuccess: 'Payment Successful!',
     paymentSuccessMsg: 'Your ad will be reviewed and activated soon',
     paymentCancelled: 'Payment Cancelled',
-    paymentCancelledMsg: 'Payment was cancelled. You can try again anytime.',
+    paymentCancelledMsg: 'Payment was cancelled',
     retry: 'Retry',
     backToHome: 'Back to Home',
-    checkingPayment: 'Checking payment...',
-    pleaseWait: 'Please wait',
     
-    // Success messages
+    // Success/Error messages
     success: 'Success!',
-    adCreated: 'Ad created',
-    requestSent: 'Request sent',
-    proofSent: 'Payment proof sent',
-    adReviewMsg: 'Your ad will be reviewed and approved within 24 hours',
-    
-    // Errors
     error: 'Error',
-    createAdFirst: 'Please create ad first',
-    paymentError: 'Payment Error',
-    failedCreateSession: 'Failed to create payment session',
     fillAllFields: 'Please fill all required fields',
-    
-    // Admin
-    adminPanel: 'Admin Panel',
-    welcome: 'Welcome',
-    totalRevenue: 'Total Revenue',
-    userPayouts: 'User Payouts',
-    netProfit: 'Net Profit',
-    totalUsers: 'Total Users',
-    withdrawRequests: 'Withdrawal Requests',
-    adRequests: 'Ad Requests',
-    noPendingWithdrawals: 'No pending withdrawal requests',
-    noPendingAds: 'No pending ad requests',
-    approve: 'Approve',
-    reject: 'Reject',
-    approveAndActivate: 'Approve & Activate',
-    amount: 'Amount',
-    points: 'Points',
-    method: 'Method',
-    duration: 'Duration',
-    month: 'month',
-    months: 'months',
-    year: 'year',
-    discount: 'discount',
     
     // Misc
     back: 'Back',
@@ -329,21 +353,141 @@ export const translations = {
     save: 'Save',
     delete: 'Delete',
     edit: 'Edit',
-    view: 'View',
-    status: 'Status',
-    pending: 'Pending',
-    approved: 'Approved',
-    rejected: 'Rejected',
-    paid: 'Paid',
-    sar: 'SAR',
-    usd: '$',
-    comingSoon: 'Coming Soon',
+    send: 'Send',
+    close: 'Close',
+    points: 'Points',
+    today: 'Today',
+    available: 'Available',
+    remaining: 'Remaining',
+    earnRate: 'Earn Rate',
+    totalPoints: 'Total Points',
+    currentBalance: 'Current Balance',
+  },
+  
+  fr: {
+    // App
+    appName: 'Saqr',
+    loading: 'Chargement...',
     
-    // Packages
-    oneMonth: 'Ad for 1 month',
-    threeMonths: 'Ad for 3 months',
-    sixMonths: 'Ad for 6 months',
-    twelveMonths: 'Ad for 1 year',
+    // Auth
+    login: 'Connexion',
+    register: "S'inscrire",
+    logout: 'Déconnexion',
+    loginWithGoogle: 'Connexion avec Google',
+    loginWithApple: 'Connexion avec Apple',
+    loginWithEmail: 'Connexion par email',
+    guestMode: 'Essayer sans compte',
+    email: 'Email',
+    password: 'Mot de passe',
+    name: 'Nom',
+    or: 'ou',
+    
+    // Navigation
+    home: 'Accueil',
+    profile: 'Profil',
+    advertiseNow: 'Publicité',
+    watch: 'Regarder',
+    
+    // Profile
+    changePassword: 'Changer le mot de passe',
+    transactionHistory: 'Historique',
+    shareApp: "Partager l'app",
+    privacyPolicy: 'Confidentialité',
+    referralCode: 'Code de parrainage',
+    
+    // 2FA
+    twoFactorAuth: 'Authentification à deux facteurs',
+    enable2FA: 'Activer 2FA',
+    verificationCode: 'Code de vérification',
+    
+    // Support
+    supportTickets: 'Tickets de support',
+    createTicket: 'Créer un ticket',
+    
+    // Comments
+    comments: 'Commentaires',
+    addComment: 'Ajouter un commentaire',
+    
+    // Dark Mode
+    darkMode: 'Mode sombre',
+    lightMode: 'Mode clair',
+    appearance: 'Apparence',
+    
+    // Language
+    language: 'Langue',
+    
+    // Misc
+    back: 'Retour',
+    cancel: 'Annuler',
+    confirm: 'Confirmer',
+    save: 'Enregistrer',
+    send: 'Envoyer',
+    close: 'Fermer',
+    points: 'Points',
+    today: "Aujourd'hui",
+  },
+  
+  tr: {
+    // App
+    appName: 'Saqr',
+    loading: 'Yükleniyor...',
+    
+    // Auth
+    login: 'Giriş Yap',
+    register: 'Kayıt Ol',
+    logout: 'Çıkış Yap',
+    loginWithGoogle: 'Google ile Giriş',
+    loginWithApple: 'Apple ile Giriş',
+    loginWithEmail: 'Email ile Giriş',
+    guestMode: 'Hesapsız deneyin',
+    email: 'E-posta',
+    password: 'Şifre',
+    name: 'İsim',
+    or: 'veya',
+    
+    // Navigation
+    home: 'Ana Sayfa',
+    profile: 'Profil',
+    advertiseNow: 'Reklam Ver',
+    watch: 'İzle',
+    
+    // Profile
+    changePassword: 'Şifre Değiştir',
+    transactionHistory: 'İşlem Geçmişi',
+    shareApp: 'Uygulamayı Paylaş',
+    privacyPolicy: 'Gizlilik Politikası',
+    referralCode: 'Referans Kodu',
+    
+    // 2FA
+    twoFactorAuth: 'İki Faktörlü Doğrulama',
+    enable2FA: '2FA Etkinleştir',
+    verificationCode: 'Doğrulama Kodu',
+    
+    // Support
+    supportTickets: 'Destek Talepleri',
+    createTicket: 'Talep Oluştur',
+    
+    // Comments
+    comments: 'Yorumlar',
+    addComment: 'Yorum Ekle',
+    
+    // Dark Mode
+    darkMode: 'Karanlık Mod',
+    lightMode: 'Aydınlık Mod',
+    appearance: 'Görünüm',
+    
+    // Language
+    language: 'Dil',
+    
+    // Misc
+    back: 'Geri',
+    cancel: 'İptal',
+    confirm: 'Onayla',
+    save: 'Kaydet',
+    send: 'Gönder',
+    close: 'Kapat',
+    points: 'Puan',
+    today: 'Bugün',
   }
 };
 
