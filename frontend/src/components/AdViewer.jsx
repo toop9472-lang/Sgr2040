@@ -307,9 +307,10 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
       {/* Session Earnings Badge - Top Center (Always visible) */}
       {totalEarnedSession > 0 && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30">
-          <div className="bg-gradient-to-r from-yellow-500 to-orange-500 px-4 py-2 rounded-full shadow-lg animate-pulse">
+          <div className="bg-gradient-to-r from-yellow-500 to-orange-500 px-4 py-2 rounded-full shadow-lg animate-pulse flex items-center gap-2">
+            <Zap className="w-4 h-4 text-black" />
             <span className="text-black font-bold text-sm">
-              🔥 {isRTL ? 'ربحت اليوم' : "Today's Earnings"}: +{totalEarnedSession}
+              {isRTL ? 'ربحت اليوم' : "Today's Earnings"}: +{totalEarnedSession}
             </span>
           </div>
         </div>
