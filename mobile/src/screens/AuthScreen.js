@@ -257,11 +257,21 @@ const AuthScreen = ({ onLogin }) => {
             {/* Privacy Policy Link */}
             <TouchableOpacity 
               style={styles.privacyLink}
-              onPress={() => Linking.openURL('https://app-security-fix-1.preview.emergentagent.com/privacy-policy.html')}
+              onPress={() => Linking.openURL('https://app-security-fix-1.preview.emergentagent.com/privacy')}
               activeOpacity={0.7}
             >
               <Ionicons name="shield-checkmark-outline" size={14} color="rgba(255,255,255,0.4)" />
               <Text style={styles.privacyText}>سياسة الخصوصية</Text>
+            </TouchableOpacity>
+
+            {/* Terms of Service Link */}
+            <TouchableOpacity 
+              style={styles.privacyLink}
+              onPress={() => Linking.openURL('https://app-security-fix-1.preview.emergentagent.com/terms')}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="document-text-outline" size={14} color="rgba(255,255,255,0.4)" />
+              <Text style={styles.privacyText}>شروط الاستخدام</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
