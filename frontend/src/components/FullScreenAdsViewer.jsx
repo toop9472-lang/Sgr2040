@@ -406,7 +406,9 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
           onClick={(e) => { e.stopPropagation(); onClose(); }}
           className="w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all"
         >
-          <span className="text-white text-xl font-light">✕</span>
+          <span className="text-white text-xl font-light">
+            <X className="w-5 h-5" />
+          </span>
         </button>
       </div>
 
@@ -538,8 +540,8 @@ const FullScreenAdsViewer = ({ user, onClose, onPointsEarned }) => {
       {!isAdComplete && currentAdTime > 3 && (
         <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
           <div className="bg-black/60 backdrop-blur-sm rounded-full px-4 py-2 border border-amber-500/20">
-            <p className="text-amber-400/90 text-xs text-center">
-              ⏱️ أكمل مشاهدة الإعلان ({formatTime(adRemaining)} متبقي) لاحتساب الوقت
+            <p className="text-amber-400/90 text-xs text-center flex items-center justify-center gap-1">
+              <Timer className="w-3 h-3" /> أكمل مشاهدة الإعلان ({formatTime(adRemaining)} متبقي) لاحتساب الوقت
             </p>
           </div>
         </div>
