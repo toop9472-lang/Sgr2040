@@ -571,9 +571,300 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
           <Text style={styles.pointsAnimSubtext}>نقطة جديدة!</Text>
         </View>
       )}
+
+      {/* نافذة التعليقات */}
+      {showComments && (
+        <CommentsModal
+          visible={showComments}
+          onClose={() => setShowComments(false)}
+          adId={currentAd?.id}
+          user={user}
+        />
+      )}
     </View>
   );
 };
+
+// مكون نافذة التعليقات
+const CommentsModal = ({ visible, onClose, adId, user }) => {
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (visible && adId) {
+      fetchComments();
+    }
+  }, [visible, adId]);
+
+  const fetchComments = async () => {
+    try {
+      const response = await api.getComments(adId);
+      if (response.ok) {
+        const data = await response.json();
+        setComments(data);
+      }
+    } catch (error) {
+      console.log('Error fetching comments:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!newComment.trim() || !user || user.isGuest) return;
+    
+    setIsSubmitting(true);
+    try {
+      const token = await storage.getToken();
+      const response = await api.createComment(adId, newComment, token);
+      if (response.ok) {
+        setNewComment('');
+        fetchComments();
+      }
+    } catch (error) {
+      Alert.alert('خطأ', 'حدث خطأ أثناء إضافة التعليق');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleLike = async (commentId) => {
+    if (!user || user.isGuest) return;
+    
+    try {
+      const token = await storage.getToken();
+      await api.likeComment(commentId, token);
+      fetchComments();
+    } catch (error) {
+      console.log('Error liking comment:', error);
+    }
+  };
+
+  return (
+    <View style={commentsStyles.overlay}>
+      <TouchableOpacity style={commentsStyles.backdrop} onPress={onClose} />
+      <View style={commentsStyles.container}>
+        <View style={commentsStyles.header}>
+          <Text style={commentsStyles.title}>التعليقات</Text>
+          <TouchableOpacity onPress={onClose} style={commentsStyles.closeBtn}>
+            <Ionicons name="close" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: 40 }} />
+        ) : comments.length === 0 ? (
+          <View style={commentsStyles.emptyState}>
+            <Ionicons name="chatbubble-outline" size={48} color="rgba(255,255,255,0.3)" />
+            <Text style={commentsStyles.emptyText}>لا توجد تعليقات بعد</Text>
+          </View>
+        ) : (
+          <View style={commentsStyles.listContainer}>
+            {comments.map((comment) => (
+              <View key={comment.comment_id} style={commentsStyles.commentItem}>
+                <View style={commentsStyles.commentHeader}>
+                  <View style={commentsStyles.avatar}>
+                    <Text style={commentsStyles.avatarText}>{comment.user_name?.[0] || 'U'}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={commentsStyles.userName}>{comment.user_name}</Text>
+                    <Text style={commentsStyles.date}>
+                      {new Date(comment.created_at).toLocaleDateString('ar-SA')}
+                    </Text>
+                  </View>
+                  <TouchableOpacity onPress={() => handleLike(comment.comment_id)} style={commentsStyles.likeBtn}>
+                    <Ionicons 
+                      name={comment.likes?.includes(user?.id || user?.user_id) ? 'heart' : 'heart-outline'} 
+                      size={18} 
+                      color={comment.likes?.includes(user?.id || user?.user_id) ? '#ef4444' : '#fff'} 
+                    />
+                    <Text style={commentsStyles.likeCount}>{comment.likes_count || 0}</Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={commentsStyles.commentText}>{comment.content}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* إدخال تعليق جديد */}
+        <View style={commentsStyles.inputContainer}>
+          {user?.isGuest ? (
+            <Text style={commentsStyles.guestText}>سجل الدخول للتعليق</Text>
+          ) : (
+            <View style={commentsStyles.inputRow}>
+              <View style={commentsStyles.textInputContainer}>
+                <Text
+                  style={commentsStyles.textInput}
+                  value={newComment}
+                  onChangeText={setNewComment}
+                  placeholder="اكتب تعليقك..."
+                  placeholderTextColor="rgba(255,255,255,0.4)"
+                />
+              </View>
+              <TouchableOpacity 
+                style={[commentsStyles.sendBtn, (!newComment.trim() || isSubmitting) && commentsStyles.sendBtnDisabled]}
+                onPress={handleSubmit}
+                disabled={!newComment.trim() || isSubmitting}
+              >
+                <Ionicons name="send" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const commentsStyles = StyleSheet.create({
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'flex-end',
+    zIndex: 100,
+  },
+  backdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  container: {
+    backgroundColor: '#0a0a0f',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '70%',
+    paddingBottom: 24,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
+  },
+  title: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 48,
+  },
+  emptyText: {
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: 12,
+    fontSize: 14,
+  },
+  listContainer: {
+    padding: 16,
+    maxHeight: 300,
+  },
+  commentItem: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+  },
+  commentHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  avatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(59,130,246,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  avatarText: {
+    color: '#60a5fa',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  userName: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 13,
+  },
+  date: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 11,
+  },
+  likeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  likeCount: {
+    color: '#fff',
+    fontSize: 12,
+  },
+  commentText: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  inputContainer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  guestText: {
+    color: 'rgba(255,255,255,0.5)',
+    textAlign: 'center',
+    fontSize: 13,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  textInputContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  textInput: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  sendBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#3b82f6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sendBtnDisabled: {
+    backgroundColor: 'rgba(59,130,246,0.4)',
+  },
+});
 
 const styles = StyleSheet.create({
   container: {
