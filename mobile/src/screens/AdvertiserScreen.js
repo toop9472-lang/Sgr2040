@@ -10,12 +10,15 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import storage from '../services/storage';
 import colors from '../styles/colors';
+
+const API_URL = 'https://saqr-app-refresh.preview.emergentagent.com';
 
 // سيتم استبدالها بالباقات من السيرفر
 const FALLBACK_PACKAGES = [
@@ -25,11 +28,12 @@ const FALLBACK_PACKAGES = [
 ];
 
 const AdvertiserScreen = () => {
-  const [step, setStep] = useState(1); // 1: package, 2: form, 3: success
+  const [step, setStep] = useState(1); // 1: package, 2: form, 3: payment, 4: success
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingPackages, setIsLoadingPackages] = useState(true);
   const [packages, setPackages] = useState(FALLBACK_PACKAGES);
+  const [createdAd, setCreatedAd] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -37,6 +41,7 @@ const AdvertiserScreen = () => {
     website: '',
     title: '',
     description: '',
+    video_url: '',
   });
 
   // جلب الباقات من السيرفر
