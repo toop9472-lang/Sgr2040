@@ -176,8 +176,8 @@ Arabic (العربية)
 
 ### P2 - Medium Priority
 - [x] ~~"Add Personal Ad/Packages" feature~~ ✅ تم التحقق والتأكد من عمله
-- [ ] Email notifications for 2FA
-- [ ] Analytics dashboard
+- [x] ~~Email notifications for 2FA~~ ✅ تم التنفيذ
+- [x] ~~Analytics dashboard~~ ✅ موجود ويعمل
 
 ### P3 - Future
 - [ ] Update iOS SDK to v26
