@@ -52,13 +52,16 @@ Arabic (العربية)
 - [x] Backup codes support
 - [x] TwoFactorSettings.jsx component
 
-#### 3. Comments System (Social)
+#### 3. Comments System (Social) ✅ FULLY INTEGRATED
 - [x] POST /api/comments/ - Create comment
 - [x] GET /api/comments/ad/{id} - Get ad comments
 - [x] POST /api/comments/like - Like/unlike comment
 - [x] DELETE /api/comments/{id} - Delete comment
 - [x] Replies support
 - [x] CommentsSection.jsx component
+- [x] **زر التعليقات في صفحة الإعلانات** (MessageCircle icon)
+- [x] **نافذة التعليقات المنبثقة** (Modal)
+- [x] **تكامل مع الجوال** (Mobile integration)
 
 #### 4. Dark Mode
 - [x] ThemeContext.js with dark/light/system modes
@@ -80,11 +83,13 @@ Arabic (العربية)
 - [x] 2FA settings link
 - [x] Notifications settings
 
-### UI/UX Updates ✅
+### UI/UX Updates (February 13, 2026) ✅
 - [x] Slim Bottom Tab Bar
 - [x] Professional icons (Lucide/Ionicons)
 - [x] Clean toasts without emojis
 - [x] Git cleanup completed
+- [x] **استبدال إيموجي الصقر 🦅 بالشعار** في شاشة التحميل
+- [x] **إزالة جميع الإيموجي من الواجهة** واستبدالها بأيقونات Lucide
 
 ---
 
@@ -131,10 +136,27 @@ Arabic (العربية)
 
 ---
 
+## Completed Tasks (This Session)
+
+### ✅ إصلاح ميزة التعليقات
+- تم إضافة زر التعليقات (MessageCircle) في صفحة الإعلانات
+- تم إنشاء نافذة التعليقات المنبثقة
+- تم تكامل CommentsSection مع FullScreenAdsViewer
+
+### ✅ استبدال إيموجي الصقر
+- تم استبدال 🦅 بـ `/logo_saqr.png` في شاشة التحميل (App.js)
+- تم استبدال 🦅 في AuthCallback.jsx
+- تم إزالة جميع الإيموجي من HomePage.jsx
+
+### ✅ إصلاح API التعليقات
+- تم إصلاح prefix في comments_routes.py (من /api/comments إلى /comments)
+
+---
+
 ## Pending Tasks
 
 ### P0 - Critical
-- [ ] **Server Always-On:** Upgrade hosting plan
+- [ ] **Server Always-On:** Upgrade hosting plan (سبب رفض Apple)
 
 ### P1 - High Priority  
 - [ ] Build new iOS version (v5.0.0, build 14)
@@ -163,12 +185,17 @@ Arabic (العربية)
 - `/app/frontend/src/components/TwoFactorSettings.jsx`
 - `/app/frontend/src/components/CommentsSection.jsx`
 - `/app/frontend/src/components/SettingsPage.jsx`
+- `/app/backend/tests/test_comments_api.py`
 
-### Modified Files
-- `/app/backend/server.py` - Added new routers
-- `/app/frontend/src/i18n/translations.js` - 4 languages
-- `/app/frontend/src/i18n/LanguageContext.js` - Multi-lang support
-- `/app/mobile/app.json` - Version bump to 5.0.0
+### Modified Files (This Session)
+- `/app/frontend/src/App.js` - استبدال إيموجي بالشعار
+- `/app/frontend/src/components/FullScreenAdsViewer.jsx` - إضافة زر التعليقات
+- `/app/frontend/src/components/HomePage.jsx` - إزالة الإيموجي
+- `/app/frontend/src/components/AdViewer.jsx` - إزالة الإيموجي
+- `/app/frontend/src/components/AuthCallback.jsx` - استبدال إيموجي
+- `/app/backend/routes/comments_routes.py` - إصلاح prefix
+- `/app/mobile/src/screens/AdViewerScreen.js` - إضافة التعليقات للجوال
+- `/app/mobile/src/services/api.js` - إضافة comments API
 
 ---
 
@@ -178,7 +205,9 @@ Arabic (العربية)
 
 ---
 
-## Testing Status
-- Backend APIs: Working
-- Frontend Components: Created
-- Mobile: Ready for build
+## Testing Status (February 13, 2026)
+- ✅ Backend APIs: 100% (9/9 tests passed)
+- ✅ Frontend Components: 100% verified
+- ✅ Comments Feature: Working
+- ✅ Logo Replacement: Working
+- 📱 Mobile: Ready for build
