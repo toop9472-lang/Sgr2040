@@ -281,7 +281,9 @@ const AdViewer = ({ ads, onAdWatched, user }) => {
               {/* Main card */}
               <div className="relative bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 p-1 rounded-3xl shadow-2xl">
                 <div className="bg-black/90 backdrop-blur-xl rounded-3xl px-8 py-6 text-center">
-                  <div className="text-6xl mb-2">🎉</div>
+                  <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center">
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </div>
                   <div className="text-white text-lg font-medium mb-1">
                     {isRTL ? 'مبروك! أكملت دقيقة' : 'Congrats! 1 Minute Complete'}
                   </div>
