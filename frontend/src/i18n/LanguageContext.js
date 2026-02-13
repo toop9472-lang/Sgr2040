@@ -1,10 +1,13 @@
 /**
  * Language Context for i18n support
+ * Supports: Arabic (ar), English (en), French (fr), Turkish (tr)
  */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import translations from './translations';
 
 const LanguageContext = createContext();
+
+const RTL_LANGUAGES = ['ar'];
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
@@ -26,22 +29,31 @@ export const LanguageProvider = ({ children }) => {
     localStorage.setItem('saqr_language', language);
     
     // Update document direction
-    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+    const isRTL = RTL_LANGUAGES.includes(language);
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = language;
   }, [language]);
 
   const t = (key) => {
-    return translations[language]?.[key] || translations['ar'][key] || key;
+    return translations[language]?.[key] || translations['en']?.[key] || translations['ar'][key] || key;
   };
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'ar' ? 'en' : 'ar');
   };
 
-  const isRTL = language === 'ar';
+  const availableLanguages = ['ar', 'en', 'fr', 'tr'];
+  const isRTL = RTL_LANGUAGES.includes(language);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, toggleLanguage, t, isRTL }}>
+    <LanguageContext.Provider value={{ 
+      language, 
+      setLanguage, 
+      toggleLanguage, 
+      t, 
+      isRTL,
+      availableLanguages 
+    }}>
       {children}
     </LanguageContext.Provider>
   );
