@@ -351,8 +351,8 @@ function MainApp() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50">
         <div className="text-center">
-          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center animate-pulse">
-            <span className="text-4xl">🦅</span>
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#0a0a0f] border-2 border-[#3b82f6]/30 flex items-center justify-center animate-pulse shadow-lg shadow-[#3b82f6]/20">
+            <img src="/logo_saqr.png" alt="صقر" className="w-16 h-16 object-contain" />
           </div>
           <p className="text-gray-600 text-lg">جاري التحميل...</p>
         </div>
