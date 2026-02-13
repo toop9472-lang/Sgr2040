@@ -177,7 +177,7 @@ eas build --platform ios --profile production
 
 ### API URL:
 ```
-https://mobile-redesign-13.preview.emergentagent.com
+https://saqr-app-refresh.preview.emergentagent.com
 ```
 
 ---
