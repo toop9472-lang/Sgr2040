@@ -102,3 +102,4 @@ CREDENTIALS.md
 .gitconfig
 test_result.md
 mobile_backup/
+frontend/node_modules/.cache/default-development/6.pack

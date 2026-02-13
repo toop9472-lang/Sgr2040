@@ -57,7 +57,7 @@ const AIFloatingButton = ({ user }) => {
           {/* Tooltip */}
           <div className="absolute left-16 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             <div className="bg-[#111118] border border-white/10 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap shadow-lg">
-              اسألني أي شيء! 🤖
+              اسألني أي شيء!
               <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-[#111118]" />
             </div>
           </div>
