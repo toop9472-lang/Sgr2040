@@ -215,7 +215,7 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.dark.bg },
-  mainArea: { flex: 1, paddingBottom: 72 }, // Reduced for TikTok-style nav
+  mainArea: { flex: 1, paddingBottom: 68 }, // Slim nav bar
   
   loadingContainer: { 
     flex: 1, 
