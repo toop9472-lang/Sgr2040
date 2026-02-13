@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowRight, Check, AlertCircle, Loader2, CreditCard, Smartphone, Building2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
@@ -16,7 +16,7 @@ const defaultWithdrawMethods = [
   {
     id: 'paypal',
     name: 'PayPal',
-    icon: '💳',
+    icon: 'credit-card',
     minAmount: 1,
     fields: [
       { name: 'email', label: 'البريد الإلكتروني لـ PayPal', type: 'email', required: true }
@@ -25,7 +25,7 @@ const defaultWithdrawMethods = [
   {
     id: 'stcpay',
     name: 'STC Pay',
-    icon: '📱',
+    icon: 'smartphone',
     minAmount: 1,
     fields: [
       { name: 'phone', label: 'رقم الجوال', type: 'tel', required: true }
@@ -34,7 +34,7 @@ const defaultWithdrawMethods = [
   {
     id: 'bank',
     name: 'تحويل بنكي',
-    icon: '🏦',
+    icon: 'building',
     minAmount: 1,
     fields: [
       { name: 'bankName', label: 'اسم البنك', type: 'text', required: true },
