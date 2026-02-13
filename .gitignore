@@ -99,3 +99,6 @@ frontend/node_modules/.cache/default-development/5.pack
 CREDENTIALS.md
 *.credentials
 *.secrets
+.gitconfig
+test_result.md
+mobile_backup/
