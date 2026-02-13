@@ -439,6 +439,12 @@ function MainApp() {
                   onNavigate={handleNavigate}
                 />
               )}
+              {currentPage === 'settings' && !showFullScreenAds && (
+                <SettingsPage 
+                  onBack={() => setCurrentPage('profile')}
+                  onNavigate={handleNavigate}
+                />
+              )}
               {currentPage === 'support' && !showFullScreenAds && (
                 <SupportPage 
                   user={user}
