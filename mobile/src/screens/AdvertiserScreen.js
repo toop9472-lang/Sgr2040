@@ -824,6 +824,129 @@ const styles = StyleSheet.create({
     fontSize: 16, 
     fontWeight: 'bold' 
   },
+
+  // Payment Step Styles
+  paymentSummary: {
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.2)',
+  },
+  paymentSummaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  paymentSummaryLabel: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 14,
+  },
+  paymentSummaryValue: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  paymentSummaryPrice: {
+    color: '#60a5fa',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  paymentOption: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  paymentOptionIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  paymentOptionContent: {
+    flex: 1,
+  },
+  paymentOptionTitle: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  paymentOptionDesc: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 13,
+  },
+  paymentOptionBadge: {
+    backgroundColor: 'rgba(34, 197, 94, 0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  paymentOptionBadgeText: {
+    color: '#22c55e',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  bankInfoCard: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  bankInfoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  bankInfoTitle: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  bankInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  bankInfoLabel: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 13,
+  },
+  bankInfoValue: {
+    color: '#FFF',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  bankInfoNote: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 12,
+    marginTop: 8,
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  stripeBtn: {
+    flex: 2,
+    backgroundColor: '#6366f1',
+    borderRadius: 14,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
 });
 
 export default AdvertiserScreen;
