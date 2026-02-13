@@ -167,12 +167,14 @@ const ProfileScreen = ({ user, onLogout, onNavigate }) => {
   };
 
   const menuItems = [
+    { id: 'settings', icon: 'settings-outline', label: 'الإعدادات', action: handleSettings, color: '#94a3b8' },
     { id: 'withdraw', icon: 'wallet-outline', label: 'سحب الأرباح', action: handleWithdraw, color: '#22c55e' },
     { id: 'history', icon: 'receipt-outline', label: 'سجل المعاملات', action: handleHistory, color: '#60a5fa' },
     { id: 'password', icon: 'lock-closed-outline', label: 'تغيير كلمة المرور', action: () => setShowChangePassword(true), color: '#a855f7' },
     { id: 'support', icon: 'chatbubble-ellipses-outline', label: 'الدعم الفني', action: handleSupport, color: '#fbbf24' },
     { id: 'share', icon: 'share-social-outline', label: 'شارك التطبيق', action: handleShareApp, color: '#ec4899' },
     { id: 'privacy', icon: 'shield-checkmark-outline', label: 'سياسة الخصوصية', action: handlePrivacy, color: '#6366f1' },
+    { id: 'terms', icon: 'document-text-outline', label: 'شروط الاستخدام', action: handleTerms, color: '#06b6d4' },
   ];
 
   return (
