@@ -114,14 +114,21 @@ async def enable_2fa(data: Enable2FARequest, user_id: str = Depends(get_current_
         upsert=True
     )
     
-    # In production, send code via email/SMS
-    # For now, return it (in production, remove this)
+    # إرسال الرمز عبر البريد الإلكتروني
+    email_sent = False
+    user_email = user.get('email')
+    user_name = user.get('name', 'المستخدم')
+    
+    if data.method == 'email' and user_email:
+        email_sent = await send_2fa_email(user_email, code, user_name)
+    
     return {
         'success': True,
         'message': f'تم إرسال رمز التحقق إلى {data.method}',
+        'email_sent': email_sent,
         'expires_in': 600,
-        # Remove this in production:
-        'debug_code': code
+        # في حالة عدم إرسال البريد، نعرض الرمز للتجربة
+        'debug_code': code if not email_sent else None
     }
 
 @router.post('/verify', response_model=dict)
