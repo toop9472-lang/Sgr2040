@@ -243,12 +243,65 @@ async def send_2fa_code(user_id: str = Depends(get_current_user_id)):
         upsert=True
     )
     
-    # In production, send via email/SMS
+    # إرسال الرمز عبر البريد الإلكتروني
+    email_sent = False
+    user_email = user.get('email')
+    user_name = user.get('name', 'المستخدم')
+    method = user.get('two_factor_method', 'email')
+    
+    if method == 'email' and user_email:
+        email_sent = await send_2fa_email(user_email, code, user_name)
+    
     return {
         'success': True,
         'message': 'تم إرسال رمز التحقق',
+        'email_sent': email_sent,
         'expires_in': 300,
-        'debug_code': code  # Remove in production
+        # في حالة عدم إرسال البريد، نعرض الرمز للتجربة
+        'debug_code': code if not email_sent else None
+    }
+
+
+class SendLoginCodeRequest(BaseModel):
+    email: str
+
+@router.post('/send-login-code', response_model=dict)
+async def send_login_2fa_code(data: SendLoginCodeRequest):
+    """إرسال رمز 2FA أثناء تسجيل الدخول (قبل المصادقة)"""
+    db = get_db()
+    
+    user = await db.users.find_one({'email': data.email})
+    if not user or not user.get('two_factor_enabled'):
+        # لا نكشف إذا كان المستخدم موجوداً أم لا
+        return {'success': True, 'message': 'إذا كان الحساب موجوداً، سيتم إرسال الرمز'}
+    
+    user_id = user.get('user_id') or user.get('id')
+    code = generate_2fa_code()
+    code_hash = hash_code(code)
+    expires_at = datetime.utcnow() + timedelta(minutes=5)
+    
+    await db.two_factor_codes.update_one(
+        {'user_id': user_id},
+        {
+            '$set': {
+                'user_id': user_id,
+                'code_hash': code_hash,
+                'expires_at': expires_at,
+                'created_at': datetime.utcnow()
+            }
+        },
+        upsert=True
+    )
+    
+    # إرسال الرمز عبر البريد الإلكتروني
+    email_sent = await send_2fa_email(data.email, code, user.get('name', 'المستخدم'))
+    
+    return {
+        'success': True,
+        'message': 'تم إرسال رمز التحقق إلى بريدك الإلكتروني',
+        'email_sent': email_sent,
+        'expires_in': 300,
+        'debug_code': code if not email_sent else None
     }
 
 @router.post('/validate', response_model=dict)
