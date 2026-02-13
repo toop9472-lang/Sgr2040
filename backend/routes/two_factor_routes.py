@@ -3,12 +3,19 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timedelta
+from motor.motor_asyncio import AsyncIOMotorClient
 import secrets
 import hashlib
-from database import get_db
+import os
 from auth.dependencies import get_current_user_id
 
 router = APIRouter(prefix="/api/2fa", tags=["Two-Factor Auth"])
+
+def get_db():
+    """Get database connection"""
+    mongo_url = os.environ['MONGO_URL']
+    client = AsyncIOMotorClient(mongo_url)
+    return client[os.environ['DB_NAME']]
 
 class Enable2FARequest(BaseModel):
     method: str = "email"  # email or sms
