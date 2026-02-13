@@ -103,6 +103,14 @@ const SwipeableApp = ({
 
   // التنقل للسحب
   const handleNavigate = (page) => {
+    if (page === 'settings') {
+      setIsInSettings(true);
+      return;
+    }
+    if (page === '2fa') {
+      // Navigate to 2FA settings - can be handled here or in settings page
+      return;
+    }
     const index = pages.findIndex(p => p.id === page);
     if (index !== -1) {
       if (page === 'ads') {
@@ -112,6 +120,16 @@ const SwipeableApp = ({
       }
     }
   };
+
+  // عرض صفحة الإعدادات
+  if (isInSettings) {
+    return (
+      <SettingsPage
+        onBack={() => setIsInSettings(false)}
+        onNavigate={handleNavigate}
+      />
+    );
+  }
 
   // عرض عارض الإعلانات بشاشة كاملة
   if (isInAdsViewer) {
