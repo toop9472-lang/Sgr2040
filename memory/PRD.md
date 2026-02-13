@@ -1,7 +1,7 @@
 # Saqr Rewards App - PRD
 
 ## Original Problem Statement
-Build an application for watching rewarded video ads where users earn points.
+Build an application for watching rewarded video ads where users earn points. Users watch ads, earn points (1 point per 60 seconds), and can withdraw earnings when they reach 500 points ($1).
 
 ## Product Requirements
 1. **Point System:** 1 point for every 60 seconds of total ad watch time
@@ -32,29 +32,36 @@ Arabic (العربية)
 - [x] App Store metadata and screenshots prepared
 - [x] AdMob credentials configured (App ID: ca-app-pub-5132559433385403~6910358704)
 
-### App Store Submission ✅ (February 7, 2026)
-- iOS app submitted to App Store Connect
-- App ID: 6758868843
-- Version: 4.4.0
-- Status: Waiting for Review
+### Security Features ✅ (February 13, 2026)
+- [x] CORS policy configured with allowlist
+- [x] Security headers middleware (X-Content-Type-Options, X-Frame-Options, etc.)
+- [x] Rate limiting on login endpoint (5 attempts per 30 minutes)
+- [x] Password strength validation (min 8 chars, uppercase, lowercase, digit)
+- [x] JWT refresh token support
+- [x] Account lockout after failed attempts
+
+### UI/UX Improvements ✅ (February 13, 2026)
+- [x] TikTok-style Bottom Tab Bar (cyan + red play button design)
+- [x] Professional Ionicons throughout mobile app
+- [x] Enhanced Profile Page with menu items (withdraw, history, password, support, share, privacy)
+- [x] Change Password dialog with validation
+- [x] Transaction history modal
+- [x] Referral code display and copy
+- [x] Guest mode with clear call-to-action
+
+### Backend APIs ✅
+- [x] POST /api/auth/change-password - Change user password
+- [x] POST /api/auth/signin - Login with rate limiting
+- [x] POST /api/auth/register - Register with password validation
+- [x] POST /api/auth/refresh-token - Refresh access token
+- [x] GET /api/payments/packages - Fetch advertisement packages
 
 ---
 
-## Pending/Upcoming Tasks
-
-### P0 - High Priority
-- [ ] **AdMob Integration:** Requires MacBook to build with react-native-google-mobile-ads
-  - iOS AdMob App ID: ca-app-pub-5132559433385403~6910358704
-  - Rewarded Ad Unit ID: ca-app-pub-5132559433385403/2999033852
-  - Blocked: CocoaPods requires Mac for iOS build
-
-### P1 - Medium Priority
-- [ ] Test AdMob integration after Mac build
-- [ ] Submit Android app to Google Play Store
-
-### P2 - Future
-- [ ] Add more payment gateways (Tap, Tabby, Tamara need API keys)
-- [ ] Implement Unity Ads as backup ad network
+## App Versions
+- **Current Version:** 4.9.0
+- **iOS Build Number:** 13
+- **Android Version Code:** 34
 
 ---
 
@@ -78,11 +85,13 @@ Arabic (العربية)
 ---
 
 ## Key Files
-- `/app/frontend/src/components/AdViewer.jsx` - Web ad viewer
-- `/app/mobile/src/screens/AdViewerScreen.js` - Mobile ad viewer
-- `/app/backend/routes/rewarded_ads_routes.py` - Rewarded ads API
-- `/app/frontend/src/pages/PrivacyPolicy.jsx` - Privacy policy page
-- `/app/mobile/app.json` - Mobile app configuration with AdMob settings
+- `/app/frontend/src/components/BottomNav.jsx` - TikTok-style web nav
+- `/app/mobile/src/components/BottomNav.js` - TikTok-style mobile nav
+- `/app/frontend/src/components/ProfilePage.jsx` - Enhanced profile page
+- `/app/mobile/src/screens/ProfileScreen.js` - Mobile profile with all features
+- `/app/backend/routes/auth_routes.py` - Auth APIs with change password
+- `/app/backend/auth/rate_limiter.py` - Login rate limiting
+- `/app/backend/auth/password_utils.py` - Password validation
 
 ---
 
@@ -91,24 +100,51 @@ Arabic (العربية)
 - `POST /api/ads/watch` - Record ad watch and earn points
 - `POST /api/rewarded-ads/complete` - Complete rewarded ad view
 - `GET /api/rewarded-ads/settings` - Get rewarded ads settings
+- `POST /api/auth/change-password` - Change password (authenticated)
+- `POST /api/auth/signin` - Login
+- `POST /api/auth/register` - Register
+- `POST /api/auth/refresh-token` - Refresh token
+- `GET /api/payments/packages` - Get ad packages
 
 ---
 
 ## Credentials
-- **Expo Account:** ziyad333 / Edcxswqaz123
-- **Apple Developer:** sky-321@hotmail.com
-- **Test User:** demo@saqr.com / demo123456
-- **Admin:** sky-321@hotmail.com / Wsxzaq123
+- **Test User:** demo@saqr.app / Demo123456
+- **Guest Mode:** Click "تجربة التطبيق بدون حساب" button
 
 ---
 
-## Bug Fixes Applied
-- Fixed double points issue (was giving 5 points instead of 1 per minute)
-- Added tracking prevention for duplicate rewards in AdViewer
+## Pending/Upcoming Tasks
+
+### P0 - Critical
+- [ ] **Server Always-On:** User needs to upgrade Emergent hosting plan to prevent sleep mode (blocks Apple approval)
+
+### P1 - High Priority
+- [ ] Build new iOS version (v4.9.0, build 13) after all fixes
+- [ ] Submit to Apple App Store with demo video
+
+### P2 - Medium Priority
+- [ ] Implement "Add Personal Ad/Packages" feature
+- [ ] Address Android compatibility warnings
+- [ ] Real-time transaction history from backend
+
+### P3 - Future
+- [ ] Update iOS SDK to version 26 (deadline: April 2026)
+- [ ] Create "Terms of Use" page
+- [ ] Dark Mode support
+- [ ] Social interaction features (likes/comments)
+- [ ] Sign in with Apple integration
 
 ---
 
-## Notes for Next Session
-1. User will return with MacBook access
-2. Need to build iOS and Android with AdMob enabled
-3. Project zip available at: /app/frontend/public/mobile-project.zip
+## Environment Files
+- `.env.example` files created for backend, frontend, and mobile
+- `.gitignore` updated to exclude sensitive files
+- CREDENTIALS.md removed from repository
+
+---
+
+## Testing
+- **Test Reports:** /app/test_reports/iteration_9.json
+- **Success Rate:** Backend 100%, Frontend 100%
+- **Last Test Date:** February 13, 2026
