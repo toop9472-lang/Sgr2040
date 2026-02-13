@@ -98,7 +98,7 @@ const WithdrawPage = ({ user, onNavigate, onWithdrawRequest }) => {
     
     if (!user || user.isGuest) {
       toast({
-        title: '⚠️ تنبيه',
+        title: 'تنبيه',
         description: 'يجب تسجيل الدخول لطلب سحب',
         variant: 'destructive'
       });
@@ -107,7 +107,7 @@ const WithdrawPage = ({ user, onNavigate, onWithdrawRequest }) => {
 
     if (availableDollars < 1) {
       toast({
-        title: '⚠️ رصيد غير كافي',
+        title: 'رصيد غير كافي',
         description: 'تحتاج 500 نقطة على الأقل (= $1) للسحب',
         variant: 'destructive'
       });
@@ -116,7 +116,7 @@ const WithdrawPage = ({ user, onNavigate, onWithdrawRequest }) => {
 
     if (!selectedMethod) {
       toast({
-        title: '⚠️ اختر طريقة السحب',
+        title: 'اختر طريقة السحب',
         description: 'الرجاء اختيار طريقة السحب',
         variant: 'destructive'
       });
@@ -130,7 +130,7 @@ const WithdrawPage = ({ user, onNavigate, onWithdrawRequest }) => {
 
     if (missingFields.length > 0) {
       toast({
-        title: '⚠️ خطأ',
+        title: 'خطأ',
         description: 'الرجاء إكمال جميع الحقول المطلوبة',
         variant: 'destructive'
       });
@@ -139,7 +139,7 @@ const WithdrawPage = ({ user, onNavigate, onWithdrawRequest }) => {
 
     if (amount > availableDollars) {
       toast({
-        title: '⚠️ مبلغ غير صالح',
+        title: 'مبلغ غير صالح',
         description: `الحد الأقصى للسحب هو $${availableDollars}`,
         variant: 'destructive'
       });
