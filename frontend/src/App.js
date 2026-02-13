@@ -302,6 +302,8 @@ function MainApp() {
   const handleNavigate = (page) => {
     if (page === 'ads') {
       setShowFullScreenAds(true);
+    } else if (page === 'settings') {
+      setCurrentPage('settings');
     } else {
       setCurrentPage(page);
     }
