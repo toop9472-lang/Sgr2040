@@ -464,14 +464,16 @@ function MainApp() {
 
 function App() {
   return (
-    <LanguageProvider>
-      <BrowserRouter>
-        <div className="App">
-          <AppRouter />
-          <Toaster />
-        </div>
-      </BrowserRouter>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <BrowserRouter>
+          <div className="App">
+            <AppRouter />
+            <Toaster />
+          </div>
+        </BrowserRouter>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
 
