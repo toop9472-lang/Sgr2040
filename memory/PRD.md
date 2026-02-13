@@ -188,8 +188,31 @@ Arabic (العربية)
 - [x] ~~Analytics dashboard~~ ✅ موجود ويعمل
 
 ### P3 - Future
-- [ ] Update iOS SDK to v26
-- [ ] Terms of Use page
+- [x] ~~Update iOS SDK to v26~~ (يتم عند البناء)
+- [x] ~~Terms of Use page~~ ✅ تم إنشاء `/terms`
+
+---
+
+## Recent Updates (February 13, 2026 - Session 2)
+
+### ✅ تفعيل الوضع الداكن (Dark Mode)
+- تم إضافة `ThemeProvider` في `App.js`
+- تم إضافة صفحة الإعدادات `SettingsPage` في المسار
+- يدعم 3 أوضاع: داكن، فاتح، حسب النظام
+
+### ✅ تفعيل دعم اللغات
+- يدعم 4 لغات: العربية، الإنجليزية، الفرنسية، التركية
+- يمكن التبديل من صفحة الإعدادات
+
+### ✅ صفحة شروط الاستخدام (Terms of Service)
+- تم إنشاء `/app/frontend/src/pages/TermsOfService.jsx`
+- مسارات: `/terms` و `/terms-of-service`
+- تدعم اللغتين العربية والإنجليزية
+- تم ربطها في صفحة تسجيل الدخول وصفحة الحساب
+
+### ✅ إزالة بيانات الاعتماد من Git
+- تم حذف `CREDENTIALS.md` نهائياً من سجل Git باستخدام `git filter-branch`
+- تم تنظيف `reflog` و `gc`
 
 ---
 
