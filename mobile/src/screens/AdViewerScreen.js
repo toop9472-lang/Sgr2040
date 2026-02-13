@@ -521,10 +521,17 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
                   {(currentAd.advertiser || currentAd.title)?.[0]?.toUpperCase() || 'A'}
                 </Text>
               </View>
-              <View>
+              <View style={{ flex: 1 }}>
                 <Text style={styles.advertiserName}>{currentAd.advertiser || 'معلن'}</Text>
                 <Text style={styles.adCount}>إعلان {currentIndex + 1} من {ads.length}</Text>
               </View>
+              {/* زر التعليقات */}
+              <TouchableOpacity 
+                style={styles.commentsButton} 
+                onPress={() => setShowComments(true)}
+              >
+                <Ionicons name="chatbubble-outline" size={22} color="#fff" />
+              </TouchableOpacity>
             </View>
             <Text style={styles.adTitle}>{currentAd.title}</Text>
             <Text style={styles.adDescription} numberOfLines={2}>{currentAd.description}</Text>
