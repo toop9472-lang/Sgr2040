@@ -839,8 +839,9 @@ const commentsStyles = StyleSheet.create({
   inputRow: {
     flexDirection: 'row',
     gap: 8,
+    alignItems: 'center',
   },
-  textInputContainer: {
+  textInput: {
     flex: 1,
     backgroundColor: 'rgba(255,255,255,0.05)',
     borderRadius: 12,
@@ -848,8 +849,6 @@ const commentsStyles = StyleSheet.create({
     paddingVertical: 12,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
-  },
-  textInput: {
     color: '#fff',
     fontSize: 14,
   },
