@@ -383,6 +383,78 @@ async def get_current_user(user_id: str = Depends(get_current_user_id)):
     }
 
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+@router.post('/change-password', response_model=dict)
+async def change_password(data: ChangePasswordRequest, user_id: str = Depends(get_current_user_id)):
+    """
+    تغيير كلمة المرور للمستخدم المسجل
+    """
+    db = get_db()
+    
+    # البحث عن المستخدم
+    user = await db.users.find_one({'id': user_id})
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='المستخدم غير موجود'
+        )
+    
+    # التحقق من كلمة المرور الحالية
+    if not user.get('password_hash'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='لا يمكن تغيير كلمة المرور لهذا الحساب'
+        )
+    
+    try:
+        password_valid = bcrypt.verify(data.current_password, user['password_hash'])
+    except Exception:
+        password_valid = False
+    
+    if not password_valid:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='كلمة المرور الحالية غير صحيحة'
+        )
+    
+    # التحقق من قوة كلمة المرور الجديدة
+    is_valid, errors = validate_password_strength(data.new_password)
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=errors[0]
+        )
+    
+    # التأكد من أن كلمة المرور الجديدة مختلفة عن الحالية
+    try:
+        same_password = bcrypt.verify(data.new_password, user['password_hash'])
+        if same_password:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='كلمة المرور الجديدة يجب أن تكون مختلفة عن الحالية'
+            )
+    except Exception:
+        pass
+    
+    # تحديث كلمة المرور
+    new_password_hash = bcrypt.hash(data.new_password)
+    await db.users.update_one(
+        {'id': user_id},
+        {
+            '$set': {
+                'password_hash': new_password_hash,
+                'updated_at': datetime.utcnow()
+            }
+        }
+    )
+    
+    return {'message': 'تم تغيير كلمة المرور بنجاح'}
+
+
 @router.post('/logout')
 async def logout():
     """
