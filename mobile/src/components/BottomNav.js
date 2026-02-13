@@ -1,4 +1,4 @@
-// Bottom Navigation Component - TikTok Style Design
+// Bottom Navigation Component - TikTok Style Design (Optimized 2024-2026)
 import React from 'react';
 import {
   View,
@@ -6,11 +6,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
+  const insets = useSafeAreaInsets();
+  
   const navItems = [
     { id: 'home', label: 'الرئيسية', icon: 'home', iconOutline: 'home-outline' },
     { id: 'advertiser', label: 'أعلن', icon: 'megaphone', iconOutline: 'megaphone-outline' },
@@ -25,13 +28,15 @@ const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
         style={styles.navItem}
         onPress={() => onNavigate(item.id)}
         activeOpacity={0.7}
+        data-testid={`nav-${item.id}`}
       >
-        <Ionicons 
-          name={isActive ? item.icon : item.iconOutline} 
-          size={26} 
-          color={isActive ? '#FFF' : 'rgba(255,255,255,0.5)'} 
-          style={isActive && styles.activeIcon}
-        />
+        <View style={[styles.iconWrapper, isActive && styles.iconWrapperActive]}>
+          <Ionicons 
+            name={isActive ? item.icon : item.iconOutline} 
+            size={26} 
+            color={isActive ? '#000' : '#888'} 
+          />
+        </View>
         <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>
           {item.label}
         </Text>
@@ -39,21 +44,29 @@ const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
     );
   };
 
+  // Calculate bottom padding for safe area
+  const bottomPadding = Math.max(insets.bottom, Platform.OS === 'ios' ? 20 : 8);
+
   return (
-    <View style={styles.container}>
-      {/* الخلفية شبه شفافة */}
+    <View style={[styles.container, { paddingBottom: bottomPadding }]}>
       <View style={styles.navContent}>
         {navItems.map((item) => (
           <NavButton key={item.id} item={item} />
         ))}
-        {/* زر المشاهدة المركزي - مثل TikTok */}
+        
+        {/* زر المشاهدة المركزي - TikTok Style */}
         <TouchableOpacity 
           onPress={onAdsPress}
-          activeOpacity={0.8}
+          activeOpacity={0.85}
           style={styles.centerButtonWrapper}
+          data-testid="nav-watch-ads"
         >
-          <View style={styles.centerButton}>
-            <Ionicons name="play" size={20} color="#FFF" />
+          <View style={styles.centerButtonOuter}>
+            <View style={styles.centerButtonLeft} />
+            <View style={styles.centerButton}>
+              <Ionicons name="play" size={18} color="#000" />
+            </View>
+            <View style={styles.centerButtonRight} />
           </View>
         </TouchableOpacity>
       </View>
@@ -67,57 +80,79 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(10, 10, 15, 0.95)',
+    backgroundColor: '#fff',
     borderTopWidth: 0.5,
-    borderTopColor: 'rgba(255,255,255,0.1)',
+    borderTopColor: '#eee',
+    // Shadow for elevation
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 10,
   },
   navContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
     paddingTop: 8,
-    paddingBottom: Platform.OS === 'ios' ? 28 : 10,
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
+    height: 56,
   },
   navItem: { 
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 60,
+    minWidth: 56,
     paddingVertical: 2,
   },
-  activeIcon: {
-    transform: [{ scale: 1.05 }],
+  iconWrapper: {
+    padding: 2,
+  },
+  iconWrapperActive: {
+    transform: [{ scale: 1.08 }],
   },
   navLabel: { 
     fontSize: 11, 
-    color: 'rgba(255,255,255,0.5)', 
-    marginTop: 2,
+    color: '#888', 
+    marginTop: -2,
     fontWeight: '500',
   },
   navLabelActive: { 
-    color: '#FFF', 
+    color: '#000', 
     fontWeight: '600',
   },
   centerButtonWrapper: {
-    marginHorizontal: 8,
+    marginHorizontal: 4,
+  },
+  centerButtonOuter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  centerButtonLeft: {
+    width: 20,
+    height: 28,
+    backgroundColor: '#25f4ee',
+    borderTopLeftRadius: 6,
+    borderBottomLeftRadius: 6,
+    marginRight: -8,
   },
   centerButton: {
-    width: 44,
-    height: 30,
-    borderRadius: 8,
-    backgroundColor: '#FFF',
+    width: 40,
+    height: 28,
+    borderRadius: 6,
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    // TikTok style gradient effect with shadows
-    shadowColor: '#fe2c55',
-    shadowOffset: { width: -2, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 0,
-    // Double shadow effect
-    borderLeftWidth: 3,
-    borderLeftColor: '#25f4ee',
-    borderRightWidth: 3,
-    borderRightColor: '#fe2c55',
+    zIndex: 1,
+    borderWidth: 0.5,
+    borderColor: '#ddd',
+  },
+  centerButtonRight: {
+    width: 20,
+    height: 28,
+    backgroundColor: '#fe2c55',
+    borderTopRightRadius: 6,
+    borderBottomRightRadius: 6,
+    marginLeft: -8,
   },
 });
 
