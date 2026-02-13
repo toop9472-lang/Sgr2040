@@ -72,6 +72,7 @@ const AdViewerScreen = ({ onClose, onPointsEarned, user }) => {
   const [completedAdsCount, setCompletedAdsCount] = useState(0);
   const [adDuration, setAdDuration] = useState(30);
   const [isAdComplete, setIsAdComplete] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   
   // حالة AdMob
   const [isAdMobReady, setIsAdMobReady] = useState(false);
