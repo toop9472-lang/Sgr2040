@@ -1,4 +1,4 @@
-// Bottom Navigation Component - Professional Design with Ionicons
+// Bottom Navigation Component - TikTok Style Design
 import React from 'react';
 import {
   View,
@@ -8,7 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import colors from '../styles/colors';
+import { BlurView } from 'expo-blur';
 
 const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
   const navItems = [
@@ -26,16 +26,12 @@ const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
         onPress={() => onNavigate(item.id)}
         activeOpacity={0.7}
       >
-        <View style={[
-          styles.navIconContainer,
-          isActive && styles.navIconContainerActive,
-        ]}>
-          <Ionicons 
-            name={isActive ? item.icon : item.iconOutline} 
-            size={24} 
-            color={isActive ? '#60a5fa' : 'rgba(255,255,255,0.5)'} 
-          />
-        </View>
+        <Ionicons 
+          name={isActive ? item.icon : item.iconOutline} 
+          size={26} 
+          color={isActive ? '#FFF' : 'rgba(255,255,255,0.5)'} 
+          style={isActive && styles.activeIcon}
+        />
         <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>
           {item.label}
         </Text>
@@ -45,20 +41,22 @@ const BottomNav = ({ currentPage, onNavigate, onAdsPress }) => {
 
   return (
     <View style={styles.container}>
-      {navItems.map((item) => (
-        <NavButton key={item.id} item={item} />
-      ))}
-      {/* زر الإعلانات */}
-      <TouchableOpacity 
-        onPress={onAdsPress}
-        activeOpacity={0.8}
-        style={styles.adsButtonWrapper}
-      >
-        <View style={styles.adsButton}>
-          <Ionicons name="play-circle" size={22} color="#FFF" />
-          <Text style={styles.adsLabel}>مشاهدة</Text>
-        </View>
-      </TouchableOpacity>
+      {/* الخلفية شبه شفافة */}
+      <View style={styles.navContent}>
+        {navItems.map((item) => (
+          <NavButton key={item.id} item={item} />
+        ))}
+        {/* زر المشاهدة المركزي - مثل TikTok */}
+        <TouchableOpacity 
+          onPress={onAdsPress}
+          activeOpacity={0.8}
+          style={styles.centerButtonWrapper}
+        >
+          <View style={styles.centerButton}>
+            <Ionicons name="play" size={20} color="#FFF" />
+          </View>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -69,62 +67,57 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    backgroundColor: 'rgba(10, 10, 15, 0.95)',
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  navContent: {
     flexDirection: 'row',
-    backgroundColor: '#0a0a0f',
-    paddingTop: 8,
-    paddingBottom: Platform.OS === 'ios' ? 24 : 8,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.08)',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingHorizontal: 8,
+    paddingTop: 8,
+    paddingBottom: Platform.OS === 'ios' ? 28 : 10,
+    paddingHorizontal: 16,
   },
   navItem: { 
-    flex: 1, 
-    alignItems: 'center', 
-    paddingVertical: 4,
-  },
-  navIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    minWidth: 60,
+    paddingVertical: 2,
   },
-  navIconContainerActive: {
-    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+  activeIcon: {
+    transform: [{ scale: 1.05 }],
   },
   navLabel: { 
-    fontSize: 10, 
+    fontSize: 11, 
     color: 'rgba(255,255,255,0.5)', 
     marginTop: 2,
+    fontWeight: '500',
   },
   navLabelActive: { 
-    color: '#60a5fa', 
-    fontWeight: '600',
-  },
-  adsButtonWrapper: {
-    paddingHorizontal: 4,
-  },
-  adsButton: {
-    backgroundColor: '#ef4444',
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    shadowColor: '#ef4444',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  adsLabel: { 
-    fontSize: 12, 
     color: '#FFF', 
     fontWeight: '600',
+  },
+  centerButtonWrapper: {
+    marginHorizontal: 8,
+  },
+  centerButton: {
+    width: 44,
+    height: 30,
+    borderRadius: 8,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // TikTok style gradient effect with shadows
+    shadowColor: '#fe2c55',
+    shadowOffset: { width: -2, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 0,
+    // Double shadow effect
+    borderLeftWidth: 3,
+    borderLeftColor: '#25f4ee',
+    borderRightWidth: 3,
+    borderRightColor: '#fe2c55',
   },
 });
 
