@@ -185,7 +185,7 @@ const SupportPage = ({ user, isRTL = true }) => {
                       >
                         {message.role === 'assistant' && !message.isError && (
                           <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/10">
-                            <span className="text-lg">🤖</span>
+                            <Bot className="w-5 h-5 text-[#FFD700]" />
                             <span className="text-xs text-[#FFD700]">المساعد الذكي</span>
                           </div>
                         )}
