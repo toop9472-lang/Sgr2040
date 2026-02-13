@@ -174,6 +174,33 @@ export const api = {
       body: JSON.stringify({ password }),
     });
   },
+
+  // Change password
+  async changePassword(data, token) {
+    return this.fetch('/api/auth/change-password', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Request withdrawal
+  async requestWithdrawal(data, token) {
+    return this.fetch('/api/withdrawals/request', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Send chat message to AI
+  async sendChatMessage(message, token) {
+    return this.fetch('/api/claude/chat', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ message }),
+    });
+  },
 };
 
 export default api;
