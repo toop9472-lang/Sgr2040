@@ -67,14 +67,14 @@ const HomePage = ({ user, onNavigateToAds }) => {
 
   // التحديات اليومية
   const challenges = settings?.daily_challenges || [
-    { title: 'المشاهد النشط', target: 5, reward: 25, icon: '👁️', desc: 'شاهد 5 إعلانات', enabled: true },
+    { title: 'المشاهد النشط', target: 5, reward: 25, icon: 'eye', desc: 'شاهد 5 إعلانات', enabled: true },
   ];
   const today = new Date().getDate();
   const dailyChallenge = challenges[today % challenges.length];
 
   // النصائح
   const tips = settings?.tips || [
-    { icon: '💡', text: 'شاهد الإعلانات واكسب النقاط!', enabled: true },
+    { icon: 'bulb', text: 'شاهد الإعلانات واكسب النقاط!', enabled: true },
   ];
 
   // Theme classes - New Professional Dark Design
