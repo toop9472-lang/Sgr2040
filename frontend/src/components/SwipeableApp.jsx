@@ -6,6 +6,7 @@ import ProfilePage from './ProfilePage';
 import AdvertiserPage from './AdvertiserPage';
 import AIFloatingButton from './AIFloatingButton';
 import FullScreenAdsViewer from './FullScreenAdsViewer';
+import SettingsPage from './SettingsPage';
 
 const SwipeableApp = ({ 
   user, 
