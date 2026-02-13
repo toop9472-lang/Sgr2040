@@ -229,7 +229,7 @@ function MainApp() {
     // If guest, show message to login
     if (user?.isGuest) {
       toast({
-        title: '🔒 سجّل الدخول لكسب النقاط',
+        title: 'سجّل الدخول لكسب النقاط',
         description: 'قم بتسجيل الدخول للحصول على نقاط عند مشاهدة الإعلانات',
         variant: 'default'
       });
@@ -249,7 +249,7 @@ function MainApp() {
       if (!response.ok) {
         if (response.status === 400) {
           toast({
-            title: '⚠️ تنبيه',
+            title: 'تنبيه',
             description: data.detail || 'لقد شاهدت هذا الإعلان بالفعل',
             variant: 'destructive'
           });
@@ -261,7 +261,7 @@ function MainApp() {
       await refreshUser();
       
       toast({
-        title: '🎉 رائع!',
+        title: 'رائع!',
         description: `حصلت على ${data.points_earned} نقطة!`,
       });
       
