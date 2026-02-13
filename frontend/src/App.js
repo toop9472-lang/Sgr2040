@@ -20,6 +20,7 @@ import { Toaster } from "./components/ui/toaster";
 import { toast } from "./hooks/use-toast";
 import { adAPI } from "./services/api";
 import { LanguageProvider, useLanguage } from "./i18n/LanguageContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
