@@ -69,14 +69,19 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(SecurityHeadersMiddleware)
 
-# CORS Configuration - Secure Origins
-ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "").split(",") if os.environ.get("ALLOWED_ORIGINS") else [
-    "https://mobile-verify-9.preview.emergentagent.com",
-    "https://saqrpointscom.store",
-    "http://localhost:3000",
-    "http://localhost:19006",
-    "exp://localhost:19006",
-]
+# CORS Configuration - Secure Origins (NO wildcards allowed)
+_cors_env = os.environ.get("CORS_ORIGINS", "")
+ALLOWED_ORIGINS = [origin.strip() for origin in _cors_env.split(",") if origin.strip() and origin.strip() != "*"] if _cors_env else []
+
+# Fallback to secure defaults if empty or contains wildcard
+if not ALLOWED_ORIGINS:
+    ALLOWED_ORIGINS = [
+        "https://mobile-verify-9.preview.emergentagent.com",
+        "https://saqrpointscom.store",
+        "http://localhost:3000",
+        "http://localhost:19006",
+        "exp://localhost:19006",
+    ]
 
 app.add_middleware(
     CORSMiddleware,
