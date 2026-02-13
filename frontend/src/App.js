@@ -309,7 +309,7 @@ function MainApp() {
     // Refresh user data to get updated points
     await refreshUser();
     toast({
-      title: '🎉 رائع!',
+      title: 'رائع!',
       description: `حصلت على ${points} نقطة!`,
     });
   };
