@@ -10,6 +10,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import AdvertiserScreen from './src/screens/AdvertiserScreen';
 import AdViewerScreen from './src/screens/AdViewerScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 
 // Components
 import BottomNav from './src/components/BottomNav';
