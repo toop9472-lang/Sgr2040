@@ -209,8 +209,8 @@ eas submit -p android
 
 ## 📞 الدعم والمساعدة
 
-- **الموقع:** https://saqr-app-refresh.preview.emergentagent.com
-- **API Docs:** https://saqr-app-refresh.preview.emergentagent.com/docs
+- **الموقع:** https://app-security-fix-1.preview.emergentagent.com
+- **API Docs:** https://app-security-fix-1.preview.emergentagent.com/docs
 
 ---
 

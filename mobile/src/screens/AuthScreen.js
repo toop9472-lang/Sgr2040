@@ -257,7 +257,7 @@ const AuthScreen = ({ onLogin }) => {
             {/* Privacy Policy Link */}
             <TouchableOpacity 
               style={styles.privacyLink}
-              onPress={() => Linking.openURL('https://saqr-app-refresh.preview.emergentagent.com/privacy-policy.html')}
+              onPress={() => Linking.openURL('https://app-security-fix-1.preview.emergentagent.com/privacy-policy.html')}
               activeOpacity={0.7}
             >
               <Ionicons name="shield-checkmark-outline" size={14} color="rgba(255,255,255,0.4)" />

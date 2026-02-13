@@ -15,7 +15,7 @@ import Constants from 'expo-constants';
 // 3. Fallback for development
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 
                 Constants.expoConfig?.extra?.apiUrl || 
-                'https://saqr-app-refresh.preview.emergentagent.com';
+                'https://app-security-fix-1.preview.emergentagent.com';
 const API_BASE = `${API_URL}/api`;
 
 // Create axios instance
